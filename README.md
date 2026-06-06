@@ -71,10 +71,17 @@ On Windows, make sure `tesseract.exe` is on `PATH`. The app still works for text
 
 ```bash
 docker build -t alcohol-label-verifier .
-docker run --rm -p 8501:8501 alcohol-label-verifier
+docker run --rm -it -p 8501:8501 alcohol-label-verifier
 ```
 
 Then open `http://localhost:8501`.
+
+To run it in the background instead:
+
+```bash
+docker run --rm -d --name alcohol-label-verifier -p 8501:8501 alcohol-label-verifier
+docker logs -f alcohol-label-verifier
+```
 
 ## Streamlit Community Cloud Deployment
 

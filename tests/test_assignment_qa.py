@@ -124,6 +124,7 @@ def test_required_docs_and_deployment_files_exist() -> None:
         "requirements.txt",
         "packages.txt",
         "Dockerfile",
+        ".dockerignore",
         ".streamlit/config.toml",
     ]
     for relative_path in required:
@@ -154,6 +155,16 @@ def test_gitignore_excludes_source_docs_and_local_artifacts() -> None:
     assert ".pytest_cache/" in gitignore
     assert ".venv/" in gitignore
     assert "uploads/" in gitignore
+
+
+def test_dockerignore_excludes_source_docs_and_local_artifacts() -> None:
+    dockerignore = (ROOT / ".dockerignore").read_text(encoding="utf-8")
+    assert "docs/source/" in dockerignore
+    assert ".git/" in dockerignore
+    assert "__pycache__/" in dockerignore
+    assert ".pytest_cache/" in dockerignore
+    assert ".venv/" in dockerignore
+    assert "uploads/" in dockerignore
 
 
 def _make_scanned_application_image() -> bytes:

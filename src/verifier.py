@@ -110,7 +110,7 @@ def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> li
         verify_optional_fuzzy("fanciful_name", fields.fanciful_name, label_text),
         verify_product_type(fields.product_type, label_text),
         verify_class_type(fields.class_type, label_text),
-        verify_formula_alcohol_content(fields.formula, label_text),
+        verify_formula_alcohol_content(fields.formula, fields.alcohol_content, fields.raw_sources.get("alcohol_content", ""), label_text),
         verify_alcohol_content(fields.alcohol_content, label_text),
         verify_net_contents(fields.net_contents, label_text),
         verify_optional_fuzzy("bottler_producer", fields.bottler_producer, label_text, missing_status=STATUS_REVIEW),
@@ -182,10 +182,22 @@ def verify_alcohol_content(expected: str, label_text: str) -> FieldResult:
     return _result("alcohol_content", f"{expected_abv:g}% ABV", f"{closest:g}% ABV", snippet_around(label_text), STATUS_FAIL, 0.95, "Material alcohol-content mismatch.")
 
 
-def verify_formula_alcohol_content(formula: str, label_text: str) -> FieldResult:
+def verify_formula_alcohol_content(formula: str, approved_alcohol_content: str, alcohol_source: str, label_text: str) -> FieldResult:
     if not formula:
-        return _result("formula", "", "", "", STATUS_REVIEW, 0.0, "Required Item 9 formula value could not be extracted.")
-    expected_values = extract_abv_values(formula)
+        return _result("formula", "", "", "", STATUS_REVIEW, 0.0, "Required Item 9 Formula ID could not be extracted.")
+    if "NO FORMULA REQUIRED" in normalize_text(formula):
+        return _result("formula", formula, formula, "", STATUS_PASS, 1.0, "Item 9 states that no formula is required.")
+    if alcohol_source != "formula-approval":
+        return _result(
+            "formula",
+            formula,
+            "",
+            "",
+            STATUS_REVIEW,
+            0.0,
+            "No matching approved formula document with final alcohol content was found for the Item 9 Formula ID.",
+        )
+    expected_values = extract_abv_values(approved_alcohol_content)
     if not expected_values:
         return _result(
             "formula",
@@ -194,39 +206,39 @@ def verify_formula_alcohol_content(formula: str, label_text: str) -> FieldResult
             "",
             STATUS_REVIEW,
             0.0,
-            "Item 9 formula did not contain extractable alcohol content or proof.",
+            "The matched formula approval did not contain extractable final alcohol content.",
         )
     expected_abv = expected_values[0]
     found_values = extract_abv_values(label_text)
     if not found_values:
         return _result(
             "formula",
-            f"{expected_abv:g}% ABV from Item 9",
+            f"{expected_abv:g}% ABV from approved formula {formula}",
             "",
             snippet_around(label_text),
             STATUS_REVIEW,
             0.45,
-            "Alcohol content from Item 9 was not clearly found on the label.",
+            "Alcohol content from the approved formula was not clearly found on the label.",
         )
     closest = min(found_values, key=lambda value: abs(value - expected_abv))
     if abs(closest - expected_abv) <= 0.3:
         return _result(
             "formula",
-            f"{expected_abv:g}% ABV from Item 9",
+            f"{expected_abv:g}% ABV from approved formula {formula}",
             f"{closest:g}% ABV",
             snippet_around(label_text, str(closest)),
             STATUS_PASS,
             0.95,
-            "Item 9 alcohol content matches the label after normalizing proof/ABV formats.",
+            "Approved formula alcohol content matches the label after normalizing proof/ABV formats.",
         )
     return _result(
         "formula",
-        f"{expected_abv:g}% ABV from Item 9",
+        f"{expected_abv:g}% ABV from approved formula {formula}",
         f"{closest:g}% ABV",
         snippet_around(label_text),
         STATUS_FAIL,
         0.95,
-        "Item 9 alcohol content materially differs from the label.",
+        "Approved formula alcohol content materially differs from the label.",
     )
 
 

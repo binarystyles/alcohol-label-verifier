@@ -150,10 +150,9 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
     except Exception as exc:
         return ApplicationExtraction(fields=fields, application_ocr_text="", errors=[f"PDF could not be opened: {exc}"])
 
-    full_text = "\n".join(page.get_text("text") for page in document)
-    summary_fields = parse_application_summary(full_text)
+    package_text = _application_package_text(document)
+    summary_fields = parse_application_summary(package_text)
     _merge_fields(fields, summary_fields, "application-summary")
-    _derive_application_values(fields)
 
     if document.page_count:
         page = document[0]
@@ -172,9 +171,9 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
                     fields.raw_sources[field_name] = "form-region"
             elif extracted.warning:
                 warnings.append(extracted.warning)
-        _derive_application_values(fields)
+        _merge_formula_approval(fields, package_text)
 
-    application_text_parts.append(_strip_label_area_from_page_one(document))
+    application_text_parts.append(package_text)
     if summary_fields:
         application_text_parts.append(_summary_text(summary_fields))
     else:
@@ -284,6 +283,51 @@ def parse_application_summary(text: str) -> dict[str, Any]:
     return fields
 
 
+def parse_formula_approval_fields(text: str, formula_id: str) -> dict[str, str]:
+    normalized_id = _normalize_formula_id(formula_id)
+    if not normalized_id:
+        return {}
+
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    windows: list[str] = []
+    for index, line in enumerate(lines):
+        if normalized_id in _normalize_formula_id(line):
+            start = max(0, index - 18)
+            end = min(len(lines), index + 40)
+            windows.append("\n".join(lines[start:end]))
+
+    for window in windows:
+        normalized_window = normalize_text(window)
+        if not _looks_like_formula_approval_text(normalized_window):
+            continue
+        abv_values = extract_abv_values(window)
+        if not abv_values:
+            continue
+        fields = {"alcohol_content": f"{abv_values[0]:g}% ABV"}
+        class_type = _extract_labeled_value(window, ("class/type", "class type", "classification"))
+        if class_type:
+            fields["class_type"] = class_type
+        return fields
+    return {}
+
+
+def extract_formula_identifier(text: str) -> str:
+    if not text:
+        return ""
+    for pattern in (
+        r"(?:TTB\s+)?FORMULA\s+ID\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})",
+        r"TTB\s+ID\s*(?:NO\.?|NUMBER)?\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})",
+        r"FORMULA\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})",
+    ):
+        labeled_match = re.search(pattern, text, flags=re.IGNORECASE)
+        if labeled_match:
+            return labeled_match.group("id").strip().upper()
+
+    first_part = re.split(r"[;\n]", text, maxsplit=1)[0]
+    generic_match = re.search(r"\b(?=[A-Z0-9-]*\d)[A-Z]{1,8}-?\d[A-Z0-9-]*\b", first_part, flags=re.IGNORECASE)
+    return generic_match.group(0).strip().upper() if generic_match else ""
+
+
 def clean_region_value(field_name: str, text: str) -> str:
     if field_name == "application_type":
         application_type = _extract_application_type(text)
@@ -349,15 +393,29 @@ def _merge_fields(fields: ApplicationFields, values: dict[str, Any], source: str
             fields.raw_sources[key] = source
 
 
-def _derive_application_values(fields: ApplicationFields) -> None:
-    if not fields.formula:
+def _merge_formula_approval(fields: ApplicationFields, package_text: str) -> None:
+    formula_id = extract_formula_identifier(fields.formula)
+    if not formula_id:
         return
-    abv_values = extract_abv_values(fields.formula)
-    if not abv_values:
-        return
-    abv = abv_values[0]
-    fields.alcohol_content = f"{abv:g}% ABV"
-    fields.raw_sources["alcohol_content"] = "formula"
+    if fields.formula != formula_id:
+        fields.formula = formula_id
+        fields.raw_sources["formula"] = "formula-id"
+    approval_fields = parse_formula_approval_fields(package_text, formula_id)
+    for key, value in approval_fields.items():
+        if key == "class_type" and fields.class_type:
+            continue
+        setattr(fields, key, value)
+        fields.raw_sources[key] = "formula-approval"
+
+
+def _application_package_text(document: fitz.Document) -> str:
+    parts: list[str] = []
+    for page_index, page in enumerate(document):
+        if page_index == 0:
+            parts.append(_strip_label_area_from_page_one(document))
+        else:
+            parts.append(page.get_text("text").strip())
+    return "\n\n".join(part for part in parts if part.strip())
 
 
 def _strip_label_area_from_page_one(document: fitz.Document) -> str:
@@ -374,6 +432,36 @@ def _summary_text(fields: dict[str, Any]) -> str:
     for key, value in fields.items():
         lines.append(f"{key}: {value}")
     return "\n".join(lines)
+
+
+def _looks_like_formula_approval_text(normalized_text: str) -> bool:
+    return any(
+        marker in normalized_text
+        for marker in (
+            "FORMULA APPROVAL",
+            "FORMULAS ONLINE",
+            "TTB FORMULA ID",
+            "FORMULA ID",
+            "FINAL ALCOHOL CONTENT",
+            "DETAILED QUANTITATIVE LIST OF INGREDIENTS",
+            "METHOD OF MANUFACTURE",
+        )
+    )
+
+
+def _extract_labeled_value(text: str, labels: tuple[str, ...]) -> str:
+    for line in text.splitlines():
+        if ":" not in line:
+            continue
+        key, value = line.split(":", 1)
+        normalized_key = re.sub(r"[^a-z0-9/ ]+", "", key.lower()).strip()
+        if normalized_key in labels:
+            return value.strip()
+    return ""
+
+
+def _normalize_formula_id(value: str) -> str:
+    return re.sub(r"[^A-Z0-9]+", "", normalize_text(value))
 
 
 def _is_form_label_line(upper_line: str) -> bool:

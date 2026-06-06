@@ -22,11 +22,13 @@ The main modules are:
 4. Try `pypdf` AcroForm extraction for PDFs.
 5. If expected values remain missing, render/extract defined page-one form regions.
 6. Parse an explicit `APPLICATION DATA SUMMARY` block when present in the package.
-7. Extract label text only from the lower page-one label area and likely supplemental label pages.
-8. Compare expected application values to label evidence.
-9. Return one application result plus field-level results.
+7. Use Item 9 as a Formula ID/reference and look for a matching formula approval/source document inside the same uploaded package.
+8. Derive expected alcohol content from the matched formula approval document when available.
+9. Extract label text only from the lower page-one label area and likely supplemental label pages, skipping formula approval/source documents.
+10. Compare expected application values to label evidence.
+11. Return one application result plus field-level results.
 
-The extractor never uses label OCR as the source of expected application values. If an expected value cannot be extracted from application fields, form regions, AcroForm values, or an explicit application-data summary, that field becomes Needs Review.
+The extractor never uses label OCR as the source of expected application values. If an expected value cannot be extracted from application fields, form regions, AcroForm values, an explicit application-data summary, or a matched formula approval document, that field becomes Needs Review.
 
 ## Status Logic
 
@@ -43,6 +45,7 @@ Needs Review is used for uncertainty:
 - Low OCR confidence.
 - Unreadable PDF.
 - Missing expected application value.
+- Missing matching formula approval content for an Item 9 Formula ID.
 - Optional supplied value not clearly found.
 - Item 15 supplied but not clearly found.
 

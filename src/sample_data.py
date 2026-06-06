@@ -36,7 +36,7 @@ BASE_FIELDS: dict[str, str | bool] = {
     "fanciful_name": "Botanical Reserve",
     "applicant_name_address": "Example Distilling Co., 100 Market Street, Portland, OR",
     "mailing_address": "",
-    "formula": "F-1001; 45% ABV",
+    "formula": "F-1001",
     "grape_varietals": "",
     "wine_appellation": "",
     "phone": "202-555-0100",
@@ -89,7 +89,7 @@ def sample_specs() -> list[SampleSpec]:
             fields={**BASE_FIELDS, "serial_number": "APP-001"},
             label_lines=good_label,
             expected_status="Pass",
-            note="Fully passing label with matching Item 9 alcohol content, application summary, and affixed label text.",
+            note="Fully passing label with matching approved formula alcohol content, application summary, and affixed label text.",
         ),
         SampleSpec(
             filename="APP-002_stones_throw_variation.pdf",
@@ -112,7 +112,7 @@ def sample_specs() -> list[SampleSpec]:
                 GOVERNMENT_WARNING,
             ],
             expected_status="Fail",
-            note="Item 9/application expects 45% ABV but label shows 40% ABV.",
+            note="Approved formula expects 45% ABV but label shows 40% ABV.",
         ),
         SampleSpec(
             filename="APP-004_bad_warning.pdf",
@@ -178,6 +178,7 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
         _draw_raster_label(page, spec.label_lines)
     else:
         _draw_text_label(page, spec.label_lines)
+    _append_formula_approval_page(document, spec.fields)
     document.set_metadata({"title": spec.filename, "subject": "Synthetic completed TTB application"})
     document.save(output_path, garbage=4, deflate=True)
     document.close()
@@ -328,6 +329,36 @@ def _draw_hidden_summary_block(page: fitz.Page, fields: dict[str, str | bool]) -
         page.insert_text((8, 600 + index * 1.35), line, fontsize=1, fontname="helv", color=(1, 1, 1), overlay=True)
 
 
+def _append_formula_approval_page(document: fitz.Document, fields: dict[str, str | bool]) -> None:
+    page = document.new_page(width=612, height=792)
+    formula_id = str(fields.get("formula", "") or "")
+    lines = [
+        "FORMULAS ONLINE APPROVAL DETERMINATION",
+        "",
+        f"TTB Formula ID: {formula_id}",
+        "Status: Approved",
+        f"Company Formula Number: {formula_id}",
+        f"Brand Name: {fields.get('brand_name', '')}",
+        f"Class/Type: {fields.get('class_type', '')}",
+        f"Final Alcohol Content: {fields.get('alcohol_content', '')}",
+        "",
+        "Detailed Quantitative List of Ingredients:",
+        "Finished alcohol, botanicals, purified water, and approved flavor materials.",
+        "",
+        "Method of Manufacture:",
+        "Blend approved ingredients, adjust to final alcohol content, filter, and bottle.",
+        "",
+        "This synthetic approval page represents the formula documentation submitted with the completed application package.",
+    ]
+    page.insert_textbox(
+        fitz.Rect(54, 54, 558, 720),
+        "\n".join(lines),
+        fontsize=10,
+        fontname="helv",
+        color=(0, 0, 0),
+    )
+
+
 def _summary_block_text(fields: dict[str, str | bool]) -> str:
     lines = ["APPLICATION DATA SUMMARY"]
     for key in (
@@ -345,7 +376,6 @@ def _summary_block_text(fields: dict[str, str | bool]) -> str:
         "application_type",
         "item_15",
         "class_type",
-        "alcohol_content",
         "net_contents",
         "bottler_producer",
         "country_of_origin",

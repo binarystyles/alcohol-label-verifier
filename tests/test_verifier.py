@@ -35,19 +35,19 @@ def test_abv_mismatch_fails() -> None:
 
 
 def test_formula_alcohol_content_matches_label() -> None:
-    result = verify_formula_alcohol_content("F-1001; 90 proof", "OLD TOM GIN 45% Alc./Vol.")
+    result = verify_formula_alcohol_content("F-1001", "45% ABV", "formula-approval", "OLD TOM GIN 45% Alc./Vol.")
     assert result.status == STATUS_PASS
     assert result.field == "formula"
 
 
-def test_formula_alcohol_content_missing_needs_review() -> None:
-    result = verify_formula_alcohol_content("F-1001", "OLD TOM GIN 45% Alc./Vol.")
+def test_formula_approval_missing_needs_review() -> None:
+    result = verify_formula_alcohol_content("F-1001", "45% ABV", "application-summary", "OLD TOM GIN 45% Alc./Vol.")
     assert result.status == STATUS_REVIEW
-    assert "Item 9 formula" in result.reason
+    assert "approved formula document" in result.reason
 
 
 def test_formula_alcohol_content_mismatch_fails() -> None:
-    result = verify_formula_alcohol_content("F-1001; 45% ABV", "OLD TOM GIN 40% Alc./Vol.")
+    result = verify_formula_alcohol_content("F-1001", "45% ABV", "formula-approval", "OLD TOM GIN 40% Alc./Vol.")
     assert result.status == STATUS_FAIL
 
 
@@ -67,11 +67,12 @@ def test_overall_status_aggregation_pass() -> None:
         serial_number="APP-X",
         product_type="DISTILLED SPIRITS",
         brand_name="OLD TOM GIN",
-        formula="F-1001; 45% ABV",
+        formula="F-1001",
         class_type="Gin",
         alcohol_content="45% ABV",
         net_contents="750 mL",
         bottler_producer="Example Distilling Co.",
+        raw_sources={"alcohol_content": "formula-approval"},
     )
     label = LabelExtraction(
         text=(
@@ -96,10 +97,11 @@ def test_overall_status_aggregation_fail() -> None:
         serial_number="APP-X",
         product_type="DISTILLED SPIRITS",
         brand_name="OLD TOM GIN",
-        formula="F-1001; 45% ABV",
+        formula="F-1001",
         class_type="Gin",
         alcohol_content="45% ABV",
         net_contents="750 mL",
+        raw_sources={"alcohol_content": "formula-approval"},
     )
     label = LabelExtraction(
         text=f"OLD TOM GIN DISTILLED SPIRITS Gin 40% Alc./Vol. 750 mL {GOVERNMENT_WARNING}",

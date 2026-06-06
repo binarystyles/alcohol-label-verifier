@@ -8,8 +8,10 @@ from src.extractors import (
     clean_region_value,
     extract_acroform_fields,
     extract_application,
+    extract_formula_identifier,
     extract_label,
     parse_application_summary,
+    parse_formula_approval_fields,
 )
 
 
@@ -32,7 +34,24 @@ def test_application_summary_parser_maps_expected_fields() -> None:
     assert fields["imported"] is True
 
 
-def test_application_derives_alcohol_content_from_formula_text() -> None:
+def test_formula_identifier_extraction() -> None:
+    assert extract_formula_identifier("F-1001") == "F-1001"
+    assert extract_formula_identifier("TTB Formula ID: F-1001") == "F-1001"
+
+
+def test_formula_approval_parser_matches_id_and_final_alcohol_content() -> None:
+    text = """
+    FORMULAS ONLINE APPROVAL DETERMINATION
+    TTB Formula ID: F-1001
+    Class/Type: Gin
+    Final Alcohol Content: 90 proof
+    """
+    fields = parse_formula_approval_fields(text, "F-1001")
+    assert fields["alcohol_content"] == "45% ABV"
+    assert fields["class_type"] == "Gin"
+
+
+def test_application_derives_alcohol_content_from_matching_formula_approval() -> None:
     document = fitz.open()
     page = document.new_page(width=612, height=1008)
     page.insert_textbox(
@@ -42,8 +61,19 @@ def test_application_derives_alcohol_content_from_formula_text() -> None:
         Serial Number: APP-FORMULA
         Product Type: DISTILLED SPIRITS
         Brand Name: Formula Sample
-        Formula: F-1001; 90 proof
+        Formula: F-1001
         END APPLICATION DATA SUMMARY
+        """,
+        fontsize=10,
+        fontname="helv",
+    )
+    formula_page = document.new_page(width=612, height=792)
+    formula_page.insert_textbox(
+        fitz.Rect(36, 36, 500, 220),
+        """
+        FORMULAS ONLINE APPROVAL DETERMINATION
+        TTB Formula ID: F-1001
+        Final Alcohol Content: 90 proof
         """,
         fontsize=10,
         fontname="helv",
@@ -55,9 +85,9 @@ def test_application_derives_alcohol_content_from_formula_text() -> None:
 
     extraction = extract_application(pdf_bytes)
 
-    assert extraction.fields.formula == "F-1001; 90 proof"
+    assert extraction.fields.formula == "F-1001"
     assert extraction.fields.alcohol_content == "45% ABV"
-    assert extraction.fields.raw_sources["alcohol_content"] == "formula"
+    assert extraction.fields.raw_sources["alcohol_content"] == "formula-approval"
 
 
 def test_acroform_extraction_falls_back_to_summary_for_generated_pdf(sample_bytes: dict[str, bytes]) -> None:
@@ -68,7 +98,9 @@ def test_acroform_extraction_falls_back_to_summary_for_generated_pdf(sample_byte
     extraction = extract_application(pdf_bytes)
     assert extraction.fields.serial_number == "APP-001"
     assert extraction.fields.brand_name == "OLD TOM GIN"
+    assert extraction.fields.formula == "F-1001"
     assert extraction.fields.alcohol_content == "45% ABV"
+    assert extraction.fields.raw_sources["alcohol_content"] == "formula-approval"
 
 
 def test_region_based_application_extraction_from_generated_pdf(sample_bytes: dict[str, bytes]) -> None:
@@ -107,6 +139,7 @@ def test_label_area_extraction_from_generated_pdf(sample_bytes: dict[str, bytes]
     assert not label.missing_label_area
     assert "OLD TOM GIN" in label.text
     assert "GOVERNMENT WARNING" in label.text
+    assert "FORMULAS ONLINE" not in label.text
 
 
 def test_missing_label_area_behavior(sample_bytes: dict[str, bytes]) -> None:

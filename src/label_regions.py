@@ -20,22 +20,28 @@ def label_regions(document: fitz.Document) -> list[tuple[int, fitz.Rect, str]]:
     for page_index in range(1, min(document.page_count, 6)):
         page = document[page_index]
         text = page.get_text("text")
-        if _looks_like_instruction_page(text):
+        if _looks_like_non_label_page(text):
             continue
         regions.append((page_index, page.rect, "supplemental-label-page"))
     return regions
 
 
-def _looks_like_instruction_page(text: str) -> bool:
+def _looks_like_non_label_page(text: str) -> bool:
     normalized = " ".join(text.upper().split())
-    instruction_hits = sum(
+    non_label_hits = sum(
         phrase in normalized
         for phrase in (
             "INSTRUCTIONS FOR COMPLETING",
             "GENERAL INSTRUCTIONS",
             "PAPERWORK REDUCTION ACT",
             "THIS CERTIFICATE DOES NOT RELIEVE",
+            "FORMULAS ONLINE",
+            "FORMULA APPROVAL",
+            "TTB FORMULA ID",
+            "FORMULA ID",
+            "METHOD OF MANUFACTURE",
+            "DETAILED QUANTITATIVE LIST OF INGREDIENTS",
+            "FINAL ALCOHOL CONTENT",
         )
     )
-    return instruction_hits >= 1
-
+    return non_label_hits >= 1

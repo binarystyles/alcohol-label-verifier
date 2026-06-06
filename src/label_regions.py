@@ -39,8 +39,13 @@ def _looks_like_non_label_page(text: str) -> bool:
             "FORMULA APPROVAL",
             "TTB FORMULA ID",
             "FORMULA ID",
+            "YIELD SUMMARY",
+            "ALCOHOL CONTENT OF FINISHED PRODUCT",
+            "ALCOHOL FROM FLAVORS",
+            "ALCOHOL FROM BASE",
             "METHOD OF MANUFACTURE",
             "DETAILED QUANTITATIVE LIST OF INGREDIENTS",
+            "INGREDIENTS LIST",
             "FINAL ALCOHOL CONTENT",
         )
     )

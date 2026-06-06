@@ -12,7 +12,7 @@ from pypdf import PdfReader
 from src.form_mapping import APPLICATION_FORM_FIELDS, FORM_REGIONS
 from src.label_regions import label_regions
 from src.models import ApplicationExtraction, ApplicationFields, LabelExtraction
-from src.normalize import extract_abv_values, extract_product_type, normalize_text
+from src.normalize import extract_product_type, normalize_text
 from src.ocr import extract_region_text
 
 
@@ -300,10 +300,10 @@ def parse_formula_approval_fields(text: str, formula_id: str) -> dict[str, str]:
         normalized_window = normalize_text(window)
         if not _looks_like_formula_approval_text(normalized_window):
             continue
-        abv_values = extract_abv_values(window)
-        if not abv_values:
+        alcohol_content = _extract_formula_final_alcohol_content(window)
+        if not alcohol_content:
             continue
-        fields = {"alcohol_content": f"{abv_values[0]:g}% ABV"}
+        fields = {"alcohol_content": alcohol_content}
         class_type = _extract_labeled_value(window, ("class/type", "class type", "classification"))
         if class_type:
             fields["class_type"] = class_type
@@ -443,10 +443,69 @@ def _looks_like_formula_approval_text(normalized_text: str) -> bool:
             "TTB FORMULA ID",
             "FORMULA ID",
             "FINAL ALCOHOL CONTENT",
+            "ALCOHOL CONTENT OF FINISHED PRODUCT",
+            "YIELD SUMMARY",
             "DETAILED QUANTITATIVE LIST OF INGREDIENTS",
+            "INGREDIENTS LIST",
             "METHOD OF MANUFACTURE",
         )
     )
+
+
+def _extract_formula_final_alcohol_content(text: str) -> str:
+    lines = [line.strip() for line in text.splitlines() if line.strip()]
+    for index, line in enumerate(lines):
+        normalized_line = normalize_text(line)
+        if not _is_formula_final_alcohol_line(normalized_line):
+            continue
+        snippet = " ".join(lines[index : index + 4])
+        values = _formula_alcohol_numbers_after_label(snippet)
+        if values:
+            return _format_formula_abv_values(values, snippet)
+
+    return ""
+
+
+def _is_formula_final_alcohol_line(normalized_line: str) -> bool:
+    return any(
+        marker in normalized_line
+        for marker in (
+            "ALCOHOL CONTENT OF FINISHED PRODUCT",
+            "FINAL ALCOHOL CONTENT",
+            "FINISHED PRODUCT ALCOHOL CONTENT",
+            "TARGET ALCOHOL CONTENT",
+        )
+    )
+
+
+def _formula_alcohol_numbers_after_label(snippet: str) -> list[float]:
+    marker_pattern = re.compile(
+        r"(?:ALCOHOL\s+CONTENT\s+OF\s+FINISHED\s+PRODUCT|FINAL\s+ALCOHOL\s+CONTENT|FINISHED\s+PRODUCT\s+ALCOHOL\s+CONTENT|TARGET\s+ALCOHOL\s+CONTENT)",
+        flags=re.IGNORECASE,
+    )
+    marker = marker_pattern.search(snippet)
+    if not marker:
+        return []
+
+    tail = snippet[marker.end() : marker.end() + 180]
+    tail = re.split(
+        r"\b(?:ALCOHOL\s+FROM\s+FLAVORS?|ALCOHOL\s+FROM\s+BASE|INGREDIENTS?\s+LIST|METHOD\s+OF\s+MANUFACTURE|DETAILED\s+QUANTITATIVE)\b",
+        tail,
+        maxsplit=1,
+        flags=re.IGNORECASE,
+    )[0]
+    values = [float(match) for match in re.findall(r"\d{1,3}(?:\.\d+)?", tail)]
+    return [value for value in values if 0 < value <= 200][:2]
+
+
+def _format_formula_abv_values(values: list[float], snippet: str) -> str:
+    uses_proof = "PROOF" in normalize_text(snippet) and "%" not in snippet and "ABV" not in normalize_text(snippet)
+    converted = [value / 2.0 if uses_proof and value > 50 else value for value in values]
+    low = min(converted)
+    high = max(converted)
+    if abs(low - high) <= 0.01:
+        return f"{low:g}% ABV"
+    return f"{low:g}-{high:g}% ABV"
 
 
 def _extract_labeled_value(text: str, labels: tuple[str, ...]) -> str:

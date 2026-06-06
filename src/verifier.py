@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import re
+
 from src.constants import (
     BRAND_PASS_THRESHOLD,
     BRAND_REVIEW_THRESHOLD,
@@ -170,16 +172,18 @@ def verify_class_type(expected: str, label_text: str) -> FieldResult:
 
 
 def verify_alcohol_content(expected: str, label_text: str) -> FieldResult:
-    expected_abv = normalize_abv(expected)
-    if expected_abv is None:
+    expected_bounds = _expected_abv_bounds(expected)
+    if expected_bounds is None:
         return _expected_missing("alcohol_content")
     found_values = extract_abv_values(label_text)
     if not found_values:
         return _result("alcohol_content", expected, "", snippet_around(label_text), STATUS_REVIEW, 0.45, "Alcohol content was not clearly found on the label.")
-    closest = min(found_values, key=lambda value: abs(value - expected_abv))
-    if abs(closest - expected_abv) <= 0.3:
-        return _result("alcohol_content", f"{expected_abv:g}% ABV", f"{closest:g}% ABV", snippet_around(label_text, str(closest)), STATUS_PASS, 0.95, "Alcohol content matches after normalizing proof/ABV formats.")
-    return _result("alcohol_content", f"{expected_abv:g}% ABV", f"{closest:g}% ABV", snippet_around(label_text), STATUS_FAIL, 0.95, "Material alcohol-content mismatch.")
+    low, high = expected_bounds
+    closest = min(found_values, key=lambda value: _distance_from_range(value, low, high))
+    expected_display = _abv_display(low, high)
+    if low - 0.3 <= closest <= high + 0.3:
+        return _result("alcohol_content", expected_display, f"{closest:g}% ABV", snippet_around(label_text, str(closest)), STATUS_PASS, 0.95, "Alcohol content matches after normalizing proof/ABV formats.")
+    return _result("alcohol_content", expected_display, f"{closest:g}% ABV", snippet_around(label_text), STATUS_FAIL, 0.95, "Material alcohol-content mismatch.")
 
 
 def verify_formula_alcohol_content(formula: str, approved_alcohol_content: str, alcohol_source: str, label_text: str) -> FieldResult:
@@ -197,8 +201,8 @@ def verify_formula_alcohol_content(formula: str, approved_alcohol_content: str, 
             0.0,
             "No matching approved formula document with final alcohol content was found for the Item 9 Formula ID.",
         )
-    expected_values = extract_abv_values(approved_alcohol_content)
-    if not expected_values:
+    expected_bounds = _expected_abv_bounds(approved_alcohol_content)
+    if expected_bounds is None:
         return _result(
             "formula",
             formula,
@@ -208,23 +212,23 @@ def verify_formula_alcohol_content(formula: str, approved_alcohol_content: str, 
             0.0,
             "The matched formula approval did not contain extractable final alcohol content.",
         )
-    expected_abv = expected_values[0]
+    low, high = expected_bounds
     found_values = extract_abv_values(label_text)
     if not found_values:
         return _result(
             "formula",
-            f"{expected_abv:g}% ABV from approved formula {formula}",
+            f"{_abv_display(low, high)} from approved formula {formula}",
             "",
             snippet_around(label_text),
             STATUS_REVIEW,
             0.45,
             "Alcohol content from the approved formula was not clearly found on the label.",
         )
-    closest = min(found_values, key=lambda value: abs(value - expected_abv))
-    if abs(closest - expected_abv) <= 0.3:
+    closest = min(found_values, key=lambda value: _distance_from_range(value, low, high))
+    if low - 0.3 <= closest <= high + 0.3:
         return _result(
             "formula",
-            f"{expected_abv:g}% ABV from approved formula {formula}",
+            f"{_abv_display(low, high)} from approved formula {formula}",
             f"{closest:g}% ABV",
             snippet_around(label_text, str(closest)),
             STATUS_PASS,
@@ -233,7 +237,7 @@ def verify_formula_alcohol_content(formula: str, approved_alcohol_content: str, 
         )
     return _result(
         "formula",
-        f"{expected_abv:g}% ABV from approved formula {formula}",
+        f"{_abv_display(low, high)} from approved formula {formula}",
         f"{closest:g}% ABV",
         snippet_around(label_text),
         STATUS_FAIL,
@@ -290,6 +294,36 @@ def verify_item_15(expected: str, label_text: str) -> FieldResult:
 
 def _expected_missing(field: str) -> FieldResult:
     return _result(field, "", "", "", STATUS_REVIEW, 0.0, "Expected application value could not be extracted.")
+
+
+def _expected_abv_bounds(expected: str) -> tuple[float, float] | None:
+    range_match = re.search(
+        r"(?P<low>\d{1,3}(?:\.\d+)?)\s*(?:-|TO|–|—)\s*(?P<high>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?\s*(?:ABV|ALC\.?\s*/?\s*VOL\.?|ALCOHOL\s+BY\s+VOLUME)?",
+        expected,
+        flags=re.IGNORECASE,
+    )
+    if range_match:
+        low = float(range_match.group("low"))
+        high = float(range_match.group("high"))
+        if 0 < low <= 100 and 0 < high <= 100:
+            return (min(low, high), max(low, high))
+
+    value = normalize_abv(expected)
+    if value is None:
+        return None
+    return (value, value)
+
+
+def _distance_from_range(value: float, low: float, high: float) -> float:
+    if low <= value <= high:
+        return 0.0
+    return min(abs(value - low), abs(value - high))
+
+
+def _abv_display(low: float, high: float) -> str:
+    if abs(low - high) <= 0.01:
+        return f"{low:g}% ABV"
+    return f"{low:g}-{high:g}% ABV"
 
 
 def _label_unavailable_result(field: str, expected: str, reason: str, optional: bool = False) -> FieldResult:

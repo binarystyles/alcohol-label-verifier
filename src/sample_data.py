@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from io import BytesIO
 from pathlib import Path
+import re
 import zipfile
 
 import fitz
@@ -332,6 +333,7 @@ def _draw_hidden_summary_block(page: fitz.Page, fields: dict[str, str | bool]) -
 def _append_formula_approval_page(document: fitz.Document, fields: dict[str, str | bool]) -> None:
     page = document.new_page(width=612, height=792)
     formula_id = str(fields.get("formula", "") or "")
+    alcohol_value = _number_from_value(fields.get("alcohol_content", ""))
     lines = [
         "FORMULAS ONLINE APPROVAL DETERMINATION",
         "",
@@ -340,9 +342,12 @@ def _append_formula_approval_page(document: fitz.Document, fields: dict[str, str
         f"Company Formula Number: {formula_id}",
         f"Brand Name: {fields.get('brand_name', '')}",
         f"Class/Type: {fields.get('class_type', '')}",
-        f"Final Alcohol Content: {fields.get('alcohol_content', '')}",
         "",
-        "Detailed Quantitative List of Ingredients:",
+        "Yield Summary",
+        "Total Yield: 100.0 Percentage",
+        f"Alcohol Content of Finished Product: Low {alcohol_value} High {alcohol_value} Unit % by Volume",
+        "",
+        "Ingredients List:",
         "Finished alcohol, botanicals, purified water, and approved flavor materials.",
         "",
         "Method of Manufacture:",
@@ -357,6 +362,11 @@ def _append_formula_approval_page(document: fitz.Document, fields: dict[str, str
         fontname="helv",
         color=(0, 0, 0),
     )
+
+
+def _number_from_value(value: str | bool) -> str:
+    match = re.search(r"\d{1,3}(?:\.\d+)?", str(value))
+    return match.group(0) if match else str(value)
 
 
 def _summary_block_text(fields: dict[str, str | bool]) -> str:

@@ -40,6 +40,16 @@ def test_formula_alcohol_content_matches_label() -> None:
     assert result.field == "formula"
 
 
+def test_formula_alcohol_content_range_matches_label() -> None:
+    result = verify_formula_alcohol_content("F-1001", "25-30% ABV", "formula-approval", "Label says 27% Alc./Vol.")
+    assert result.status == STATUS_PASS
+
+
+def test_formula_alcohol_content_range_mismatch_fails() -> None:
+    result = verify_formula_alcohol_content("F-1001", "25-30% ABV", "formula-approval", "Label says 35% Alc./Vol.")
+    assert result.status == STATUS_FAIL
+
+
 def test_formula_approval_missing_needs_review() -> None:
     result = verify_formula_alcohol_content("F-1001", "45% ABV", "application-summary", "OLD TOM GIN 45% Alc./Vol.")
     assert result.status == STATUS_REVIEW

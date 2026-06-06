@@ -51,6 +51,20 @@ def test_formula_approval_parser_matches_id_and_final_alcohol_content() -> None:
     assert fields["class_type"] == "Gin"
 
 
+def test_formula_approval_parser_uses_finished_product_row_before_ingredient_abv() -> None:
+    text = """
+    Formulas Online
+    TTB Formula ID: F-2002
+    Ingredients List
+    Vodka 98.0 - 99.0 Percentage ABV: 45% - 45%
+    Yield Summary
+    Alcohol Content of Finished Product: Low 25 High 30 Unit % by Volume
+    Method of Manufacture
+    """
+    fields = parse_formula_approval_fields(text, "F-2002")
+    assert fields["alcohol_content"] == "25-30% ABV"
+
+
 def test_application_derives_alcohol_content_from_matching_formula_approval() -> None:
     document = fitz.open()
     page = document.new_page(width=612, height=1008)

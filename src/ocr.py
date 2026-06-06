@@ -10,7 +10,7 @@ import fitz
 import pytesseract
 from PIL import Image
 
-from src.preprocess import nonwhite_ratio, prepare_for_ocr
+from src.preprocess import nonwhite_ratio, prepare_for_ocr, sharpness_score
 
 
 @dataclass
@@ -20,6 +20,7 @@ class OCRText:
     source: str
     warning: str = ""
     nonwhite_ratio: float = 0.0
+    sharpness: float = 0.0
 
 
 @lru_cache(maxsize=1)
@@ -39,6 +40,7 @@ def page_region_to_image(page: fitz.Page, rect: fitz.Rect, dpi: int = 200) -> Im
 
 def ocr_image(image: Image.Image) -> OCRText:
     ratio = nonwhite_ratio(image)
+    sharpness = sharpness_score(image)
     if not tesseract_available():
         return OCRText(
             text="",
@@ -46,6 +48,7 @@ def ocr_image(image: Image.Image) -> OCRText:
             source="ocr-unavailable",
             warning="Local Tesseract OCR is not installed or is not on PATH.",
             nonwhite_ratio=ratio,
+            sharpness=sharpness,
         )
 
     prepared = prepare_for_ocr(image)
@@ -58,6 +61,7 @@ def ocr_image(image: Image.Image) -> OCRText:
             source="ocr-error",
             warning=f"Local OCR failed: {exc}",
             nonwhite_ratio=ratio,
+            sharpness=sharpness,
         )
 
     words: list[str] = []
@@ -80,6 +84,7 @@ def ocr_image(image: Image.Image) -> OCRText:
         confidence=round(mean_confidence, 3),
         source="tesseract",
         nonwhite_ratio=ratio,
+        sharpness=sharpness,
     )
 
 
@@ -89,10 +94,11 @@ def extract_region_text(page: fitz.Page, rect: fitz.Rect, prefer_text_layer: boo
         text = page.get_text("text", clip=rect).strip()
     image = page_region_to_image(page, rect)
     ratio = nonwhite_ratio(image)
+    sharpness = sharpness_score(image)
     if text:
-        return OCRText(text=text, confidence=0.97, source="pdf-text", nonwhite_ratio=ratio)
+        return OCRText(text=text, confidence=0.97, source="pdf-text", nonwhite_ratio=ratio, sharpness=sharpness)
 
     result = ocr_image(image)
     result.nonwhite_ratio = ratio
+    result.sharpness = sharpness
     return result
-

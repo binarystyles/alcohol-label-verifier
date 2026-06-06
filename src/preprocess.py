@@ -34,3 +34,9 @@ def nonwhite_ratio(image: Image.Image, threshold: int = 245) -> float:
     array = np.array(gray)
     return float(np.mean(array < threshold))
 
+
+def sharpness_score(image: Image.Image) -> float:
+    """Estimate rendered image sharpness using variance of the Laplacian."""
+    gray = image.convert("L")
+    array = np.array(gray)
+    return float(cv2.Laplacian(array, cv2.CV_64F).var())

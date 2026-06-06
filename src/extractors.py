@@ -81,6 +81,7 @@ FORMULA_FINAL_ALCOHOL_PATTERN = re.compile(
     r"(?:ALCOHOL\s+CONTENT\s+OF\s+FINISHED\s+PRODUCT|FINAL\s+ALCOHOL\s+CONTENT|FINISHED\s+PRODUCT\s+ALCOHOL\s+CONTENT|TARGET\s+ALCOHOL\s+CONTENT)",
     flags=re.IGNORECASE,
 )
+LOW_LABEL_SHARPNESS_THRESHOLD = 250.0
 
 FIELD_LABEL_PATTERNS: dict[str, tuple[re.Pattern[str], ...]] = {
     "serial_number": (re.compile(r"^\s*4\.?\s*SERIAL\s+NUMBER\s*[:\-]?\s*", re.IGNORECASE),),
@@ -205,6 +206,7 @@ def extract_label(pdf_bytes: bytes) -> LabelExtraction:
     warnings: list[str] = []
     saw_visual_content = False
     saw_readable_content = False
+    saw_low_quality_label_image = False
 
     for page_index, rect, label in label_regions(document):
         page = document[page_index]
@@ -213,6 +215,8 @@ def extract_label(pdf_bytes: bytes) -> LabelExtraction:
             continue
         if extracted.nonwhite_ratio > 0.02 or extracted.text.strip():
             saw_visual_content = True
+        if extracted.nonwhite_ratio > 0.02 and 0 < extracted.sharpness < LOW_LABEL_SHARPNESS_THRESHOLD:
+            saw_low_quality_label_image = True
         if extracted.text.strip():
             saw_readable_content = True
             texts.append(f"[{label} p.{page_index + 1}]\n{extracted.text.strip()}")
@@ -240,11 +244,13 @@ def extract_label(pdf_bytes: bytes) -> LabelExtraction:
         )
 
     confidence = min(confidences) if confidences else 0.0
+    if saw_low_quality_label_image:
+        warnings.append("Label image appears rotated, blurry, or low quality; OCR results require human review.")
     return LabelExtraction(
         text="\n\n".join(texts),
         confidence=round(confidence, 3),
         missing_label_area=False,
-        unreadable=confidence < 0.4,
+        unreadable=confidence < 0.4 or saw_low_quality_label_image,
         warnings=_dedupe(warnings),
     )
 

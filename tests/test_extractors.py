@@ -300,6 +300,32 @@ def test_label_extraction_skips_ocr_text_that_looks_like_instructions(monkeypatc
     assert "PAPERWORK REDUCTION ACT" not in label.text
 
 
+def test_label_extraction_marks_low_sharpness_ocr_as_unreadable(monkeypatch) -> None:
+    document = fitz.open()
+    document.new_page(width=612, height=792)
+    try:
+        pdf_bytes = document.write()
+    finally:
+        document.close()
+
+    def fake_extract_region_text(page: fitz.Page, rect: fitz.Rect) -> OCRText:
+        return OCRText(
+            text="OLD TOM GIN Botanical Reserve DISTILLED SPIRITS 45% ABV",
+            confidence=0.9,
+            source="tesseract",
+            nonwhite_ratio=0.5,
+            sharpness=100.0,
+        )
+
+    monkeypatch.setattr("src.extractors.extract_region_text", fake_extract_region_text)
+
+    label = extract_label(pdf_bytes)
+
+    assert label.unreadable
+    assert label.confidence == 0.9
+    assert any("rotated, blurry, or low quality" in warning for warning in label.warnings)
+
+
 def test_missing_label_area_behavior(sample_bytes: dict[str, bytes]) -> None:
     label = extract_label(sample_bytes["APP-006_missing_label_area.pdf"])
     assert label.missing_label_area

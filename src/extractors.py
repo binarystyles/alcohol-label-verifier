@@ -12,7 +12,7 @@ from pypdf import PdfReader
 from src.form_mapping import APPLICATION_FORM_FIELDS, FORM_REGIONS
 from src.label_regions import label_regions
 from src.models import ApplicationExtraction, ApplicationFields, LabelExtraction
-from src.normalize import extract_product_type, normalize_text
+from src.normalize import extract_abv_values, extract_product_type, normalize_text
 from src.ocr import extract_region_text
 
 
@@ -153,6 +153,7 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
     full_text = "\n".join(page.get_text("text") for page in document)
     summary_fields = parse_application_summary(full_text)
     _merge_fields(fields, summary_fields, "application-summary")
+    _derive_application_values(fields)
 
     if document.page_count:
         page = document[0]
@@ -171,6 +172,7 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
                     fields.raw_sources[field_name] = "form-region"
             elif extracted.warning:
                 warnings.append(extracted.warning)
+        _derive_application_values(fields)
 
     application_text_parts.append(_strip_label_area_from_page_one(document))
     if summary_fields:
@@ -345,6 +347,17 @@ def _merge_fields(fields: ApplicationFields, values: dict[str, Any], source: str
         if value and (not getattr(fields, key) or may_override_existing):
             setattr(fields, key, value)
             fields.raw_sources[key] = source
+
+
+def _derive_application_values(fields: ApplicationFields) -> None:
+    if not fields.formula:
+        return
+    abv_values = extract_abv_values(fields.formula)
+    if not abv_values:
+        return
+    abv = abv_values[0]
+    fields.alcohol_content = f"{abv:g}% ABV"
+    fields.raw_sources["alcohol_content"] = "formula"
 
 
 def _strip_label_area_from_page_one(document: fitz.Document) -> str:

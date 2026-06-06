@@ -97,6 +97,7 @@ def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> li
             _label_unavailable_result("fanciful_name", fields.fanciful_name, reason, optional=True),
             _label_unavailable_result("product_type", fields.product_type, reason),
             _label_unavailable_result("class_type", fields.class_type, reason),
+            _label_unavailable_result("formula", fields.formula, reason),
             _label_unavailable_result("alcohol_content", fields.alcohol_content, reason),
             _label_unavailable_result("net_contents", fields.net_contents, reason),
             _label_unavailable_result("bottler_producer", fields.bottler_producer, reason, optional=True),
@@ -109,6 +110,7 @@ def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> li
         verify_optional_fuzzy("fanciful_name", fields.fanciful_name, label_text),
         verify_product_type(fields.product_type, label_text),
         verify_class_type(fields.class_type, label_text),
+        verify_formula_alcohol_content(fields.formula, label_text),
         verify_alcohol_content(fields.alcohol_content, label_text),
         verify_net_contents(fields.net_contents, label_text),
         verify_optional_fuzzy("bottler_producer", fields.bottler_producer, label_text, missing_status=STATUS_REVIEW),
@@ -178,6 +180,54 @@ def verify_alcohol_content(expected: str, label_text: str) -> FieldResult:
     if abs(closest - expected_abv) <= 0.3:
         return _result("alcohol_content", f"{expected_abv:g}% ABV", f"{closest:g}% ABV", snippet_around(label_text, str(closest)), STATUS_PASS, 0.95, "Alcohol content matches after normalizing proof/ABV formats.")
     return _result("alcohol_content", f"{expected_abv:g}% ABV", f"{closest:g}% ABV", snippet_around(label_text), STATUS_FAIL, 0.95, "Material alcohol-content mismatch.")
+
+
+def verify_formula_alcohol_content(formula: str, label_text: str) -> FieldResult:
+    if not formula:
+        return _result("formula", "", "", "", STATUS_REVIEW, 0.0, "Required Item 9 formula value could not be extracted.")
+    expected_values = extract_abv_values(formula)
+    if not expected_values:
+        return _result(
+            "formula",
+            formula,
+            "",
+            "",
+            STATUS_REVIEW,
+            0.0,
+            "Item 9 formula did not contain extractable alcohol content or proof.",
+        )
+    expected_abv = expected_values[0]
+    found_values = extract_abv_values(label_text)
+    if not found_values:
+        return _result(
+            "formula",
+            f"{expected_abv:g}% ABV from Item 9",
+            "",
+            snippet_around(label_text),
+            STATUS_REVIEW,
+            0.45,
+            "Alcohol content from Item 9 was not clearly found on the label.",
+        )
+    closest = min(found_values, key=lambda value: abs(value - expected_abv))
+    if abs(closest - expected_abv) <= 0.3:
+        return _result(
+            "formula",
+            f"{expected_abv:g}% ABV from Item 9",
+            f"{closest:g}% ABV",
+            snippet_around(label_text, str(closest)),
+            STATUS_PASS,
+            0.95,
+            "Item 9 alcohol content matches the label after normalizing proof/ABV formats.",
+        )
+    return _result(
+        "formula",
+        f"{expected_abv:g}% ABV from Item 9",
+        f"{closest:g}% ABV",
+        snippet_around(label_text),
+        STATUS_FAIL,
+        0.95,
+        "Item 9 alcohol content materially differs from the label.",
+    )
 
 
 def verify_net_contents(expected: str, label_text: str) -> FieldResult:

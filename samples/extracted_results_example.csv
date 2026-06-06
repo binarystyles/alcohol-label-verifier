@@ -1,7 +1,7 @@
 filename,application_id,serial_number,brand_name,product_type,overall_status,confidence,processing_time_seconds,short_summary,warnings,errors
-APP-001_old_tom_pass.pdf,1,1,OLD TOM GIN,DISTILLED SPIRITS,Pass,0.95,0.081,All required checks passed with adequate confidence.,,
-APP-002_stones_throw_variation.pdf,2,2,STONE'S THROW,DISTILLED SPIRITS,Pass,0.95,0.078,All required checks passed with adequate confidence.,,
-APP-003_wrong_abv.pdf,3,3,OLD TOM GIN,DISTILLED SPIRITS,Fail,0.95,0.075,Failed critical checks: alcohol_content,,
-APP-004_bad_warning.pdf,4,4,OLD TOM GIN,DISTILLED SPIRITS,Fail,0.95,0.074,Failed critical checks: government_warning,,
-APP-005_low_quality_rotated.pdf,5,5,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.0,0.091,"Needs review: brand_name, fanciful_name, product_type, class_type","Local Tesseract OCR is not installed or is not on PATH.; Label artwork was present, but text could not be read with adequate confidence.; Label text is unreadable or low confidence.",
-APP-006_missing_label_area.pdf,6,6,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.0,0.075,"Needs review: brand_name, fanciful_name, product_type, class_type","Local Tesseract OCR is not installed or is not on PATH.; Label artwork was present, but text could not be read with adequate confidence.; Label text is unreadable or low confidence.",
+APP-001_old_tom_pass.pdf,APP-001,APP-001,OLD TOM GIN,DISTILLED SPIRITS,Pass,0.95,0.081,All required checks passed with adequate confidence.,,
+APP-002_stones_throw_variation.pdf,APP-002,APP-002,STONE'S THROW,DISTILLED SPIRITS,Pass,0.95,0.078,All required checks passed with adequate confidence.,,
+APP-003_wrong_abv.pdf,APP-003,APP-003,OLD TOM GIN,DISTILLED SPIRITS,Fail,0.95,0.074,"Failed critical checks: formula, alcohol_content",,
+APP-004_bad_warning.pdf,APP-004,APP-004,OLD TOM GIN,DISTILLED SPIRITS,Fail,0.95,0.075,Failed critical checks: government_warning,,
+APP-005_low_quality_rotated.pdf,APP-005,APP-005,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.0,0.093,"Needs review: brand_name, fanciful_name, product_type, class_type","Local Tesseract OCR is not installed or is not on PATH.; Label artwork was present, but text could not be read with adequate confidence.; Label text is unreadable or low confidence.",
+APP-006_missing_label_area.pdf,APP-006,APP-006,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.0,0.072,"Needs review: brand_name, fanciful_name, product_type, class_type",No readable affixed label area was found in the completed application file.; Label area is missing or blank.,

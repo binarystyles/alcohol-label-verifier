@@ -36,7 +36,7 @@ BASE_FIELDS: dict[str, str | bool] = {
     "fanciful_name": "Botanical Reserve",
     "applicant_name_address": "Example Distilling Co., 100 Market Street, Portland, OR",
     "mailing_address": "",
-    "formula": "F-1001",
+    "formula": "F-1001; 45% ABV",
     "grape_varietals": "",
     "wine_appellation": "",
     "phone": "202-555-0100",
@@ -89,7 +89,7 @@ def sample_specs() -> list[SampleSpec]:
             fields={**BASE_FIELDS, "serial_number": "APP-001"},
             label_lines=good_label,
             expected_status="Pass",
-            note="Fully passing label with matching application summary and affixed label text.",
+            note="Fully passing label with matching Item 9 alcohol content, application summary, and affixed label text.",
         ),
         SampleSpec(
             filename="APP-002_stones_throw_variation.pdf",
@@ -112,7 +112,7 @@ def sample_specs() -> list[SampleSpec]:
                 GOVERNMENT_WARNING,
             ],
             expected_status="Fail",
-            note="Application expects 45% ABV but label shows 40% ABV.",
+            note="Item 9/application expects 45% ABV but label shows 40% ABV.",
         ),
         SampleSpec(
             filename="APP-004_bad_warning.pdf",

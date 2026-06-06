@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import fitz
+
 from src.extractors import (
     clean_region_value,
     extract_acroform_fields,
@@ -28,6 +30,34 @@ def test_application_summary_parser_maps_expected_fields() -> None:
     assert fields["product_type"] == "WINE"
     assert fields["class_type"] == "Red Wine"
     assert fields["imported"] is True
+
+
+def test_application_derives_alcohol_content_from_formula_text() -> None:
+    document = fitz.open()
+    page = document.new_page(width=612, height=1008)
+    page.insert_textbox(
+        fitz.Rect(36, 36, 500, 220),
+        """
+        APPLICATION DATA SUMMARY
+        Serial Number: APP-FORMULA
+        Product Type: DISTILLED SPIRITS
+        Brand Name: Formula Sample
+        Formula: F-1001; 90 proof
+        END APPLICATION DATA SUMMARY
+        """,
+        fontsize=10,
+        fontname="helv",
+    )
+    try:
+        pdf_bytes = document.write()
+    finally:
+        document.close()
+
+    extraction = extract_application(pdf_bytes)
+
+    assert extraction.fields.formula == "F-1001; 90 proof"
+    assert extraction.fields.alcohol_content == "45% ABV"
+    assert extraction.fields.raw_sources["alcohol_content"] == "formula"
 
 
 def test_acroform_extraction_falls_back_to_summary_for_generated_pdf(sample_bytes: dict[str, bytes]) -> None:

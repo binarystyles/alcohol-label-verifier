@@ -129,7 +129,7 @@ Label OCR text is never used to invent expected application values.
 
 ## TTB F 5100.31 Field Mapping
 
-The prototype maps Item 4 through Item 15 and the lower page-one label area with normalized coordinates in `src/form_mapping.py`. The mapping is based on the current TTB Forms page entry for TTB F 5100.31 (04/2023) and the instructions embedded in that form. Current TTB F 5100.31 instructions treat Item 9 as the formula/pre-COLA reference field, not as the general alcohol-content field. Alcohol content, net contents, class/type, bottler/producer, and similar package facts may come from label/application package evidence or an explicit in-PDF application-data summary. See `docs/FORM_MAPPING.md` for the full mapping. Coordinates are heuristics and should be tuned with real completed application samples.
+The prototype maps Item 4 through Item 15 and the lower page-one label area with normalized coordinates in `src/form_mapping.py`. The mapping is based on the current TTB Forms page entry for TTB F 5100.31 (04/2023) and the instructions embedded in that form. Current TTB F 5100.31 instructions treat Item 9 as formula/pre-COLA information; when that application-side formula text includes ABV or proof, the app derives expected alcohol content from it and verifies that it matches the label. Missing Item 9 alcohol content becomes Needs Review, while a readable Item 9 alcohol mismatch becomes Fail. Alcohol content, net contents, class/type, bottler/producer, and similar package facts may also come from label/application package evidence or an explicit in-PDF application-data summary. See `docs/FORM_MAPPING.md` for the full mapping. Coordinates are heuristics and should be tuned with real completed application samples.
 
 ## Approach
 

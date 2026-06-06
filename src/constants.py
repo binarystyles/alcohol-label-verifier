@@ -15,6 +15,7 @@ PRODUCT_TYPES = ("WINE", "DISTILLED SPIRITS", "MALT BEVERAGES")
 
 CRITICAL_FIELDS = {
     "brand_name",
+    "formula",
     "government_warning",
     "alcohol_content",
     "net_contents",
@@ -27,4 +28,3 @@ CLASS_TYPE_REVIEW_THRESHOLD = 76
 TEXT_FIELD_PASS_THRESHOLD = 86
 
 LOW_CONFIDENCE_THRESHOLD = 0.55
-

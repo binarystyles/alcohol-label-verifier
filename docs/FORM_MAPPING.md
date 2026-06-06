@@ -12,7 +12,7 @@ Source reviewed: the TTB Forms page lists current TTB F 5100.31 as `Application 
 | Item 7 | `fanciful_name` | Optional check when supplied. |
 | Item 8 | `applicant_name_address` | Application context and possible bottler/producer support. |
 | Item 8a | `mailing_address` | Extracted for reviewer context. |
-| Item 9 | `formula` | Formula/pre-COLA reference, such as a TTB Formula ID, TTB ID, lab number, pre-import approval reference, or no-formula-required note. This is not used as the general ABV field. |
+| Item 9 | `formula` | Required formula/pre-COLA reference or formula text, such as a TTB Formula ID, TTB ID, lab number, pre-import approval reference, no-formula-required note, or quantitative formula information. If the application-side formula text includes ABV or proof, the extractor derives expected `alcohol_content` from it and verifies that value against the label. Missing Item 9 alcohol content becomes Needs Review. A readable Item 9 alcohol mismatch becomes Fail. |
 | Item 10 | `grape_varietals` | Extracted for reviewer context for wine applications. |
 | Item 11 | `wine_appellation` | Extracted for reviewer context and possible label comparison. |
 | Item 12 | `phone` | Extracted for reviewer context. |
@@ -21,7 +21,7 @@ Source reviewed: the TTB Forms page lists current TTB F 5100.31 as `Application 
 | Item 15 | `item_15` | Checked against label/container text when supplied; missing evidence becomes Needs Review. |
 | Lower page-one label area | label OCR text | Evidence source for all label checks. |
 
-The current TTB F 5100.31 instructions place brand, fanciful name, product type, formula/pre-COLA reference, wine-only grape varietals, wine appellation, contact details, application type, and Item 15 container text in page-one form fields. Alcohol content and net contents are mandatory label facts rather than dedicated page-one application fields. Class/type, bottler/producer, country of origin, and imported status may also be represented through label/application package evidence rather than standalone first-page fields.
+The current TTB F 5100.31 instructions place brand, fanciful name, product type, formula/pre-COLA information, wine-only grape varietals, wine appellation, contact details, application type, and Item 15 container text in page-one form fields. The formula instructions describe a formula as a quantitative list of ingredients and step-by-step method of manufacture, and the app treats ABV/proof in Item 9 as application-side expected alcohol content. Alcohol content and net contents may also be mandatory label facts rather than dedicated page-one application fields. Class/type, bottler/producer, country of origin, and imported status may also be represented through label/application package evidence rather than standalone first-page fields.
 
 The blank TTB F 5100.31 form does not always expose class/type, alcohol content, net contents, bottler/producer, country of origin, or imported status as simple fields. For this reason, the extractor also looks for an explicit application-data summary block inside the completed PDF. That block is treated as application/package metadata, not label evidence.
 

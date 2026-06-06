@@ -8,6 +8,7 @@ from src.verifier import (
     verify_brand,
     verify_class_type,
     verify_government_warning,
+    verify_formula_alcohol_content,
     verify_net_contents,
 )
 
@@ -33,6 +34,23 @@ def test_abv_mismatch_fails() -> None:
     assert result.status == STATUS_FAIL
 
 
+def test_formula_alcohol_content_matches_label() -> None:
+    result = verify_formula_alcohol_content("F-1001; 90 proof", "OLD TOM GIN 45% Alc./Vol.")
+    assert result.status == STATUS_PASS
+    assert result.field == "formula"
+
+
+def test_formula_alcohol_content_missing_needs_review() -> None:
+    result = verify_formula_alcohol_content("F-1001", "OLD TOM GIN 45% Alc./Vol.")
+    assert result.status == STATUS_REVIEW
+    assert "Item 9 formula" in result.reason
+
+
+def test_formula_alcohol_content_mismatch_fails() -> None:
+    result = verify_formula_alcohol_content("F-1001; 45% ABV", "OLD TOM GIN 40% Alc./Vol.")
+    assert result.status == STATUS_FAIL
+
+
 def test_net_contents_match_passes_with_liters() -> None:
     result = verify_net_contents("750 mL", "Net Contents .75 L")
     assert result.status == STATUS_PASS
@@ -49,6 +67,7 @@ def test_overall_status_aggregation_pass() -> None:
         serial_number="APP-X",
         product_type="DISTILLED SPIRITS",
         brand_name="OLD TOM GIN",
+        formula="F-1001; 45% ABV",
         class_type="Gin",
         alcohol_content="45% ABV",
         net_contents="750 mL",
@@ -77,6 +96,7 @@ def test_overall_status_aggregation_fail() -> None:
         serial_number="APP-X",
         product_type="DISTILLED SPIRITS",
         brand_name="OLD TOM GIN",
+        formula="F-1001; 45% ABV",
         class_type="Gin",
         alcohol_content="45% ABV",
         net_contents="750 mL",
@@ -93,4 +113,3 @@ def test_overall_status_aggregation_fail() -> None:
         processing_time_seconds=0.1,
     )
     assert result.overall_status == STATUS_FAIL
-

@@ -19,7 +19,7 @@ uploads/
 
 docs/source/*
 !docs/source/.gitkeep
+!docs/source/f510031.pdf
 
 .DS_Store
 Thumbs.db
-

@@ -101,6 +101,8 @@ python scripts/create_sample_applications.py
 
 Open the app, select PDFs from `samples/applications` or upload `samples/sample_batch.zip`, then click **Verify Applications**. The expected outcomes are documented in `samples/expected_outcomes.md`.
 
+The sample generator uses the public TTB F 5100.31 template at `docs/source/f510031.pdf` when present, so generated samples resemble the current agency form with completed fields and affixed label artwork. If that template is absent, the generator falls back to a controlled one-page layout for tests.
+
 The generated set includes:
 
 - `APP-001_old_tom_pass.pdf`: passing label.
@@ -127,7 +129,7 @@ Label OCR text is never used to invent expected application values.
 
 ## TTB F 5100.31 Field Mapping
 
-The prototype maps Item 4 through Item 15 and the lower page-one label area with normalized coordinates in `src/form_mapping.py`. See `docs/FORM_MAPPING.md` for the full mapping. Coordinates are heuristics and should be tuned with real completed application samples.
+The prototype maps Item 4 through Item 15 and the lower page-one label area with normalized coordinates in `src/form_mapping.py`. The mapping is based on the current TTB Forms page entry for TTB F 5100.31 (04/2023) and the instructions embedded in that form. Current TTB F 5100.31 instructions treat Item 9 as the formula/pre-COLA reference field, not as the general alcohol-content field. Alcohol content, net contents, class/type, bottler/producer, and similar package facts may come from label/application package evidence or an explicit in-PDF application-data summary. See `docs/FORM_MAPPING.md` for the full mapping. Coordinates are heuristics and should be tuned with real completed application samples.
 
 ## Approach
 
@@ -149,7 +151,7 @@ The app uses deterministic rules plus fuzzy matching rather than cloud LLM APIs.
 
 ## Security And Privacy
 
-Uploaded files are processed in memory during the Streamlit session. The app does not permanently store uploads, does not call cloud AI APIs, and does not make runtime network calls. Avoid committing raw source/reference files under `docs/source/`; that path is ignored by git.
+Uploaded files are processed in memory during the Streamlit session. The app does not permanently store uploads, does not call cloud AI APIs, and does not make runtime network calls. The public TTB blank form at `docs/source/f510031.pdf` is tracked because deterministic sample generation depends on it. Other raw source/reference files under `docs/source/` remain ignored.
 
 ## Performance Notes
 

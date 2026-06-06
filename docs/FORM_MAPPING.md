@@ -2,6 +2,8 @@
 
 The prototype uses normalized page coordinates in `src/form_mapping.py` so regions scale with page size. These regions are tuned around TTB F 5100.31 page one and are intended to be easy to adjust. Scanned application image files are converted to an in-memory PDF page first, then the same normalized regions are applied.
 
+Source reviewed: the TTB Forms page lists current TTB F 5100.31 as `Application for and Certification/Exemption of Label/Bottle Approval (04/2023)`, and the linked form PDF includes the page-one fields and instructions used for this mapping.
+
 | TTB item | Extracted field | Verification use |
 | --- | --- | --- |
 | Item 4 | `serial_number` | Application identifier and result table reference. |
@@ -10,7 +12,7 @@ The prototype uses normalized page coordinates in `src/form_mapping.py` so regio
 | Item 7 | `fanciful_name` | Optional check when supplied. |
 | Item 8 | `applicant_name_address` | Application context and possible bottler/producer support. |
 | Item 8a | `mailing_address` | Extracted for reviewer context. |
-| Item 9 | `formula` | Extracted for reviewer context. |
+| Item 9 | `formula` | Formula/pre-COLA reference, such as a TTB Formula ID, TTB ID, lab number, pre-import approval reference, or no-formula-required note. This is not used as the general ABV field. |
 | Item 10 | `grape_varietals` | Extracted for reviewer context for wine applications. |
 | Item 11 | `wine_appellation` | Extracted for reviewer context and possible label comparison. |
 | Item 12 | `phone` | Extracted for reviewer context. |
@@ -18,6 +20,8 @@ The prototype uses normalized page coordinates in `src/form_mapping.py` so regio
 | Item 14 | `application_type` | Extracted for reviewer context. |
 | Item 15 | `item_15` | Checked against label/container text when supplied; missing evidence becomes Needs Review. |
 | Lower page-one label area | label OCR text | Evidence source for all label checks. |
+
+The current TTB F 5100.31 instructions place brand, fanciful name, product type, formula/pre-COLA reference, wine-only grape varietals, wine appellation, contact details, application type, and Item 15 container text in page-one form fields. Alcohol content and net contents are mandatory label facts rather than dedicated page-one application fields. Class/type, bottler/producer, country of origin, and imported status may also be represented through label/application package evidence rather than standalone first-page fields.
 
 The blank TTB F 5100.31 form does not always expose class/type, alcohol content, net contents, bottler/producer, country of origin, or imported status as simple fields. For this reason, the extractor also looks for an explicit application-data summary block inside the completed PDF. That block is treated as application/package metadata, not label evidence.
 

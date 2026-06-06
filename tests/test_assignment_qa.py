@@ -182,6 +182,7 @@ def test_runtime_code_has_no_cloud_ai_or_network_clients() -> None:
 def test_gitignore_excludes_source_docs_and_local_artifacts() -> None:
     gitignore = (ROOT / ".gitignore").read_text(encoding="utf-8")
     assert "docs/source/*" in gitignore
+    assert "!docs/source/f510031.pdf" in gitignore
     assert "__pycache__/" in gitignore
     assert ".pytest_cache/" in gitignore
     assert ".venv/" in gitignore
@@ -190,7 +191,8 @@ def test_gitignore_excludes_source_docs_and_local_artifacts() -> None:
 
 def test_dockerignore_excludes_source_docs_and_local_artifacts() -> None:
     dockerignore = (ROOT / ".dockerignore").read_text(encoding="utf-8")
-    assert "docs/source/" in dockerignore
+    assert "docs/source/*" in dockerignore
+    assert "!docs/source/f510031.pdf" in dockerignore
     assert ".git/" in dockerignore
     assert "__pycache__/" in dockerignore
     assert ".pytest_cache/" in dockerignore

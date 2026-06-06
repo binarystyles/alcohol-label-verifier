@@ -29,6 +29,12 @@ def test_government_warning_missing_fails_when_label_is_readable() -> None:
     assert result.status == STATUS_FAIL
 
 
+def test_government_warning_low_confidence_needs_review_instead_of_missing_fail() -> None:
+    result = verify_government_warning("OLD TOM GIN garbled rotated text", 0.32)
+    assert result.status == STATUS_REVIEW
+    assert "rotated, blurry, or unreadable" in result.reason
+
+
 def test_abv_mismatch_fails() -> None:
     result = verify_alcohol_content("45% ABV", "OLD TOM GIN 40% Alc./Vol.")
     assert result.status == STATUS_FAIL
@@ -125,3 +131,33 @@ def test_overall_status_aggregation_fail() -> None:
         processing_time_seconds=0.1,
     )
     assert result.overall_status == STATUS_FAIL
+
+
+def test_low_confidence_label_text_does_not_fail_government_warning() -> None:
+    fields = ApplicationFields(
+        serial_number="APP-LOW",
+        product_type="DISTILLED SPIRITS",
+        brand_name="OLD TOM GIN",
+        formula="F-1001",
+        class_type="Gin",
+        alcohol_content="45% ABV",
+        net_contents="750 mL",
+        raw_sources={"alcohol_content": "formula-approval"},
+    )
+    label = LabelExtraction(
+        text="OLD TOM GIN blurry rotated OCR text",
+        confidence=0.32,
+        unreadable=True,
+    )
+
+    result = verify_application(
+        filename="low.pdf",
+        fields=fields,
+        label=label,
+        application_ocr_text="",
+        processing_time_seconds=0.1,
+    )
+    warning = next(field for field in result.field_results if field.field == "government_warning")
+    assert result.overall_status == STATUS_REVIEW
+    assert warning.status == STATUS_REVIEW
+    assert "rotated, blurry, or unreadable" in warning.reason

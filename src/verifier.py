@@ -92,8 +92,13 @@ def verify_application(
 
 def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> list[FieldResult]:
     label_text = label.text
-    if (label.missing_label_area or label.unreadable) and not label_text.strip():
-        reason = "Label area is missing or unreadable, so this field needs human review."
+    if label.missing_label_area or label.unreadable or label.confidence < LOW_CONFIDENCE_THRESHOLD:
+        if label.missing_label_area:
+            reason = "Label area is missing or blank, so this field needs human review."
+            warning_reason = "Label area is missing or blank, so the government warning cannot be judged."
+        else:
+            reason = "Label OCR is low confidence; the label appears rotated, blurry, or unreadable, so this field needs human review."
+            warning_reason = "Label OCR is low confidence; the label appears rotated, blurry, or unreadable, so the government warning cannot be judged reliably."
         return [
             _label_unavailable_result("brand_name", fields.brand_name, reason),
             _label_unavailable_result("fanciful_name", fields.fanciful_name, reason, optional=True),
@@ -104,7 +109,7 @@ def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> li
             _label_unavailable_result("net_contents", fields.net_contents, reason),
             _label_unavailable_result("bottler_producer", fields.bottler_producer, reason, optional=True),
             _label_unavailable_country(fields.country_of_origin, fields.imported, reason),
-            _result("government_warning", GOVERNMENT_WARNING, "", "", STATUS_REVIEW, label.confidence, "OCR confidence around the warning is too low to judge."),
+            _result("government_warning", GOVERNMENT_WARNING, "", "", STATUS_REVIEW, label.confidence, warning_reason),
             _label_unavailable_result("item_15", fields.item_15, reason, optional=True),
         ]
     return [
@@ -272,8 +277,16 @@ def verify_country_of_origin(expected: str, imported: bool, label_text: str) -> 
 
 
 def verify_government_warning(label_text: str, label_confidence: float) -> FieldResult:
-    if label_confidence < 0.4 and not label_text.strip():
-        return _result("government_warning", GOVERNMENT_WARNING, "", "", STATUS_REVIEW, label_confidence, "OCR confidence around the warning is too low to judge.")
+    if label_confidence < LOW_CONFIDENCE_THRESHOLD:
+        return _result(
+            "government_warning",
+            GOVERNMENT_WARNING,
+            "",
+            snippet_around(label_text),
+            STATUS_REVIEW,
+            label_confidence,
+            "Label OCR is low confidence; the label appears rotated, blurry, or unreadable, so the government warning cannot be judged reliably.",
+        )
     if contains_title_case_warning(label_text):
         return _result("government_warning", GOVERNMENT_WARNING, "Government Warning", snippet_around(label_text, "Government Warning"), STATUS_FAIL, 0.95, "Government warning heading is not all caps.")
     if government_warning_matches(label_text):

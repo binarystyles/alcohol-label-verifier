@@ -77,18 +77,123 @@ def _apply_theme(dark_mode: bool) -> None:
         st.markdown(
             """
             <style>
+            :root { color-scheme: dark; }
             [data-testid="stAppViewContainer"] { background: #0f172a; color: #e5e7eb; }
+            [data-testid="stSidebar"] { background: #111827; color: #e5e7eb; }
             [data-testid="stHeader"] { background: rgba(15, 23, 42, 0.92); }
             [data-testid="stToolbar"] { color: #e5e7eb; }
-            .stApp, .stMarkdown, .stText, label, p, span, h1, h2, h3 { color: #e5e7eb; }
-            [data-testid="stFileUploader"], [data-testid="stExpander"], [data-testid="stMetric"],
-            [data-testid="stDataFrame"], textarea, input {
+            .stApp, .stMarkdown, .stText, label, p, h1, h2, h3, h4, h5, h6 {
+                color: #e5e7eb !important;
+            }
+            small, [data-testid="stMarkdownContainer"] code, [data-testid="stWidgetLabel"] {
+                color: #cbd5e1 !important;
+            }
+
+            [data-testid="stFileUploader"] section,
+            [data-testid="stFileUploader"] [data-testid="stFileUploaderDropzone"],
+            [data-testid="stExpander"] details,
+            [data-testid="stMetric"],
+            textarea, input {
                 background-color: #111827 !important;
+                color: #f8fafc !important;
+                border-color: #334155 !important;
+            }
+            [data-testid="stFileUploader"] * {
+                color: #e5e7eb !important;
+            }
+            [data-testid="stFileUploader"] button,
+            [data-testid="stFileUploader"] button * {
+                background-color: #f8fafc !important;
+                color: #0f172a !important;
+            }
+
+            div[data-testid="stButton"] > button,
+            div[data-testid="stDownloadButton"] > button,
+            [data-testid="baseButton-secondary"],
+            [data-testid="baseButton-minimal"] {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                border: 1px solid #475569 !important;
+            }
+            div[data-testid="stButton"] > button *,
+            div[data-testid="stDownloadButton"] > button *,
+            [data-testid="baseButton-secondary"] *,
+            [data-testid="baseButton-minimal"] * {
+                color: #f8fafc !important;
+            }
+            button[kind="primary"],
+            [data-testid="baseButton-primary"] {
+                background-color: #176b87 !important;
+                color: #ffffff !important;
+                border-color: #38bdf8 !important;
+            }
+            button[kind="primary"] *,
+            [data-testid="baseButton-primary"] * {
+                color: #ffffff !important;
+            }
+            button:disabled,
+            button[disabled],
+            button:disabled *,
+            button[disabled] * {
+                background-color: #334155 !important;
+                color: #cbd5e1 !important;
+                opacity: 1 !important;
+            }
+
+            [data-testid="stSegmentedControl"] label,
+            [data-testid="stSegmentedControl"] button,
+            [data-testid="stSegmentedControl"] [role="button"] {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                border-color: #475569 !important;
+            }
+            [data-testid="stSegmentedControl"] button *,
+            [data-testid="stSegmentedControl"] [role="button"] * {
+                color: #f8fafc !important;
+            }
+            [data-testid="stSegmentedControl"] [aria-pressed="true"],
+            [data-testid="stSegmentedControl"] [aria-checked="true"] {
+                background-color: #0e7490 !important;
+                color: #ffffff !important;
+            }
+
+            [data-testid="stExpander"] summary,
+            [data-testid="stExpander"] summary *,
+            [data-testid="stExpander"] [role="button"],
+            [data-testid="stExpander"] [role="button"] * {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+            }
+            [data-testid="stExpander"] details > div {
+                background-color: #0f172a !important;
                 color: #e5e7eb !important;
                 border-color: #334155 !important;
             }
-            div[data-testid="stNotification"] { background-color: #1f2937; color: #f9fafb; }
-            button { border-color: #475569 !important; }
+
+            [data-testid="stTabs"] button,
+            [data-testid="stTabs"] button * {
+                color: #e5e7eb !important;
+            }
+            [data-testid="stTabs"] [aria-selected="true"],
+            [data-testid="stTabs"] [aria-selected="true"] * {
+                color: #67e8f9 !important;
+            }
+
+            [data-testid="stAlert"],
+            div[data-testid="stNotification"] {
+                background-color: #1f2937 !important;
+                color: #f9fafb !important;
+                border-color: #475569 !important;
+            }
+            [data-testid="stAlert"] * {
+                color: #f9fafb !important;
+            }
+
+            [data-testid="stDataFrame"] {
+                background-color: #f8fafc !important;
+                color: #111827 !important;
+                border-radius: 8px;
+            }
             </style>
             """,
             unsafe_allow_html=True,

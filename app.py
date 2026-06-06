@@ -7,8 +7,22 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from src.constants import STATUS_FAIL, STATUS_PASS, STATUS_REVIEW
-from src.pdf_intake import SUPPORTED_UPLOAD_TYPES, expand_named_files, process_application_file_cached
+import src.constants as constants
+
+
+if not hasattr(constants, "STATUS_PASS"):
+    constants.STATUS_PASS = "Pass"
+if not hasattr(constants, "STATUS_REVIEW"):
+    constants.STATUS_REVIEW = "Needs Review"
+if not hasattr(constants, "STATUS_FAIL"):
+    constants.STATUS_FAIL = "Fail"
+
+STATUS_PASS = constants.STATUS_PASS
+STATUS_REVIEW = constants.STATUS_REVIEW
+STATUS_FAIL = constants.STATUS_FAIL
+import src.pdf_intake as pdf_intake
+
+SUPPORTED_UPLOAD_TYPES = getattr(pdf_intake, "SUPPORTED_UPLOAD_TYPES", ["pdf", "png", "jpg", "jpeg", "tif", "tiff", "bmp"])
 
 
 st.set_page_config(page_title="Alcohol Label Verification", layout="wide")
@@ -114,14 +128,15 @@ def _load_sample_files() -> list[tuple[str, bytes]]:
 
 
 def _run_batch(named_files: list[tuple[str, bytes]], cache: dict) -> list:
-    pdfs = expand_named_files(named_files)
+    pdfs = pdf_intake.expand_named_files(named_files)
+    processor = getattr(pdf_intake, "process_application_file_cached", pdf_intake.process_pdf_cached)
     progress = st.progress(0)
     status = st.empty()
     results = []
     total = len(pdfs)
     for index, (filename, data) in enumerate(pdfs, start=1):
         status.write(f"Processing {index} of {total}: {filename}")
-        results.append(process_application_file_cached(filename, data, cache=cache))
+        results.append(processor(filename, data, cache=cache))
         progress.progress(index / total)
     status.write("Verification complete.")
     return results

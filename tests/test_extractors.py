@@ -13,6 +13,8 @@ from src.extractors import (
     parse_application_summary,
     parse_formula_approval_fields,
 )
+from src.form_mapping import FORM_REGIONS
+from src.ocr import OCRText
 
 
 def test_application_summary_parser_maps_expected_fields() -> None:
@@ -228,6 +230,74 @@ def test_label_area_extraction_from_generated_pdf(sample_bytes: dict[str, bytes]
     assert "OLD TOM GIN" in label.text
     assert "GOVERNMENT WARNING" in label.text
     assert "FORMULAS ONLINE" not in label.text
+
+
+def test_label_extraction_finds_supplemental_label_after_attached_instructions() -> None:
+    document = fitz.open()
+    first_page = document.new_page(width=612, height=792)
+    label_rect = FORM_REGIONS["label_area"].to_rect(first_page.rect)
+    first_page.draw_rect(label_rect, color=(1, 1, 1), fill=(1, 1, 1))
+
+    for _ in range(5):
+        page = document.new_page(width=612, height=792)
+        page.insert_textbox(
+            fitz.Rect(36, 36, 560, 740),
+            "GENERAL INSTRUCTIONS\nPAPERWORK REDUCTION ACT\nThis certificate does not relieve you from liability.",
+            fontsize=12,
+            fontname="helv",
+        )
+
+    label_page = document.new_page(width=612, height=792)
+    label_page.insert_textbox(
+        fitz.Rect(72, 72, 540, 360),
+        "OLD TOM GIN\n45% Alc./Vol.\nGOVERNMENT WARNING",
+        fontsize=18,
+        fontname="helv",
+    )
+    try:
+        pdf_bytes = document.write()
+    finally:
+        document.close()
+
+    label = extract_label(pdf_bytes)
+
+    assert not label.missing_label_area
+    assert "OLD TOM GIN" in label.text
+    assert "PAPERWORK REDUCTION ACT" not in label.text
+
+
+def test_label_extraction_skips_ocr_text_that_looks_like_instructions(monkeypatch) -> None:
+    document = fitz.open()
+    for _ in range(3):
+        document.new_page(width=612, height=792)
+    try:
+        pdf_bytes = document.write()
+    finally:
+        document.close()
+
+    def fake_extract_region_text(page: fitz.Page, rect: fitz.Rect) -> OCRText:
+        if page.number == 1:
+            return OCRText(
+                text="GENERAL INSTRUCTIONS PAPERWORK REDUCTION ACT",
+                confidence=0.91,
+                source="tesseract",
+                nonwhite_ratio=0.4,
+            )
+        if page.number == 2:
+            return OCRText(
+                text="OLD TOM GIN 45% Alc./Vol. GOVERNMENT WARNING",
+                confidence=0.9,
+                source="tesseract",
+                nonwhite_ratio=0.3,
+            )
+        return OCRText(text="", confidence=0.0, source="pdf-text", nonwhite_ratio=0.0)
+
+    monkeypatch.setattr("src.extractors.extract_region_text", fake_extract_region_text)
+
+    label = extract_label(pdf_bytes)
+
+    assert "OLD TOM GIN" in label.text
+    assert "PAPERWORK REDUCTION ACT" not in label.text
 
 
 def test_missing_label_area_behavior(sample_bytes: dict[str, bytes]) -> None:

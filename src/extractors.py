@@ -10,7 +10,7 @@ import fitz
 from pypdf import PdfReader
 
 from src.form_mapping import APPLICATION_FORM_FIELDS, FORM_REGIONS
-from src.label_regions import label_regions
+from src.label_regions import label_regions, looks_like_non_label_page
 from src.models import ApplicationExtraction, ApplicationFields, LabelExtraction
 from src.normalize import extract_product_type, normalize_text
 from src.ocr import extract_region_text
@@ -209,6 +209,8 @@ def extract_label(pdf_bytes: bytes) -> LabelExtraction:
     for page_index, rect, label in label_regions(document):
         page = document[page_index]
         extracted = extract_region_text(page, rect)
+        if label == "supplemental-label-page" and extracted.text.strip() and looks_like_non_label_page(extracted.text):
+            continue
         if extracted.nonwhite_ratio > 0.02 or extracted.text.strip():
             saw_visual_content = True
         if extracted.text.strip():

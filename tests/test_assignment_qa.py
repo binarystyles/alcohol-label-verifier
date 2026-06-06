@@ -152,6 +152,7 @@ def test_required_docs_and_deployment_files_exist() -> None:
         "docs/APPROACH.md",
         "docs/ASSUMPTIONS.md",
         "docs/FORM_MAPPING.md",
+        "docs/TOOLS_USED.md",
         "requirements.txt",
         "packages.txt",
         "Dockerfile",

@@ -13,6 +13,9 @@ The main modules are:
 - `src/normalize.py`: text, brand, ABV/proof, net contents, product type, and warning normalization.
 - `src/verifier.py`: field checks and overall Pass / Needs Review / Fail aggregation.
 - `src/batch.py`: batch orchestration and CSV-ready dataframes.
+- `src/sample_data.py`: deterministic sample application package generation, including color-artwork labels.
+
+See `docs/TOOLS_USED.md` for the implementation, OCR, test, and deployment toolchain.
 
 ## Pipeline
 

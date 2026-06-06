@@ -8,9 +8,7 @@ import pandas as pd
 import streamlit as st
 
 from src.batch import (
-    application_fields_dataframe,
     field_results_dataframe,
-    process_batch,
     summary_dataframe,
     summary_metrics,
 )
@@ -146,7 +144,7 @@ def _render_results(results: list) -> None:
 
     summary_df = summary_dataframe(results)
     detail_df = field_results_dataframe(results)
-    fields_df = application_fields_dataframe(results)
+    fields_df = _application_fields_dataframe(results)
 
     status_filter = st.segmented_control(
         "Status filter",
@@ -201,6 +199,16 @@ def _render_results(results: list) -> None:
                 st.text_area("Label OCR text", result.label_ocr_text or "No readable label text extracted.", height=240)
             with tab_app:
                 st.text_area("Application OCR text", result.application_ocr_text or "No application text extracted.", height=240)
+
+
+def _application_fields_dataframe(results: list) -> pd.DataFrame:
+    rows: list[dict] = []
+    for result in results:
+        row = dict(result.extracted_application_fields)
+        row["filename"] = result.filename
+        row["application_id"] = result.application_id
+        rows.append(row)
+    return pd.DataFrame(rows)
 
 
 if __name__ == "__main__":

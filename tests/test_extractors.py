@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from src.extractors import extract_acroform_fields, extract_application, extract_label, parse_application_summary
+from src.extractors import (
+    clean_region_value,
+    extract_acroform_fields,
+    extract_application,
+    extract_label,
+    parse_application_summary,
+)
 
 
 def test_application_summary_parser_maps_expected_fields() -> None:
@@ -39,6 +45,30 @@ def test_region_based_application_extraction_from_generated_pdf(sample_bytes: di
     assert extraction.fields.product_type == "DISTILLED SPIRITS"
 
 
+def test_generated_pdf_application_fields_do_not_keep_form_boilerplate(sample_bytes: dict[str, bytes]) -> None:
+    extraction = extract_application(sample_bytes["APP-001_old_tom_pass.pdf"])
+    assert extraction.fields.mailing_address == ""
+    assert extraction.fields.grape_varietals == ""
+    assert extraction.fields.wine_appellation == ""
+    assert extraction.fields.phone == "202-555-0100"
+    assert extraction.fields.email == "labels@example.test"
+    assert extraction.fields.application_type == "Certificate of Label Approval"
+    assert extraction.fields.item_15 == ""
+    assert "TYPE OF A" not in extraction.fields.to_dict().get("grape_varietals", "")
+
+
+def test_region_cleaning_preserves_values_after_printed_field_labels() -> None:
+    assert clean_region_value("serial_number", "4. SERIAL NUMBER APP-SCAN") == "APP-SCAN"
+    assert clean_region_value("brand_name", "6. BRAND NAME SCANNED SAMPLE") == "SCANNED SAMPLE"
+    assert clean_region_value("phone", "EMAIL A\n202 555 0100") == "202-555-0100"
+    assert clean_region_value("email", 'DDRESS\n"For sale in only"\nlabels@example.test') == "labels@example.test"
+    assert clean_region_value("item_15", "O\nSO, S O\nS\nO S O") == ""
+    assert (
+        clean_region_value("application_type", "CERTIFIC\nATE OF LABEL APPROVAL\nTTB ID")
+        == "Certificate of Label Approval"
+    )
+
+
 def test_label_area_extraction_from_generated_pdf(sample_bytes: dict[str, bytes]) -> None:
     label = extract_label(sample_bytes["APP-001_old_tom_pass.pdf"])
     assert not label.missing_label_area
@@ -55,4 +85,3 @@ def test_missing_label_area_behavior(sample_bytes: dict[str, bytes]) -> None:
 def test_unreadable_ocr_behavior(sample_bytes: dict[str, bytes]) -> None:
     label = extract_label(sample_bytes["APP-005_low_quality_rotated.pdf"])
     assert label.unreadable or label.confidence < 0.55
-

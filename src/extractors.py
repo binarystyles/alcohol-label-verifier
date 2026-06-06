@@ -75,6 +75,63 @@ SUMMARY_KEYS: dict[str, str] = {
     "imported": "imported",
 }
 
+PHONE_PATTERN = re.compile(r"(?:\+?1[\s.-]?)?(?:\(?\d{3}\)?[\s.-]?)\d{3}[\s.-]?\d{4}")
+EMAIL_PATTERN = re.compile(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.IGNORECASE)
+
+FIELD_LABEL_PATTERNS: dict[str, tuple[re.Pattern[str], ...]] = {
+    "serial_number": (re.compile(r"^\s*4\.?\s*SERIAL\s+NUMBER\s*[:\-]?\s*", re.IGNORECASE),),
+    "product_type": (re.compile(r"^\s*5\.?\s*TYPE\s+OF\s+PRODUCT\s*[:\-]?\s*", re.IGNORECASE),),
+    "brand_name": (re.compile(r"^\s*6\.?\s*BRAND\s+NAME\s*[:\-]?\s*", re.IGNORECASE),),
+    "fanciful_name": (re.compile(r"^\s*7\.?\s*FANCIFUL\s+NAME\s*[:\-]?\s*", re.IGNORECASE),),
+    "applicant_name_address": (
+        re.compile(r"^\s*8\.?\s*NAME\s+AND\s+ADDRESS\s+OF\s+APPLICANT\s*[:\-]?\s*", re.IGNORECASE),
+        re.compile(r"^\s*NAME\s+AND\s+ADDRESS\s*[:\-]?\s*", re.IGNORECASE),
+    ),
+    "mailing_address": (
+        re.compile(r"^\s*8A\.?\s*MAILING\s+ADDRESS\s*[:\-]?\s*", re.IGNORECASE),
+        re.compile(r"^\s*MAILING\s+ADDRESS\s*[:\-]?\s*", re.IGNORECASE),
+    ),
+    "formula": (re.compile(r"^\s*9\.?\s*FORMULA\s*[:\-]?\s*", re.IGNORECASE),),
+    "grape_varietals": (re.compile(r"^\s*10\.?\s*GRAPE\s+VARIETALS?\s*[:\-]?\s*", re.IGNORECASE),),
+    "wine_appellation": (re.compile(r"^\s*11\.?\s*WINE\s+APPELLATION\s*[:\-]?\s*", re.IGNORECASE),),
+    "phone": (re.compile(r"^\s*12\.?\s*PHONE(?:\s+NUMBER)?\s*[:\-]?\s*", re.IGNORECASE),),
+    "email": (re.compile(r"^\s*13\.?\s*EMAIL(?:\s+ADDRESS)?\s*[:\-]?\s*", re.IGNORECASE),),
+    "application_type": (re.compile(r"^\s*14\.?\s*TYPE\s+OF\s+APPLICATION\s*[:\-]?\s*", re.IGNORECASE),),
+}
+
+APPLICATION_TYPE_OPTIONS: tuple[tuple[str, str], ...] = (
+    ("CERTIFICATEOFLABELAPPROVAL", "Certificate of Label Approval"),
+    ("CERTIFICATEOFEXEMPTIONFROMLABELAPPROVAL", "Certificate of Exemption from Label Approval"),
+    ("DISTINCTIVELIQUORBOTTLEAPPROVAL", "Distinctive Liquor Bottle Approval"),
+    ("RESUBMISSIONAFTERREJECTION", "Resubmission After Rejection"),
+)
+
+FORM_BOILERPLATE_FRAGMENTS = (
+    "AFFIXED BELOW",
+    "ATE OF EXEMPTION",
+    "ATE OF LABEL",
+    "BOTTLE CAPACITY",
+    "CERTIFIC",
+    "CHECK APPLICABLE",
+    "DISTINCTIVE LIQUOR",
+    "EMAIL A",
+    "EXEMPTION FROM LABEL",
+    "FILL IN",
+    "FOR SALE IN",
+    "IF ANY",
+    "LABEL APPROVAL",
+    "ONLY IF IT DOES NOT APPEAR",
+    "PPLICATION",
+    "REJECTION",
+    "REQUIRED",
+    "RESUBMISSION",
+    "SHOW ANY INFORMATION",
+    "TOTAL BOTTLE",
+    "TRANSLATIONS OF FOREIGN",
+    "TTB ID",
+    "TYPE OF A",
+)
+
 
 def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
     warnings: list[str] = []
@@ -95,6 +152,7 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
 
     full_text = "\n".join(page.get_text("text") for page in document)
     summary_fields = parse_application_summary(full_text)
+    _merge_fields(fields, summary_fields, "application-summary")
 
     if document.page_count:
         page = document[0]
@@ -114,7 +172,6 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
             elif extracted.warning:
                 warnings.append(extracted.warning)
 
-    _merge_fields(fields, summary_fields, "application-summary")
     application_text_parts.append(_strip_label_area_from_page_one(document))
     if summary_fields:
         application_text_parts.append(_summary_text(summary_fields))
@@ -226,16 +283,31 @@ def parse_application_summary(text: str) -> dict[str, Any]:
 
 
 def clean_region_value(field_name: str, text: str) -> str:
+    if field_name == "application_type":
+        application_type = _extract_application_type(text)
+        if application_type:
+            return application_type
+    if field_name == "phone":
+        match = PHONE_PATTERN.search(text)
+        return _normalize_phone(match.group(0)) if match else ""
+    if field_name == "email":
+        match = EMAIL_PATTERN.search(text)
+        return match.group(0).strip() if match else ""
+
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     kept: list[str] = []
     for line in lines:
+        line = _strip_field_label_prefix(field_name, line)
         upper = normalize_text(line)
-        if _is_form_label_line(upper):
+        if _is_form_label_line(upper) or _is_form_boilerplate_line(upper):
             continue
         kept.append(line)
     cleaned = "\n".join(kept).strip(" :-")
-    if field_name == "item_15" and "PART II" in normalize_text(cleaned):
+    if _is_blank_or_punctuation(cleaned):
         return ""
+    if field_name == "item_15":
+        if "PART II" in normalize_text(cleaned) or _looks_like_item_15_noise(cleaned):
+            return ""
     if field_name == "product_type":
         return extract_product_type(cleaned)
     return cleaned
@@ -317,6 +389,50 @@ def _is_form_label_line(upper_line: str) -> bool:
     if re.fullmatch(r"\d+[A-Z]?\.?", upper_line):
         return True
     return False
+
+
+def _strip_field_label_prefix(field_name: str, line: str) -> str:
+    stripped = line
+    for pattern in FIELD_LABEL_PATTERNS.get(field_name, ()):
+        stripped = pattern.sub("", stripped)
+    return stripped.strip(" :-")
+
+
+def _is_form_boilerplate_line(upper_line: str) -> bool:
+    if not upper_line:
+        return True
+    if any(fragment in upper_line for fragment in FORM_BOILERPLATE_FRAGMENTS):
+        return True
+    if re.fullmatch(r"[A-D]\.?", upper_line):
+        return True
+    return False
+
+
+def _extract_application_type(text: str) -> str:
+    compact = re.sub(r"[^A-Z]", "", normalize_text(text))
+    for marker, display in APPLICATION_TYPE_OPTIONS:
+        if marker in compact:
+            return display
+    return ""
+
+
+def _normalize_phone(value: str) -> str:
+    digits = re.sub(r"\D+", "", value)
+    if len(digits) == 11 and digits.startswith("1"):
+        digits = digits[1:]
+    if len(digits) == 10:
+        return f"{digits[:3]}-{digits[3:6]}-{digits[6:]}"
+    return value.strip()
+
+
+def _is_blank_or_punctuation(value: str) -> bool:
+    return not re.sub(r"[\W_]+", "", value)
+
+
+def _looks_like_item_15_noise(value: str) -> bool:
+    tokens = re.findall(r"[A-Z0-9]+", normalize_text(value))
+    meaningful_tokens = [token for token in tokens if len(token) > 2]
+    return not meaningful_tokens and len(tokens) >= 3
 
 
 def _dedupe(values: list[str]) -> list[str]:

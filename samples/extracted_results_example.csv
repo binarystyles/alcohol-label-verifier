@@ -1,7 +1,7 @@
 filename,application_id,serial_number,brand_name,product_type,overall_status,confidence,processing_time_seconds,short_summary,warnings,errors
-APP-001_old_tom_pass.pdf,APP-001,APP-001,OLD TOM GIN,DISTILLED SPIRITS,Pass,0.95,0.115,All required checks passed with adequate confidence.,,
-APP-002_stones_throw_variation.pdf,APP-002,APP-002,STONE'S THROW,DISTILLED SPIRITS,Pass,0.95,0.11,All required checks passed with adequate confidence.,,
-APP-003_wrong_abv.pdf,APP-003,APP-003,OLD TOM GIN,DISTILLED SPIRITS,Fail,0.95,0.108,Failed critical checks: alcohol_content,,
-APP-004_bad_warning.pdf,APP-004,APP-004,OLD TOM GIN,DISTILLED SPIRITS,Fail,0.95,0.118,Failed critical checks: government_warning,,
-APP-005_low_quality_rotated.pdf,APP-005,APP-005,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.0,0.119,"Needs review: brand_name, fanciful_name, product_type, class_type",No readable affixed label area was found in the completed application PDF.; Label area is missing or blank.,
-APP-006_missing_label_area.pdf,APP-006,APP-006,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.0,0.111,"Needs review: brand_name, fanciful_name, product_type, class_type",No readable affixed label area was found in the completed application PDF.; Label area is missing or blank.,
+APP-001_old_tom_pass.pdf,APP-001,APP-001,OLD TOM GIN,DISTILLED SPIRITS,Pass,0.95,0.079,All required checks passed with adequate confidence.,,
+APP-002_stones_throw_variation.pdf,APP-002,APP-002,STONE'S THROW,DISTILLED SPIRITS,Pass,0.95,0.077,All required checks passed with adequate confidence.,,
+APP-003_wrong_abv.pdf,APP-003,APP-003,OLD TOM GIN,DISTILLED SPIRITS,Fail,0.95,0.071,Failed critical checks: alcohol_content,,
+APP-004_bad_warning.pdf,APP-004,APP-004,OLD TOM GIN,DISTILLED SPIRITS,Fail,0.95,0.071,Failed critical checks: government_warning,,
+APP-005_low_quality_rotated.pdf,APP-005,APP-005,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.0,0.08,"Needs review: brand_name, fanciful_name, product_type, class_type",No readable affixed label area was found in the completed application file.; Label area is missing or blank.,
+APP-006_missing_label_area.pdf,APP-006,APP-006,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.0,0.072,"Needs review: brand_name, fanciful_name, product_type, class_type",No readable affixed label area was found in the completed application file.; Label area is missing or blank.,

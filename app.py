@@ -135,34 +135,77 @@ def _apply_theme(dark_mode: bool) -> None:
             button[disabled],
             button:disabled *,
             button[disabled] * {
-                background-color: #334155 !important;
-                color: #cbd5e1 !important;
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                opacity: 1 !important;
+            }
+            div[data-testid="stDownloadButton"] button:disabled,
+            div[data-testid="stDownloadButton"] button[disabled],
+            div[data-testid="stDownloadButton"] button:disabled *,
+            div[data-testid="stDownloadButton"] button[disabled] * {
+                background-color: #1e293b !important;
+                color: #f8fafc !important;
+                border-color: #64748b !important;
                 opacity: 1 !important;
             }
 
             [data-testid="stSegmentedControl"] label,
+            [data-testid="stSegmentedControl"] label *,
+            [data-testid="stSegmentedControl"] label > div,
             [data-testid="stSegmentedControl"] button,
-            [data-testid="stSegmentedControl"] [role="button"] {
+            [data-testid="stSegmentedControl"] button *,
+            [data-testid="stSegmentedControl"] [role="button"],
+            [data-testid="stSegmentedControl"] [role="button"] *,
+            [data-testid="stSegmentedControl"] [role="radio"],
+            [data-testid="stSegmentedControl"] [role="radio"] *,
+            [data-testid="stSegmentedControl"] [data-baseweb="radio"],
+            [data-testid="stSegmentedControl"] [data-baseweb="radio"] * {
                 background-color: #1e293b !important;
                 color: #f8fafc !important;
                 border-color: #475569 !important;
             }
-            [data-testid="stSegmentedControl"] button *,
-            [data-testid="stSegmentedControl"] [role="button"] * {
+            [data-testid="stSegmentedControl"] p,
+            [data-testid="stSegmentedControl"] span {
                 color: #f8fafc !important;
             }
+            [data-testid="stSegmentedControl"] label:has(input:checked),
+            [data-testid="stSegmentedControl"] label:has(input:checked) *,
             [data-testid="stSegmentedControl"] [aria-pressed="true"],
-            [data-testid="stSegmentedControl"] [aria-checked="true"] {
-                background-color: #0e7490 !important;
+            [data-testid="stSegmentedControl"] [aria-pressed="true"] *,
+            [data-testid="stSegmentedControl"] [aria-checked="true"],
+            [data-testid="stSegmentedControl"] [aria-checked="true"] * {
+                background-color: #083047 !important;
                 color: #ffffff !important;
+                border-color: #38bdf8 !important;
+            }
+            [data-testid="stSelectbox"] *,
+            [data-testid="stSelectbox"] div[data-baseweb="select"] *,
+            div[data-baseweb="popover"] li,
+            div[data-baseweb="popover"] li * {
+                color: #f8fafc !important;
+            }
+            [data-testid="stSelectbox"] div[data-baseweb="select"] > div,
+            div[data-baseweb="popover"] ul,
+            div[data-baseweb="popover"] li {
+                background-color: #1e293b !important;
+                border-color: #475569 !important;
             }
 
+            [data-testid="stExpander"] details,
+            [data-testid="stExpander"] details *,
             [data-testid="stExpander"] summary,
             [data-testid="stExpander"] summary *,
+            [data-testid="stExpander"] summary div,
+            [data-testid="stExpander"] summary p,
+            [data-testid="stExpander"] summary span,
             [data-testid="stExpander"] [role="button"],
             [data-testid="stExpander"] [role="button"] * {
                 background-color: #1e293b !important;
                 color: #f8fafc !important;
+            }
+            [data-testid="stExpander"] svg {
+                color: #f8fafc !important;
+                fill: currentColor !important;
             }
             [data-testid="stExpander"] details > div {
                 background-color: #0f172a !important;
@@ -248,10 +291,10 @@ def _render_results(results: list) -> None:
     detail_df = _field_results_dataframe(results)
     fields_df = _application_fields_dataframe(results)
 
-    status_filter = st.segmented_control(
+    status_filter = st.selectbox(
         "Status filter",
         options=["All", STATUS_PASS, STATUS_REVIEW, STATUS_FAIL],
-        default="All",
+        index=0,
     )
     visible_summary = summary_df if status_filter == "All" else summary_df[summary_df["overall_status"] == status_filter]
     st.dataframe(visible_summary, use_container_width=True, hide_index=True)
@@ -298,9 +341,19 @@ def _render_results(results: list) -> None:
             with tab_results:
                 st.dataframe(pd.DataFrame([field.to_dict() for field in result.field_results]), use_container_width=True)
             with tab_label:
-                st.text_area("Label OCR text", result.label_ocr_text or "No readable label text extracted.", height=240)
+                st.text_area(
+                    "Label OCR text",
+                    result.label_ocr_text or "No readable label text extracted.",
+                    height=240,
+                    key=f"label_ocr_{result.application_id}_{result.filename}",
+                )
             with tab_app:
-                st.text_area("Application OCR text", result.application_ocr_text or "No application text extracted.", height=240)
+                st.text_area(
+                    "Application OCR text",
+                    result.application_ocr_text or "No application text extracted.",
+                    height=240,
+                    key=f"application_ocr_{result.application_id}_{result.filename}",
+                )
 
 
 def _application_fields_dataframe(results: list) -> pd.DataFrame:

@@ -36,9 +36,34 @@ def test_streamlit_ui_exposes_only_completed_pdf_batch_workflow() -> None:
     assert 'type=["csv"]' not in source
     assert "read_csv" not in source
     assert "label image" not in source.lower()
+    assert 'key=f"label_ocr_' in source
+    assert 'key=f"application_ocr_' in source
     assert "pdf" in SUPPORTED_UPLOAD_TYPES
     assert "png" in SUPPORTED_UPLOAD_TYPES
     assert "jpg" in SUPPORTED_UPLOAD_TYPES
+
+
+def test_streamlit_results_render_multiple_applications_without_duplicate_widget_ids(sample_bytes: dict[str, bytes]) -> None:
+    app = AppTest.from_file(str(ROOT / "app.py"))
+    app.run(timeout=20)
+    app.file_uploader[0].set_value(
+        [
+            ("APP-001_old_tom_pass.pdf", sample_bytes["APP-001_old_tom_pass.pdf"], "application/pdf"),
+            ("APP-003_wrong_abv.pdf", sample_bytes["APP-003_wrong_abv.pdf"], "application/pdf"),
+            ("APP-006_missing_label_area.pdf", sample_bytes["APP-006_missing_label_area.pdf"], "application/pdf"),
+        ]
+    ).run(timeout=20)
+    app.button[0].click().run(timeout=120)
+
+    assert len(app.exception) == 0
+    assert [area.label for area in app.text_area] == [
+        "Label OCR text",
+        "Application OCR text",
+        "Label OCR text",
+        "Application OCR text",
+        "Label OCR text",
+        "Application OCR text",
+    ]
 
 
 def test_csvs_are_download_outputs_only() -> None:

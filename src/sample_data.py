@@ -253,13 +253,20 @@ def _draw_summary_block(page: fitz.Page, fields: dict[str, str | bool]) -> None:
         "brand_name",
         "fanciful_name",
         "applicant_name_address",
+        "mailing_address",
+        "formula",
+        "grape_varietals",
+        "wine_appellation",
+        "phone",
+        "email",
+        "application_type",
+        "item_15",
         "class_type",
         "alcohol_content",
         "net_contents",
         "bottler_producer",
         "country_of_origin",
         "imported",
-        "item_15",
     ):
         value = fields.get(key, "")
         lines.append(f"{_display_key(key)}: {value}")

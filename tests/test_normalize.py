@@ -37,6 +37,7 @@ def test_abv_and_proof_extraction_normalize_to_abv() -> None:
 def test_net_contents_extraction_normalizes_units() -> None:
     values = extract_net_contents_values("750ML 0.75 L .75 liters 750 milliliters")
     assert values == [750.0]
+    assert extract_net_contents_values("12 fl oz") == [354.882]
 
 
 def test_government_warning_validation_exact_statement() -> None:
@@ -45,4 +46,3 @@ def test_government_warning_validation_exact_statement() -> None:
 
 def test_title_case_warning_is_detected() -> None:
     assert contains_title_case_warning("Government Warning: do not drink during pregnancy")
-

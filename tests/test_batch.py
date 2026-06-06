@@ -4,6 +4,8 @@ from pathlib import Path
 
 from src.batch import application_fields_dataframe, field_results_dataframe, process_batch, summary_dataframe, summary_metrics
 from src.constants import STATUS_FAIL, STATUS_PASS, STATUS_REVIEW
+from src.ocr import tesseract_available
+from src.sample_data import sample_specs
 
 
 def test_batch_processing_one_pdf(sample_bytes: dict[str, bytes]) -> None:
@@ -29,9 +31,10 @@ def test_zip_batch_processing(sample_paths: list[Path]) -> None:
     results = process_batch([("sample_batch.zip", zip_bytes)], cache={})
     assert len(results) == len(sample_paths)
     metrics = summary_metrics(results)
-    assert metrics["pass"] == 2
-    assert metrics["fail"] == 2
-    assert metrics["needs_review"] == 2
+    expected_statuses = [_expected_status(spec) for spec in sample_specs()]
+    assert metrics["pass"] == expected_statuses.count(STATUS_PASS)
+    assert metrics["fail"] == expected_statuses.count(STATUS_FAIL)
+    assert metrics["needs_review"] == expected_statuses.count(STATUS_REVIEW)
 
 
 def test_export_dataframes_have_expected_rows(sample_bytes: dict[str, bytes]) -> None:
@@ -39,3 +42,9 @@ def test_export_dataframes_have_expected_rows(sample_bytes: dict[str, bytes]) ->
     assert len(summary_dataframe(results)) == 1
     assert len(field_results_dataframe(results)) == 11
     assert len(application_fields_dataframe(results)) == 1
+
+
+def _expected_status(spec) -> str:
+    if tesseract_available():
+        return spec.expected_status
+    return spec.expected_status_without_ocr or spec.expected_status

@@ -44,7 +44,7 @@ def test_expand_named_files_accepts_pdf_and_zip(sample_bytes: dict[str, bytes]) 
             ("batch.zip", zip_bytes),
         ]
     )
-    assert len(expanded) == 7
+    assert len(expanded) == len(sample_bytes) + 1
 
 
 def test_missing_label_area_process_result(sample_bytes: dict[str, bytes]) -> None:

@@ -96,7 +96,7 @@ def test_pdf_and_zip_intake_treat_each_pdf_as_own_package(sample_bytes: dict[str
             ("mixed.zip", mixed_zip.getvalue()),
         ]
     )
-    assert len(expanded) == 9
+    assert len(expanded) == len(sample_bytes) + 3
     assert any(name.lower().endswith(".png") for name, _ in expanded)
     assert all(name.lower().endswith((".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp")) for name, _ in expanded)
 

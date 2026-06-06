@@ -106,7 +106,7 @@ def normalize_abv(text: str | None) -> float | None:
 
 
 NET_CONTENTS_PATTERN = re.compile(
-    r"(?<![A-Z0-9])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>ML|M\.L\.|MILLILITERS?|L|LITERS?|LITRES?)\b",
+    r"(?<![A-Z0-9])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>ML|M\.L\.|MILLILITERS?|L|LITERS?|LITRES?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?)\b",
     re.IGNORECASE,
 )
 
@@ -117,8 +117,10 @@ def extract_net_contents_values(text: str | None) -> list[float]:
     values: list[float] = []
     for match in NET_CONTENTS_PATTERN.finditer(text):
         number = float(match.group("num"))
-        unit = match.group("unit").upper().replace(".", "")
-        if unit.startswith("M"):
+        unit = re.sub(r"[^A-Z]+", "", match.group("unit").upper())
+        if "OZ" in unit or "OUNCE" in unit:
+            milliliters = number * 29.5735
+        elif unit.startswith("M"):
             milliliters = number
         else:
             milliliters = number * 1000
@@ -172,4 +174,3 @@ def _dedupe_floats(values: list[float]) -> list[float]:
         if not any(abs(value - seen) < 0.01 for seen in deduped):
             deduped.append(value)
     return deduped
-

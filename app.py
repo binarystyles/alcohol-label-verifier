@@ -7,11 +7,6 @@ from pathlib import Path
 import pandas as pd
 import streamlit as st
 
-from src.batch import (
-    field_results_dataframe,
-    summary_dataframe,
-    summary_metrics,
-)
 from src.constants import STATUS_FAIL, STATUS_PASS, STATUS_REVIEW
 from src.pdf_intake import SUPPORTED_UPLOAD_TYPES, expand_named_files, process_application_file_cached
 
@@ -133,7 +128,7 @@ def _run_batch(named_files: list[tuple[str, bytes]], cache: dict) -> list:
 
 
 def _render_results(results: list) -> None:
-    metrics = summary_metrics(results)
+    metrics = _summary_metrics(results)
     cols = st.columns(6)
     cols[0].metric("Total", metrics["total"])
     cols[1].metric("Pass", metrics["pass"])
@@ -142,8 +137,8 @@ def _render_results(results: list) -> None:
     cols[4].metric("Unreadable", metrics["unreadable"])
     cols[5].metric("Missing Label Area", metrics["missing_label_area"])
 
-    summary_df = summary_dataframe(results)
-    detail_df = field_results_dataframe(results)
+    summary_df = _summary_dataframe(results)
+    detail_df = _field_results_dataframe(results)
     fields_df = _application_fields_dataframe(results)
 
     status_filter = st.segmented_control(
@@ -209,6 +204,35 @@ def _application_fields_dataframe(results: list) -> pd.DataFrame:
         row["application_id"] = result.application_id
         rows.append(row)
     return pd.DataFrame(rows)
+
+
+def _summary_dataframe(results: list) -> pd.DataFrame:
+    return pd.DataFrame([result.to_summary_dict() for result in results])
+
+
+def _field_results_dataframe(results: list) -> pd.DataFrame:
+    rows: list[dict] = []
+    for result in results:
+        for field in result.field_results:
+            row = field.to_dict()
+            row["filename"] = result.filename
+            row["application_id"] = result.application_id
+            rows.append(row)
+    return pd.DataFrame(rows)
+
+
+def _summary_metrics(results: list) -> dict[str, int]:
+    return {
+        "total": len(results),
+        "pass": sum(result.overall_status == STATUS_PASS for result in results),
+        "needs_review": sum(result.overall_status == STATUS_REVIEW for result in results),
+        "fail": sum(result.overall_status == STATUS_FAIL for result in results),
+        "unreadable": sum(any("unreadable" in warning.lower() for warning in result.warnings) for result in results),
+        "missing_label_area": sum(
+            any("label area" in warning.lower() and "missing" in warning.lower() for warning in result.warnings)
+            for result in results
+        ),
+    }
 
 
 if __name__ == "__main__":

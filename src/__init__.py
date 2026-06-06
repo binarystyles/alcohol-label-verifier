@@ -1,0 +1,2 @@
+"""Alcohol label verifier package."""
+

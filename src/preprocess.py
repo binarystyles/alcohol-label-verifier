@@ -1,0 +1,36 @@
+"""Image preprocessing used before local OCR."""
+
+from __future__ import annotations
+
+import cv2
+import numpy as np
+from PIL import Image, ImageEnhance, ImageFilter
+
+
+def prepare_for_ocr(image: Image.Image) -> Image.Image:
+    """Return a high-contrast grayscale image suitable for Tesseract."""
+    gray = image.convert("L")
+    scale = 2 if min(gray.size) < 1000 else 1
+    if scale > 1:
+        gray = gray.resize((gray.width * scale, gray.height * scale), Image.Resampling.LANCZOS)
+    gray = ImageEnhance.Contrast(gray).enhance(1.8)
+    gray = gray.filter(ImageFilter.SHARPEN)
+
+    array = np.array(gray)
+    array = cv2.GaussianBlur(array, (3, 3), 0)
+    thresholded = cv2.adaptiveThreshold(
+        array,
+        255,
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+        cv2.THRESH_BINARY,
+        31,
+        11,
+    )
+    return Image.fromarray(thresholded)
+
+
+def nonwhite_ratio(image: Image.Image, threshold: int = 245) -> float:
+    gray = image.convert("L")
+    array = np.array(gray)
+    return float(np.mean(array < threshold))
+

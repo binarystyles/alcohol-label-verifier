@@ -1,0 +1,177 @@
+# Alcohol Label Verification
+
+Live demo URL: `https://your-streamlit-app-url.example`
+
+## Summary
+
+Alcohol Label Verification is a local-first Streamlit prototype for batch review of completed TTB alcohol label application PDFs. Compliance agents select one or many completed application PDFs, click **Verify Applications**, and receive Pass, Needs Review, or Fail recommendations with downloadable CSV outputs.
+
+Each PDF is treated as a self-contained verification package. Users do not upload labels separately. Users do not create CSV input files. CSVs are generated only as outputs for reviewer convenience.
+
+## Problem Context
+
+Agents compare application data against label artwork for brand name, product type, class/type designation, alcohol content, net contents, bottler or producer, country of origin when applicable, Item 15 information when supplied, and the required government warning. The prototype is designed for a simple batch-first workflow because large submitters may send hundreds of applications at once.
+
+The prior pilot target was missed because processing took 30 to 40 seconds per label. This implementation avoids cloud calls and minimizes OCR by checking AcroForms and PDF text layers before rendering only needed regions.
+
+## Primary Workflow
+
+1. Open the app.
+2. Select completed TTB application PDFs, or upload a ZIP containing completed application PDFs.
+3. Click **Verify Applications**.
+4. Review the summary table.
+5. Open details only for applications that need attention.
+6. Download summary, field-results, or extracted-application-data CSVs.
+
+There is no manual-entry mode and no separate single-application page. Batch mode handles one PDF and many PDFs the same way.
+
+## Key Features
+
+- Batch PDF and ZIP intake.
+- One-button verification workflow.
+- Session-only PDF hash caching.
+- Best-effort AcroForm extraction with region and summary fallback.
+- Separate application extraction and label evidence extraction.
+- Local Tesseract OCR fallback for raster label areas.
+- Fuzzy brand matching for harmless variations such as `STONE'S THROW`, `Stone's Throw`, and `STONES THROW`.
+- Strict government warning validation.
+- CSV exports for summary, field-level checks, and extracted application data.
+- Synthetic completed application PDFs for demo and tests.
+
+## Architecture
+
+The pipeline is implemented in small modules under `src/`:
+
+- `pdf_intake.py`: file hashing, ZIP expansion, PDF processing.
+- `extractors.py`: AcroForm, form-region, summary, and label extraction.
+- `form_mapping.py`: normalized TTB F 5100.31 coordinate heuristics.
+- `ocr.py` and `preprocess.py`: local OCR and image cleanup.
+- `normalize.py`: deterministic value parsing and fuzzy normalization.
+- `verifier.py`: field checks and overall status logic.
+- `batch.py`: batch processing and CSV dataframes.
+- `sample_data.py`: synthetic completed application PDF generation.
+
+## Local Setup
+
+Install Python 3.11 and Tesseract OCR, then run:
+
+```bash
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+python scripts/create_sample_applications.py
+python -m pytest -q
+streamlit run app.py
+```
+
+On Windows, make sure `tesseract.exe` is on `PATH`. The app still works for text-layer PDFs without Tesseract, but raster label OCR requires it.
+
+## Docker Setup
+
+```bash
+docker build -t alcohol-label-verifier .
+docker run --rm -p 8501:8501 alcohol-label-verifier
+```
+
+Then open `http://localhost:8501`.
+
+## Streamlit Community Cloud Deployment
+
+1. Push this repository to GitHub.
+2. Create a new Streamlit Community Cloud app from the repository.
+3. Set the main file path to `app.py`.
+4. Keep `requirements.txt` and `packages.txt` in the repo so Tesseract and Python dependencies install.
+5. Deploy and replace the live demo placeholder above with the app URL.
+
+## Testing With Sample PDFs
+
+Generate the samples:
+
+```bash
+python scripts/create_sample_applications.py
+```
+
+Open the app, click **Load Sample Applications**, then click **Verify Applications**. The expected outcomes are documented in `samples/expected_outcomes.md`.
+
+The generated set includes:
+
+- `APP-001_old_tom_pass.pdf`: passing label.
+- `APP-002_stones_throw_variation.pdf`: harmless brand variation.
+- `APP-003_wrong_abv.pdf`: material ABV mismatch.
+- `APP-004_bad_warning.pdf`: altered/title-case warning.
+- `APP-005_low_quality_rotated.pdf`: OCR quality issue.
+- `APP-006_missing_label_area.pdf`: missing label area.
+
+## PDF Intake
+
+For each completed application PDF, the app:
+
+1. Reads bytes in memory.
+2. Computes SHA-256 for session caching.
+3. Tries `pypdf` AcroForm extraction.
+4. Extracts mapped form regions from page one when needed.
+5. Parses an explicit application-data summary block when present.
+6. Extracts label evidence from the lower page-one affixed label area and likely supplemental label pages.
+7. Compares application values to label evidence.
+
+Label OCR text is never used to invent expected application values.
+
+## TTB F 5100.31 Field Mapping
+
+The prototype maps Item 4 through Item 15 and the lower page-one label area with normalized coordinates in `src/form_mapping.py`. See `docs/FORM_MAPPING.md` for the full mapping. Coordinates are heuristics and should be tuned with real completed application samples.
+
+## Approach
+
+The app uses deterministic rules plus fuzzy matching rather than cloud LLM APIs. That choice keeps the proof of concept local, explainable, lower latency, and easier to deploy in privacy-sensitive environments. See `docs/APPROACH.md`.
+
+## Tools Used
+
+- Python 3.11
+- Streamlit
+- PyMuPDF
+- pypdf
+- Tesseract and pytesseract
+- Pillow
+- opencv-python-headless
+- rapidfuzz
+- pandas
+- pytest
+- reportlab/PyMuPDF for sample generation
+
+## Security And Privacy
+
+Uploaded files are processed in memory during the Streamlit session. The app does not permanently store uploads, does not call cloud AI APIs, and does not make runtime network calls. Avoid committing raw source/reference files under `docs/source/`; that path is ignored by git.
+
+## Performance Notes
+
+Clean text-layer PDFs process quickly because the app avoids OCR when PDF text is available. Scanned PDFs and raster labels require local OCR and may take longer. Session caching avoids reprocessing unchanged files during Streamlit reruns.
+
+## Error Handling
+
+Unreadable PDFs, missing label areas, low OCR confidence, and missing expected values produce plain-English Needs Review reasons. Critical mismatches on readable evidence produce Fail.
+
+## Known Limitations And Tradeoffs
+
+- Form coordinates are prototype heuristics.
+- Real completed PDFs may have different layout, scan quality, or supplemental page structure.
+- OCR confidence is an approximation.
+- Low-quality raster labels may need human review.
+- Visual validation of bold type, exact type size, characters per inch, and contrasting background is not fully implemented.
+- The app does not integrate with COLA and does not grant approval.
+
+## Future Improvements
+
+- Tune form mappings against a larger real-world PDF set.
+- Add optional reviewer-adjustable coordinate profiles.
+- Add better supplemental-label page classification.
+- Add visual quality scoring for warning size, contrast, and legibility.
+- Add multiprocessing for very large batches after memory profiling.
+- Add persistent audit exports if approved by policy.
+
+## Testing
+
+```bash
+python scripts/create_sample_applications.py
+python -m pytest -q
+```
+

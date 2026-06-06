@@ -1,0 +1,14 @@
+streamlit
+pytesseract
+pillow
+opencv-python-headless
+rapidfuzz
+pandas
+pydantic
+pytest
+openpyxl
+pypdf
+pymupdf
+numpy
+reportlab
+

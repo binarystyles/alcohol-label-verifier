@@ -28,7 +28,7 @@ def test_streamlit_ui_exposes_only_completed_pdf_batch_workflow() -> None:
         "Or select a ZIP containing completed application files",
     ]
     assert any(button.label == "Verify Applications" for button in app.button)
-    assert any(button.label == "Load Sample Applications" for button in app.button)
+    assert not any(button.label == "Load Sample Applications" for button in app.button)
 
     source = (ROOT / "app.py").read_text(encoding="utf-8")
     assert "SUPPORTED_UPLOAD_TYPES" in source

@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pandas as pd
 import streamlit as st
 
@@ -50,21 +48,16 @@ def main() -> None:
     )
     uploaded_zip = st.file_uploader("Or select a ZIP containing completed application files", type=["zip"])
 
-    actions = st.columns([1, 1, 4])
+    actions = st.columns([1, 5])
     verify_clicked = actions[0].button("Verify Applications", type="primary", use_container_width=True)
-    sample_clicked = actions[1].button("Load Sample Applications", use_container_width=True)
 
     named_files = _uploaded_to_named_files(uploaded_files, uploaded_zip)
-    if sample_clicked:
-        named_files = _load_sample_files()
-        st.session_state.loaded_files = named_files
-        st.info(f"Loaded {len(named_files)} sample applications.")
-    elif named_files:
+    if named_files:
         st.session_state.loaded_files = named_files
 
     if verify_clicked:
         if not st.session_state.loaded_files:
-            st.warning("Select one or more completed application files, or load the sample applications.")
+            st.warning("Select one or more completed application files.")
         else:
             st.session_state.results = _run_batch(st.session_state.loaded_files, st.session_state.result_cache)
 
@@ -119,12 +112,6 @@ def _uploaded_to_named_files(uploaded_files, uploaded_zip) -> list[tuple[str, by
     if uploaded_zip is not None:
         named_files.append((uploaded_zip.name, uploaded_zip.getvalue()))
     return named_files
-
-
-def _load_sample_files() -> list[tuple[str, bytes]]:
-    sample_dir = Path("samples/applications")
-    files = sorted(sample_dir.glob("*.pdf"))
-    return [(path.name, path.read_bytes()) for path in files]
 
 
 def _run_batch(named_files: list[tuple[str, bytes]], cache: dict) -> list:

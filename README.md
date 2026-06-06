@@ -99,7 +99,7 @@ Generate the samples:
 python scripts/create_sample_applications.py
 ```
 
-Open the app, click **Load Sample Applications**, then click **Verify Applications**. The expected outcomes are documented in `samples/expected_outcomes.md`.
+Open the app, select PDFs from `samples/applications` or upload `samples/sample_batch.zip`, then click **Verify Applications**. The expected outcomes are documented in `samples/expected_outcomes.md`.
 
 The generated set includes:
 

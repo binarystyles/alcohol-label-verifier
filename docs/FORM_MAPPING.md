@@ -2,7 +2,7 @@
 
 The prototype uses normalized page coordinates in `src/form_mapping.py` so regions scale with page size. These regions are tuned around TTB F 5100.31 page one and are intended to be easy to adjust. Scanned application image files are converted to an in-memory PDF page first, then the same normalized regions are applied.
 
-Sources reviewed: the TTB Forms page lists current TTB F 5100.31 as `Application for and Certification/Exemption of Label/Bottle Approval (04/2023)`, and the linked form PDF includes the page-one fields and instructions used for this mapping. TTB's formula approval basics guidance states that the Formula ID is needed before applying for label approval and that final alcohol content is part of the formula application information. TTB's example formula pages show Formulas Online entries with a Yield Summary section and an `Alcohol Content of Finished Product` row.
+Sources reviewed: the TTB Forms page lists current TTB F 5100.31 as `Application for and Certification/Exemption of Label/Bottle Approval (04/2023)`, and the linked form PDF includes the page-one fields and instructions used for this mapping. TTB's formula approval basics guidance states that the Formula ID is needed before applying for label approval and that final alcohol content is part of the formula application information. TTB's distilled spirits, wine, and malt beverage example formula pages show Formulas Online entries with a Yield Summary section and an `Alcohol Content of Finished Product` row.
 
 | TTB item | Extracted field | Verification use |
 | --- | --- | --- |
@@ -12,7 +12,7 @@ Sources reviewed: the TTB Forms page lists current TTB F 5100.31 as `Application
 | Item 7 | `fanciful_name` | Optional check when supplied. |
 | Item 8 | `applicant_name_address` | Application context and possible bottler/producer support. |
 | Item 8a | `mailing_address` | Extracted for reviewer context. |
-| Item 9 | `formula` | Formula ID/reference, such as a TTB Formula ID, TTB ID, lab number, pre-import approval reference, or no-formula-required note. When a Formula ID is present, the extractor looks for a matching formula approval/source document inside the same uploaded PDF package and derives expected `alcohol_content` from that matched document's `Alcohol Content of Finished Product` or final-alcohol-content field. Low/high ranges are preserved for label comparison. Missing matching formula alcohol content becomes Needs Review. A readable approved-formula alcohol mismatch becomes Fail. |
+| Item 9 | `formula` | Formula ID/reference, such as a TTB Formula ID, TTB ID, lab number, pre-import approval reference, or no-formula-required note. When a Formula ID is present, the extractor looks for a matching formula approval/source document inside the same uploaded PDF package and derives expected `alcohol_content` from that matched document's `Alcohol Content of Finished Product` or final-alcohol-content field. Low/high ranges are preserved for label comparison. Malt beverage rows for `Alcohol From Flavors` and `Alcohol From Base` are ignored as the expected label ABV source. Missing matching formula alcohol content becomes Needs Review. A readable approved-formula alcohol mismatch becomes Fail. |
 | Item 10 | `grape_varietals` | Extracted for reviewer context for wine applications. |
 | Item 11 | `wine_appellation` | Extracted for reviewer context and possible label comparison. |
 | Item 12 | `phone` | Extracted for reviewer context. |

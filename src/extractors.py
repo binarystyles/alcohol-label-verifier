@@ -77,6 +77,10 @@ SUMMARY_KEYS: dict[str, str] = {
 
 PHONE_PATTERN = re.compile(r"(?:\+?1[\s.-]?)?(?:\(?\d{3}\)?[\s.-]?)\d{3}[\s.-]?\d{4}")
 EMAIL_PATTERN = re.compile(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.IGNORECASE)
+FORMULA_FINAL_ALCOHOL_PATTERN = re.compile(
+    r"(?:ALCOHOL\s+CONTENT\s+OF\s+FINISHED\s+PRODUCT|FINAL\s+ALCOHOL\s+CONTENT|FINISHED\s+PRODUCT\s+ALCOHOL\s+CONTENT|TARGET\s+ALCOHOL\s+CONTENT)",
+    flags=re.IGNORECASE,
+)
 
 FIELD_LABEL_PATTERNS: dict[str, tuple[re.Pattern[str], ...]] = {
     "serial_number": (re.compile(r"^\s*4\.?\s*SERIAL\s+NUMBER\s*[:\-]?\s*", re.IGNORECASE),),
@@ -458,10 +462,15 @@ def _extract_formula_final_alcohol_content(text: str) -> str:
         normalized_line = normalize_text(line)
         if not _is_formula_final_alcohol_line(normalized_line):
             continue
+        prefix_segment = _formula_alcohol_segment_before_label(line)
+        prefix_values = _formula_alcohol_numbers(prefix_segment)
+        if prefix_values:
+            return _format_formula_abv_values(prefix_values[-2:], prefix_segment)
         snippet = " ".join(lines[index : index + 4])
-        values = _formula_alcohol_numbers_after_label(snippet)
+        segment = _formula_alcohol_segment_after_label(snippet)
+        values = _formula_alcohol_numbers(segment)[:2]
         if values:
-            return _format_formula_abv_values(values, snippet)
+            return _format_formula_abv_values(values, segment)
 
     return ""
 
@@ -478,24 +487,33 @@ def _is_formula_final_alcohol_line(normalized_line: str) -> bool:
     )
 
 
-def _formula_alcohol_numbers_after_label(snippet: str) -> list[float]:
-    marker_pattern = re.compile(
-        r"(?:ALCOHOL\s+CONTENT\s+OF\s+FINISHED\s+PRODUCT|FINAL\s+ALCOHOL\s+CONTENT|FINISHED\s+PRODUCT\s+ALCOHOL\s+CONTENT|TARGET\s+ALCOHOL\s+CONTENT)",
-        flags=re.IGNORECASE,
-    )
-    marker = marker_pattern.search(snippet)
+def _formula_alcohol_segment_after_label(snippet: str) -> str:
+    marker = FORMULA_FINAL_ALCOHOL_PATTERN.search(snippet)
     if not marker:
-        return []
+        return ""
 
     tail = snippet[marker.end() : marker.end() + 180]
-    tail = re.split(
+    return re.split(
         r"\b(?:ALCOHOL\s+FROM\s+FLAVORS?|ALCOHOL\s+FROM\s+BASE|INGREDIENTS?\s+LIST|METHOD\s+OF\s+MANUFACTURE|DETAILED\s+QUANTITATIVE)\b",
         tail,
         maxsplit=1,
         flags=re.IGNORECASE,
     )[0]
-    values = [float(match) for match in re.findall(r"\d{1,3}(?:\.\d+)?", tail)]
-    return [value for value in values if 0 < value <= 200][:2]
+
+
+def _formula_alcohol_segment_before_label(line: str) -> str:
+    marker = FORMULA_FINAL_ALCOHOL_PATTERN.search(line)
+    if not marker:
+        return ""
+    prefix = line[: marker.start()]
+    if "TOTAL YIELD" in normalize_text(prefix):
+        return ""
+    return prefix
+
+
+def _formula_alcohol_numbers(segment: str) -> list[float]:
+    values = [float(match) for match in re.findall(r"\d{1,3}(?:\.\d+)?", segment)]
+    return [value for value in values if 0 < value <= 200]
 
 
 def _format_formula_abv_values(values: list[float], snippet: str) -> str:

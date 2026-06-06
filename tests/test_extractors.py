@@ -65,6 +65,80 @@ def test_formula_approval_parser_uses_finished_product_row_before_ingredient_abv
     assert fields["alcohol_content"] == "25-30% ABV"
 
 
+def test_formula_approval_parser_handles_ttb_distilled_spirits_range() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: DS-2002
+    Product Information Class: DISTILLED SPIRITS SPECIALTY
+    Yield Summary
+    Total Yield: 5.0 Gallons
+    Alcohol Content of Finished Product: 25 30 % by Volume
+    Ingredients List
+    Corn 10.0 - 12.0 lb.
+    Method of Manufacture
+    """
+    fields = parse_formula_approval_fields(text, "DS-2002")
+    assert fields["alcohol_content"] == "25-30% ABV"
+
+
+def test_formula_approval_parser_handles_ttb_wine_multiline_range() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: W-1001
+    Product Information Class: OTHER THAN STANDARD WINE
+    Yield Summary
+    Alcohol Content of Finished Product:
+    Low High Unit
+    12.75 13.55 % by Volume
+    Ingredients List
+    Grape juice 950.0 - 975.0 gal.
+    """
+    fields = parse_formula_approval_fields(text, "W-1001")
+    assert fields["alcohol_content"] == "12.75-13.55% ABV"
+
+
+def test_formula_approval_parser_handles_ttb_malt_rows_without_using_flavor_or_base_alcohol() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: MB-1001
+    Product Information Class: MALT BEVERAGE SPECIALTY
+    Yield Summary
+    Alcohol Content of Finished Product: 5.5 5.8 % by Volume
+    Alcohol From Flavors: 0.99 0.99 % by Volume
+    Alcohol From Base: 4.51 4.81 % by Volume
+    Ingredients List
+    Malted barley 23.0 - 28.0 kg
+    """
+    fields = parse_formula_approval_fields(text, "MB-1001")
+    assert fields["alcohol_content"] == "5.5-5.8% ABV"
+
+
+def test_formula_approval_parser_converts_proof_before_later_percent_rows() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: DS-9001
+    Yield Summary
+    Final Alcohol Content: 90 Proof
+    Alcohol From Base: 45 45 % by Volume
+    Ingredients List
+    Finished alcohol
+    """
+    fields = parse_formula_approval_fields(text, "DS-9001")
+    assert fields["alcohol_content"] == "45% ABV"
+
+
+def test_formula_approval_parser_handles_ocr_values_before_finished_product_label() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: MB-2002
+    Yield Summary
+    3 5.5 5.8 % by Volume Alcohol Content of Finished Product
+    0.99 0.99 % by Volume Alcohol From Flavors
+    """
+    fields = parse_formula_approval_fields(text, "MB-2002")
+    assert fields["alcohol_content"] == "5.5-5.8% ABV"
+
+
 def test_application_derives_alcohol_content_from_matching_formula_approval() -> None:
     document = fitz.open()
     page = document.new_page(width=612, height=1008)

@@ -62,6 +62,7 @@ def test_region_cleaning_preserves_values_after_printed_field_labels() -> None:
     assert clean_region_value("brand_name", "6. BRAND NAME SCANNED SAMPLE") == "SCANNED SAMPLE"
     assert clean_region_value("phone", "EMAIL A\n202 555 0100") == "202-555-0100"
     assert clean_region_value("email", 'DDRESS\n"For sale in only"\nlabels@example.test') == "labels@example.test"
+    assert clean_region_value("item_15", "Item 15 container and translation info") == ""
     assert clean_region_value("item_15", "O\nSO, S O\nS\nO S O") == ""
     assert (
         clean_region_value("application_type", "CERTIFIC\nATE OF LABEL APPROVAL\nTTB ID")

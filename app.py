@@ -49,7 +49,7 @@ def main() -> None:
     uploaded_zip = st.file_uploader("Or select a ZIP containing completed application files", type=["zip"])
 
     actions = st.columns([1, 5])
-    verify_clicked = actions[0].button("Verify Applications", type="primary", use_container_width=True)
+    verify_clicked = actions[0].button("Verify Applications", type="primary", width="stretch")
 
     named_files = _uploaded_to_named_files(uploaded_files, uploaded_zip)
     if named_files:
@@ -297,7 +297,7 @@ def _render_results(results: list) -> None:
         index=0,
     )
     visible_summary = summary_df if status_filter == "All" else summary_df[summary_df["overall_status"] == status_filter]
-    st.dataframe(visible_summary, use_container_width=True, hide_index=True)
+    st.dataframe(visible_summary, width="stretch", hide_index=True)
 
     download_cols = st.columns(3)
     download_cols[0].download_button(
@@ -305,21 +305,21 @@ def _render_results(results: list) -> None:
         data=summary_df.to_csv(index=False).encode("utf-8"),
         file_name="alcohol_label_verification_summary.csv",
         mime="text/csv",
-        use_container_width=True,
+        width="stretch",
     )
     download_cols[1].download_button(
         "Download detailed field-results CSV",
         data=detail_df.to_csv(index=False).encode("utf-8"),
         file_name="alcohol_label_verification_field_results.csv",
         mime="text/csv",
-        use_container_width=True,
+        width="stretch",
     )
     download_cols[2].download_button(
         "Download extracted application data CSV",
         data=fields_df.to_csv(index=False).encode("utf-8"),
         file_name="alcohol_label_verification_application_fields.csv",
         mime="text/csv",
-        use_container_width=True,
+        width="stretch",
     )
 
     st.subheader("Application Details")
@@ -337,9 +337,9 @@ def _render_results(results: list) -> None:
                 ["Extracted application fields", "Field results", "Label OCR text", "Application OCR text"]
             )
             with tab_fields:
-                st.dataframe(pd.DataFrame([result.extracted_application_fields]), use_container_width=True)
+                st.dataframe(pd.DataFrame([result.extracted_application_fields]), width="stretch")
             with tab_results:
-                st.dataframe(pd.DataFrame([field.to_dict() for field in result.field_results]), use_container_width=True)
+                st.dataframe(pd.DataFrame([field.to_dict() for field in result.field_results]), width="stretch")
             with tab_label:
                 st.text_area(
                     "Label OCR text",

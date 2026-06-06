@@ -32,7 +32,7 @@ class NormalizedRegion:
 
 FORM_REGIONS: dict[str, NormalizedRegion] = {
     "serial_number": NormalizedRegion(0.03, 0.15, 0.22, 0.20, "Item 4 serial number"),
-    "product_type": NormalizedRegion(0.23, 0.145, 0.48, 0.205, "Item 5 product type"),
+    "product_type": NormalizedRegion(0.23, 0.145, 0.40, 0.205, "Item 5 product type"),
     "brand_name": NormalizedRegion(0.03, 0.205, 0.47, 0.235, "Item 6 brand name"),
     "fanciful_name": NormalizedRegion(0.03, 0.23, 0.47, 0.26, "Item 7 fanciful name"),
     "applicant_name_address": NormalizedRegion(0.41, 0.11, 0.96, 0.21, "Item 8 applicant"),
@@ -49,4 +49,3 @@ FORM_REGIONS: dict[str, NormalizedRegion] = {
 
 
 APPLICATION_FORM_FIELDS = tuple(key for key in FORM_REGIONS if key != "label_area")
-

@@ -7,7 +7,7 @@ import zipfile
 from PIL import Image, ImageDraw
 from streamlit.testing.v1 import AppTest
 
-from src.constants import GOVERNMENT_WARNING, STATUS_REVIEW
+from src.constants import GOVERNMENT_WARNING, STATUS_FAIL, STATUS_REVIEW
 from src.extractors import extract_application, extract_label
 from src.models import ApplicationFields, LabelExtraction
 from src.pdf_intake import SUPPORTED_UPLOAD_TYPES, expand_named_files, process_application_file
@@ -36,6 +36,7 @@ def test_streamlit_ui_exposes_only_completed_pdf_batch_workflow() -> None:
     assert 'type=["csv"]' not in source
     assert "read_csv" not in source
     assert "label image" not in source.lower()
+    assert "use_container_width" not in source
     assert 'key=f"label_ocr_' in source
     assert 'key=f"application_ocr_' in source
     assert "pdf" in SUPPORTED_UPLOAD_TYPES
@@ -46,6 +47,7 @@ def test_streamlit_ui_exposes_only_completed_pdf_batch_workflow() -> None:
 def test_streamlit_results_render_multiple_applications_without_duplicate_widget_ids(sample_bytes: dict[str, bytes]) -> None:
     app = AppTest.from_file(str(ROOT / "app.py"))
     app.run(timeout=20)
+    app.toggle[0].set_value(True).run(timeout=20)
     app.file_uploader[0].set_value(
         [
             ("APP-001_old_tom_pass.pdf", sample_bytes["APP-001_old_tom_pass.pdf"], "application/pdf"),
@@ -56,6 +58,7 @@ def test_streamlit_results_render_multiple_applications_without_duplicate_widget
     app.button[0].click().run(timeout=120)
 
     assert len(app.exception) == 0
+    assert app.selectbox[0].label == "Status filter"
     assert [area.label for area in app.text_area] == [
         "Label OCR text",
         "Application OCR text",
@@ -64,6 +67,9 @@ def test_streamlit_results_render_multiple_applications_without_duplicate_widget
         "Label OCR text",
         "Application OCR text",
     ]
+    app.selectbox[0].set_value(STATUS_FAIL).run(timeout=20)
+    assert len(app.exception) == 0
+    assert app.selectbox[0].value == STATUS_FAIL
 
 
 def test_csvs_are_download_outputs_only() -> None:

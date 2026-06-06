@@ -15,7 +15,6 @@ from src.form_mapping import FORM_REGIONS
 
 
 SAMPLE_DIR = Path("samples/applications")
-SOURCE_FORM = Path("docs/source/f510031.pdf")
 
 
 @dataclass(frozen=True)
@@ -161,7 +160,7 @@ def generate_samples(output_dir: Path = SAMPLE_DIR) -> list[Path]:
 
 
 def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
-    document = _new_document_from_form()
+    document = _new_sample_document()
     page = document[0]
     _cover_label_area(page)
     _draw_form_values(page, spec.fields)
@@ -196,28 +195,22 @@ def write_expected_outcomes(output_path: Path) -> None:
     lines.extend(
         [
             "",
-            "These PDFs are synthetic completed applications. They use the TTB F 5100.31 visual base when `docs/source/f510031.pdf` is present; otherwise the generator creates a simplified form with the same field concepts.",
+            "These PDFs are synthetic completed applications. They use a controlled TTB-like one-page form layout so sample coordinates remain deterministic across developer machines.",
         ]
     )
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 
-def _new_document_from_form() -> fitz.Document:
-    if SOURCE_FORM.exists():
-        source = fitz.open(SOURCE_FORM)
-        document = fitz.open()
-        document.insert_pdf(source, from_page=0, to_page=0)
-        source.close()
-        return document
-
+def _new_sample_document() -> fitz.Document:
     document = fitz.open()
     page = document.new_page(width=612, height=1008)
-    page.insert_text((210, 60), "APPLICATION FOR LABEL/BOTTLE APPROVAL", fontsize=14)
+    page.insert_text((170, 48), "APPLICATION FOR LABEL/BOTTLE APPROVAL", fontsize=15, fontname="helv")
+    page.insert_text((34, 78), "Synthetic completed TTB application package for verifier testing", fontsize=8, fontname="helv")
     for field_name, region in FORM_REGIONS.items():
         rect = region.to_rect(page.rect)
         page.draw_rect(rect, color=(0, 0, 0), width=0.5)
         if field_name != "label_area":
-            page.insert_text((rect.x0 + 3, rect.y0 + 10), region.description, fontsize=6)
+            page.insert_text((rect.x0 + 3, rect.y0 + 10), region.description, fontsize=6.5, fontname="helv")
     page.insert_text((24, FORM_REGIONS["label_area"].to_rect(page.rect).y0 - 8), "AFFIX COMPLETE SET OF LABELS BELOW", fontsize=8)
     return document
 
@@ -244,7 +237,7 @@ def _draw_form_values(page: fitz.Page, fields: dict[str, str | bool]) -> None:
 
 
 def _draw_summary_block(page: fitz.Page, fields: dict[str, str | bool]) -> None:
-    rect = fitz.Rect(300, 430, 590, 640)
+    rect = fitz.Rect(285, 438, 590, 672)
     page.draw_rect(rect, color=(0, 0, 0), fill=(1, 1, 1), width=0.5)
     lines = ["APPLICATION DATA SUMMARY"]
     for key in (
@@ -271,7 +264,7 @@ def _draw_summary_block(page: fitz.Page, fields: dict[str, str | bool]) -> None:
         value = fields.get(key, "")
         lines.append(f"{_display_key(key)}: {value}")
     lines.append("END APPLICATION DATA SUMMARY")
-    page.insert_textbox(fitz.Rect(rect.x0 + 5, rect.y0 + 5, rect.x1 - 5, rect.y1 - 5), "\n".join(lines), fontsize=6.8, fontname="helv")
+    page.insert_textbox(fitz.Rect(rect.x0 + 5, rect.y0 + 5, rect.x1 - 5, rect.y1 - 5), "\n".join(lines), fontsize=6.2, fontname="helv")
 
 
 def _draw_text_label(page: fitz.Page, label_lines: list[str]) -> None:

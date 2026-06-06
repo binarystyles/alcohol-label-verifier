@@ -383,10 +383,13 @@ def _is_form_label_line(upper_line: str) -> bool:
         "TRANSLATIONS OF FOREIGN",
         "REQUIRED",
         "IF ANY",
+        "ITEM 15 CONTAINER AND TRANSLATION INFO",
     )
     if any(phrase in upper_line for phrase in label_phrases):
         return True
     if re.fullmatch(r"\d+[A-Z]?\.?", upper_line):
+        return True
+    if re.fullmatch(r"ITEM \d+[A-Z]? .+", upper_line):
         return True
     return False
 

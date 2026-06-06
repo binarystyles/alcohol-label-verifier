@@ -21,4 +21,4 @@ The prototype uses normalized page coordinates in `src/form_mapping.py` so regio
 
 The blank TTB F 5100.31 form does not always expose class/type, alcohol content, net contents, bottler/producer, country of origin, or imported status as simple fields. For this reason, the extractor also looks for an explicit application-data summary block inside the completed PDF. That block is treated as application/package metadata, not label evidence.
 
-The sample generator always creates a controlled TTB-like one-page form. It does not use local source PDFs from `docs/source/`; that keeps the generated sample field, summary, and label coordinates deterministic across machines.
+When `docs/source/f510031.pdf` is available locally, the sample generator fills the real TTB form template and adds an invisible application-data summary text layer for expected values that are not first-page fields. If the source form is absent, it falls back to a controlled TTB-like one-page layout.

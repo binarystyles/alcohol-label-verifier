@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import fitz
+
 from src.batch import process_batch
 from src.constants import STATUS_FAIL, STATUS_PASS, STATUS_REVIEW
 from src.form_mapping import FORM_REGIONS
@@ -27,10 +29,20 @@ def test_expected_status_set_is_complete() -> None:
     assert statuses == {STATUS_PASS, STATUS_FAIL, STATUS_REVIEW}
 
 
-def test_sample_generator_uses_controlled_layout_not_local_source_pdf() -> None:
-    source = Path("src/sample_data.py").read_text(encoding="utf-8")
-    assert "docs/source" not in source
-    assert "f510031.pdf" not in source
+def test_sample_generator_uses_real_source_form_when_available(sample_paths: list[Path]) -> None:
+    source_form = Path("docs/source/f510031.pdf")
+    if not source_form.exists():
+        return
+
+    document = fitz.open(sample_paths[0])
+    try:
+        text = document[0].get_text("text")
+    finally:
+        document.close()
+
+    assert "DEPARTMENT OF THE TREASURY" in text
+    assert "ALCOHOL AND TOBACCO TAX AND TRADE BUREAU" in text
+    assert "APPLICATION DATA SUMMARY" in text
 
 
 def test_sample_form_mapping_keeps_product_and_applicant_regions_separate() -> None:

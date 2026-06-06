@@ -32,7 +32,9 @@ def test_application_summary_parser_maps_expected_fields() -> None:
 
 def test_acroform_extraction_falls_back_to_summary_for_generated_pdf(sample_bytes: dict[str, bytes]) -> None:
     pdf_bytes = sample_bytes["APP-001_old_tom_pass.pdf"]
-    assert extract_acroform_fields(pdf_bytes) == {}
+    acroform_fields = extract_acroform_fields(pdf_bytes)
+    assert acroform_fields["brand_name"] == "OLD TOM GIN"
+    assert acroform_fields["serial_number"] == "1"
     extraction = extract_application(pdf_bytes)
     assert extraction.fields.serial_number == "APP-001"
     assert extraction.fields.brand_name == "OLD TOM GIN"

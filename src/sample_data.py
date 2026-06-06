@@ -15,6 +15,8 @@ from src.form_mapping import FORM_REGIONS
 
 
 SAMPLE_DIR = Path("samples/applications")
+SOURCE_FORM = Path("docs/source/f510031.pdf")
+SOURCE_LABEL_RECT = (24.6108, 681.248, 589.351, 979.0804)
 
 
 @dataclass(frozen=True)
@@ -160,11 +162,16 @@ def generate_samples(output_dir: Path = SAMPLE_DIR) -> list[Path]:
 
 
 def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
-    document = _new_sample_document()
+    document = _new_document()
     page = document[0]
-    _cover_label_area(page)
-    _draw_form_values(page, spec.fields)
-    _draw_summary_block(page, spec.fields)
+    if SOURCE_FORM.exists():
+        _fill_source_form_widgets(page, spec.fields)
+        _draw_hidden_summary_block(page, spec.fields)
+        _prepare_source_label_area(page)
+    else:
+        _cover_label_area(page)
+        _draw_form_values(page, spec.fields)
+        _draw_summary_block(page, spec.fields)
     if spec.blank_label:
         pass
     elif spec.raster_label:
@@ -195,10 +202,20 @@ def write_expected_outcomes(output_path: Path) -> None:
     lines.extend(
         [
             "",
-            "These PDFs are synthetic completed applications. They use a controlled TTB-like one-page form layout so sample coordinates remain deterministic across developer machines.",
+            "These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.",
         ]
     )
     output_path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def _new_document() -> fitz.Document:
+    if SOURCE_FORM.exists():
+        source = fitz.open(SOURCE_FORM)
+        document = fitz.open()
+        document.insert_pdf(source, from_page=0, to_page=0)
+        source.close()
+        return document
+    return _new_sample_document()
 
 
 def _new_sample_document() -> fitz.Document:
@@ -213,6 +230,70 @@ def _new_sample_document() -> fitz.Document:
             page.insert_text((rect.x0 + 3, rect.y0 + 10), region.description, fontsize=6.5, fontname="helv")
     page.insert_text((24, FORM_REGIONS["label_area"].to_rect(page.rect).y0 - 8), "AFFIX COMPLETE SET OF LABELS BELOW", fontsize=8)
     return document
+
+
+def _fill_source_form_widgets(page: fitz.Page, fields: dict[str, str | bool]) -> None:
+    serial_digits = "".join(ch for ch in str(fields.get("serial_number", "")) if ch.isdigit())[-4:].zfill(4)
+    field_values = {
+        "YEAR 1": "2",
+        "YEAR 2": "6",
+        "SERIAL NUMBER 1": serial_digits[0],
+        "SERIAL NUMBER 2": serial_digits[1],
+        "SERIAL NUMBER 3": serial_digits[2],
+        "SERIAL NUMBER 4": serial_digits[3],
+        "2.  PLANT REGISTRY/BASIC PERMIT/BREWER'S NO. (Required)": "DSP-OR-10001",
+        "6. BRAND NAME (Required)": str(fields.get("brand_name", "") or ""),
+        "7. FANCIFUL NAME (If any)": str(fields.get("fanciful_name", "") or ""),
+        "8. NAME AND ADDRESS OF APPLICANT AS SHOWN ON PLANT REGISTRY, BASIC": str(fields.get("applicant_name_address", "") or ""),
+        "8a. MAILING ADDRESS, IF DIFFERENT": str(fields.get("mailing_address", "") or ""),
+        "9.  FORMULA": str(fields.get("formula", "") or ""),
+        "10. GRAPE VARIETAL(S) Wine only": str(fields.get("grape_varietals", "") or ""),
+        "11.  WINE APPELLATION (If on label)": str(fields.get("wine_appellation", "") or ""),
+        "12.  PHONE NUMBER": str(fields.get("phone", "") or ""),
+        "13.  EMAIL ADDRESS": str(fields.get("email", "") or ""),
+        "15.  SHOW ANY INFORMATION THAT IS BLOWN, BRANDED, OR EMBOSSED ON THE CONTAINER (e.g., net contents) ONLY IF IT DOES NOT APPEAR ON THE LABELS": str(fields.get("item_15", "") or ""),
+        "16.  DATE OF APPLICATION": "06/06/2026",
+        "18.  PRINT NAME OF APPLICANT OR AUTHORIZED AGENT": "Example Distilling Co.",
+    }
+
+    for widget in page.widgets() or []:
+        if widget.field_name in field_values:
+            widget.field_value = field_values[widget.field_name]
+            widget.update()
+        elif widget.field_type_string == "CheckBox":
+            _set_source_checkbox(widget, fields)
+
+
+def _set_source_checkbox(widget: fitz.Widget, fields: dict[str, str | bool]) -> None:
+    states = (widget.button_states() or {}).get("normal", [])
+    state_names = {str(state).lower(): str(state) for state in states}
+    value = "Off"
+    rect = widget.rect
+
+    if "domes" in state_names and not fields.get("imported"):
+        value = state_names["domes"]
+    elif "import" in state_names and fields.get("imported"):
+        value = state_names["import"]
+    elif "spirits" in state_names and fields.get("product_type") == "DISTILLED SPIRITS":
+        value = state_names["spirits"]
+    elif "wine" in state_names and fields.get("product_type") == "WINE":
+        value = state_names["wine"]
+    elif "malt" in state_names and fields.get("product_type") == "MALT BEVERAGES":
+        value = state_names["malt"]
+    elif "yes" in state_names and 265 <= rect.y0 <= 276:
+        value = state_names["yes"]
+
+    widget.field_value = value
+    widget.update()
+
+
+def _prepare_source_label_area(page: fitz.Page) -> None:
+    for widget in list(page.widgets() or []):
+        if widget.field_name.endswith("_af_image"):
+            page.delete_widget(widget)
+            break
+    rect = fitz.Rect(*SOURCE_LABEL_RECT)
+    page.draw_rect(rect, color=(0.75, 0.75, 0.75), fill=(1, 1, 1), width=0.7)
 
 
 def _draw_form_values(page: fitz.Page, fields: dict[str, str | bool]) -> None:
@@ -239,6 +320,15 @@ def _draw_form_values(page: fitz.Page, fields: dict[str, str | bool]) -> None:
 def _draw_summary_block(page: fitz.Page, fields: dict[str, str | bool]) -> None:
     rect = fitz.Rect(285, 438, 590, 672)
     page.draw_rect(rect, color=(0, 0, 0), fill=(1, 1, 1), width=0.5)
+    page.insert_textbox(fitz.Rect(rect.x0 + 5, rect.y0 + 5, rect.x1 - 5, rect.y1 - 5), _summary_block_text(fields), fontsize=6.2, fontname="helv")
+
+
+def _draw_hidden_summary_block(page: fitz.Page, fields: dict[str, str | bool]) -> None:
+    for index, line in enumerate(_summary_block_text(fields).splitlines()):
+        page.insert_text((8, 600 + index * 1.35), line, fontsize=1, fontname="helv", color=(1, 1, 1), overlay=True)
+
+
+def _summary_block_text(fields: dict[str, str | bool]) -> str:
     lines = ["APPLICATION DATA SUMMARY"]
     for key in (
         "serial_number",
@@ -264,7 +354,7 @@ def _draw_summary_block(page: fitz.Page, fields: dict[str, str | bool]) -> None:
         value = fields.get(key, "")
         lines.append(f"{_display_key(key)}: {value}")
     lines.append("END APPLICATION DATA SUMMARY")
-    page.insert_textbox(fitz.Rect(rect.x0 + 5, rect.y0 + 5, rect.x1 - 5, rect.y1 - 5), "\n".join(lines), fontsize=6.2, fontname="helv")
+    return "\n".join(lines)
 
 
 def _draw_text_label(page: fitz.Page, label_lines: list[str]) -> None:
@@ -315,13 +405,22 @@ def _draw_raster_label(page: fitz.Page, label_lines: list[str]) -> None:
 
 
 def _cover_label_area(page: fitz.Page) -> None:
-    rect = FORM_REGIONS["label_area"].to_rect(page.rect)
+    rect = _label_area_rect(page)
     page.draw_rect(rect, color=None, fill=(1, 1, 1), width=0)
 
 
 def _inner_label_rect(page: fitz.Page) -> fitz.Rect:
-    rect = FORM_REGIONS["label_area"].to_rect(page.rect)
+    rect = _label_area_rect(page)
     return fitz.Rect(rect.x0 + 30, rect.y0 + 25, rect.x1 - 30, rect.y1 - 20)
+
+
+def _label_area_rect(page: fitz.Page) -> fitz.Rect:
+    for widget in page.widgets() or []:
+        if widget.field_name.endswith("_af_image"):
+            return widget.rect
+    if SOURCE_FORM.exists():
+        return fitz.Rect(*SOURCE_LABEL_RECT)
+    return FORM_REGIONS["label_area"].to_rect(page.rect)
 
 
 def _display_key(key: str) -> str:

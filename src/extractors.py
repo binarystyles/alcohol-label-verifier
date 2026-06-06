@@ -204,7 +204,7 @@ def extract_label(pdf_bytes: bytes) -> LabelExtraction:
     for page_index, rect, label in label_regions(document):
         page = document[page_index]
         extracted = extract_region_text(page, rect)
-        if extracted.nonwhite_ratio > 0.01 or extracted.text.strip():
+        if extracted.nonwhite_ratio > 0.02 or extracted.text.strip():
             saw_visual_content = True
         if extracted.text.strip():
             saw_readable_content = True
@@ -341,8 +341,8 @@ def _merge_fields(fields: ApplicationFields, values: dict[str, Any], source: str
             continue
         value = str(value).strip()
         existing_source = fields.raw_sources.get(key, "")
-        may_override_noisy_region = source == "application-summary" and existing_source == "form-region"
-        if value and (not getattr(fields, key) or may_override_noisy_region):
+        may_override_existing = source == "application-summary" and existing_source in {"acroform", "form-region"}
+        if value and (not getattr(fields, key) or may_override_existing):
             setattr(fields, key, value)
             fields.raw_sources[key] = source
 

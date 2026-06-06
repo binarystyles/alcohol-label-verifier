@@ -162,7 +162,7 @@ def extract_label(pdf_bytes: bytes) -> LabelExtraction:
             confidence=0.0,
             missing_label_area=True,
             unreadable=False,
-            warnings=["No readable affixed label area was found in the completed application PDF."],
+            warnings=["No readable affixed label area was found in the completed application file."],
         )
 
     if saw_visual_content and not saw_readable_content:

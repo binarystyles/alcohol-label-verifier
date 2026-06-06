@@ -1,4 +1,4 @@
-"""PDF and ZIP intake helpers."""
+"""Application file and ZIP intake helpers."""
 
 from __future__ import annotations
 
@@ -8,9 +8,17 @@ import hashlib
 import time
 import zipfile
 
+import fitz
+from PIL import Image, ImageOps, ImageSequence
+
 from src.extractors import extract_application, extract_label
 from src.models import ApplicationResult
 from src.verifier import verify_application
+
+
+SUPPORTED_IMAGE_EXTENSIONS = (".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp")
+SUPPORTED_APPLICATION_EXTENSIONS = (".pdf", *SUPPORTED_IMAGE_EXTENSIONS)
+SUPPORTED_UPLOAD_TYPES = ["pdf", "png", "jpg", "jpeg", "tif", "tiff", "bmp"]
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -21,27 +29,75 @@ def expand_named_files(named_files: list[tuple[str, bytes]]) -> list[tuple[str, 
     expanded: list[tuple[str, bytes]] = []
     for filename, data in named_files:
         lower = filename.lower()
-        if lower.endswith(".pdf"):
+        if is_supported_application_file(filename):
             expanded.append((filename, data))
         elif lower.endswith(".zip"):
-            expanded.extend(extract_pdfs_from_zip(data, prefix=filename))
+            expanded.extend(extract_application_files_from_zip(data, prefix=filename))
     return expanded
 
 
-def extract_pdfs_from_zip(zip_bytes: bytes, prefix: str = "archive.zip") -> list[tuple[str, bytes]]:
-    pdfs: list[tuple[str, bytes]] = []
+def is_supported_application_file(filename: str) -> bool:
+    return filename.lower().endswith(SUPPORTED_APPLICATION_EXTENSIONS)
+
+
+def extract_application_files_from_zip(zip_bytes: bytes, prefix: str = "archive.zip") -> list[tuple[str, bytes]]:
+    files: list[tuple[str, bytes]] = []
     with zipfile.ZipFile(BytesIO(zip_bytes)) as archive:
         for info in archive.infolist():
-            if info.is_dir() or not info.filename.lower().endswith(".pdf"):
+            if info.is_dir() or not is_supported_application_file(info.filename):
                 continue
             with archive.open(info) as handle:
-                pdfs.append((f"{prefix}/{info.filename}", handle.read()))
-    return pdfs
+                files.append((f"{prefix}/{info.filename}", handle.read()))
+    return files
 
 
-def process_pdf(filename: str, pdf_bytes: bytes) -> ApplicationResult:
+def extract_pdfs_from_zip(zip_bytes: bytes, prefix: str = "archive.zip") -> list[tuple[str, bytes]]:
+    """Backward-compatible PDF-only ZIP helper used by older callers/tests."""
+    return [
+        (filename, data)
+        for filename, data in extract_application_files_from_zip(zip_bytes, prefix=prefix)
+        if filename.lower().endswith(".pdf")
+    ]
+
+
+def image_bytes_to_pdf_bytes(image_bytes: bytes) -> bytes:
+    """Convert one scanned image file into an in-memory PDF package."""
+    with Image.open(BytesIO(image_bytes)) as image:
+        frames = []
+        for frame in ImageSequence.Iterator(image):
+            oriented = ImageOps.exif_transpose(frame)
+            frames.append(oriented.convert("RGB").copy())
+
+    if not frames:
+        raise ValueError("Image did not contain any readable pages.")
+
+    document = fitz.open()
+    try:
+        for frame in frames:
+            page_width = 612
+            page_height = max(1, page_width * frame.height / frame.width)
+            page = document.new_page(width=page_width, height=page_height)
+            image_buffer = BytesIO()
+            frame.save(image_buffer, format="PNG")
+            page.insert_image(page.rect, stream=image_buffer.getvalue())
+        return document.tobytes(garbage=4, deflate=True)
+    finally:
+        document.close()
+
+
+def normalize_application_file_to_pdf(filename: str, file_bytes: bytes) -> bytes:
+    lower = filename.lower()
+    if lower.endswith(".pdf"):
+        return file_bytes
+    if lower.endswith(SUPPORTED_IMAGE_EXTENSIONS):
+        return image_bytes_to_pdf_bytes(file_bytes)
+    raise ValueError("Unsupported file type. Use a completed application PDF or scanned image file.")
+
+
+def process_application_file(filename: str, file_bytes: bytes) -> ApplicationResult:
     start = time.perf_counter()
     try:
+        pdf_bytes = normalize_application_file_to_pdf(filename, file_bytes)
         application = extract_application(pdf_bytes)
         label = extract_label(pdf_bytes)
         elapsed = time.perf_counter() - start
@@ -56,7 +112,6 @@ def process_pdf(filename: str, pdf_bytes: bytes) -> ApplicationResult:
         )
     except Exception as exc:
         elapsed = time.perf_counter() - start
-        from src.constants import STATUS_REVIEW
         from src.models import ApplicationFields, LabelExtraction
 
         return verify_application(
@@ -70,13 +125,22 @@ def process_pdf(filename: str, pdf_bytes: bytes) -> ApplicationResult:
         )
 
 
-def process_pdf_cached(filename: str, pdf_bytes: bytes, cache: dict[str, ApplicationResult] | None = None) -> ApplicationResult:
+def process_application_file_cached(filename: str, file_bytes: bytes, cache: dict[str, ApplicationResult] | None = None) -> ApplicationResult:
     if cache is None:
-        return process_pdf(filename, pdf_bytes)
-    key = sha256_bytes(pdf_bytes)
+        return process_application_file(filename, file_bytes)
+    key = sha256_bytes(file_bytes)
     if key not in cache:
-        cache[key] = process_pdf(filename, pdf_bytes)
+        cache[key] = process_application_file(filename, file_bytes)
     result = deepcopy(cache[key])
     result.filename = filename
     return result
 
+
+def process_pdf(filename: str, pdf_bytes: bytes) -> ApplicationResult:
+    """Backward-compatible alias for processing a completed application PDF."""
+    return process_application_file(filename, pdf_bytes)
+
+
+def process_pdf_cached(filename: str, pdf_bytes: bytes, cache: dict[str, ApplicationResult] | None = None) -> ApplicationResult:
+    """Backward-compatible alias for cached PDF processing."""
+    return process_application_file_cached(filename, pdf_bytes, cache=cache)

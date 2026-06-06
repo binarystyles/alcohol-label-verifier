@@ -4,9 +4,9 @@ Live demo URL: `https://your-streamlit-app-url.example`
 
 ## Summary
 
-Alcohol Label Verification is a local-first Streamlit prototype for batch review of completed TTB alcohol label application PDFs. Compliance agents select one or many completed application PDFs, click **Verify Applications**, and receive Pass, Needs Review, or Fail recommendations with downloadable CSV outputs.
+Alcohol Label Verification is a local-first Streamlit prototype for batch review of completed TTB alcohol label application files. Compliance agents select one or many completed application PDFs or scanned application images, click **Verify Applications**, and receive Pass, Needs Review, or Fail recommendations with downloadable CSV outputs.
 
-Each PDF is treated as a self-contained verification package. Users do not upload labels separately. Users do not create CSV input files. CSVs are generated only as outputs for reviewer convenience.
+Each PDF or scanned application image is treated as a self-contained verification package. Users do not upload labels separately. Users do not create CSV input files. CSVs are generated only as outputs for reviewer convenience.
 
 ## Problem Context
 
@@ -17,18 +17,19 @@ The prior pilot target was missed because processing took 30 to 40 seconds per l
 ## Primary Workflow
 
 1. Open the app.
-2. Select completed TTB application PDFs, or upload a ZIP containing completed application PDFs.
+2. Select completed TTB application PDFs, scanned application images, or upload a ZIP containing either.
 3. Click **Verify Applications**.
 4. Review the summary table.
 5. Open details only for applications that need attention.
 6. Download summary, field-results, or extracted-application-data CSVs.
 
-There is no manual-entry mode and no separate single-application page. Batch mode handles one PDF and many PDFs the same way.
+There is no manual-entry mode and no separate single-application page. Batch mode handles one file and many files the same way.
 
 ## Key Features
 
-- Batch PDF and ZIP intake.
+- Batch PDF, scanned image, and ZIP intake.
 - One-button verification workflow.
+- Top-page light/dark mode toggle.
 - Session-only PDF hash caching.
 - Best-effort AcroForm extraction with region and summary fallback.
 - Separate application extraction and label evidence extraction.
@@ -42,7 +43,7 @@ There is no manual-entry mode and no separate single-application page. Batch mod
 
 The pipeline is implemented in small modules under `src/`:
 
-- `pdf_intake.py`: file hashing, ZIP expansion, PDF processing.
+- `pdf_intake.py`: file hashing, ZIP expansion, scanned image normalization, and PDF processing.
 - `extractors.py`: AcroForm, form-region, summary, and label extraction.
 - `form_mapping.py`: normalized TTB F 5100.31 coordinate heuristics.
 - `ocr.py` and `preprocess.py`: local OCR and image cleanup.
@@ -64,7 +65,7 @@ python -m pytest -q
 streamlit run app.py
 ```
 
-On Windows, make sure `tesseract.exe` is on `PATH`. The app still works for text-layer PDFs without Tesseract, but raster label OCR requires it.
+On Windows, make sure `tesseract.exe` is on `PATH`. The app still works for text-layer PDFs without Tesseract, but scanned images and raster label OCR require it.
 
 ## Docker Setup
 
@@ -102,17 +103,18 @@ The generated set includes:
 - `APP-005_low_quality_rotated.pdf`: OCR quality issue.
 - `APP-006_missing_label_area.pdf`: missing label area.
 
-## PDF Intake
+## Application File Intake
 
-For each completed application PDF, the app:
+For each completed application file, the app:
 
 1. Reads bytes in memory.
 2. Computes SHA-256 for session caching.
-3. Tries `pypdf` AcroForm extraction.
-4. Extracts mapped form regions from page one when needed.
-5. Parses an explicit application-data summary block when present.
-6. Extracts label evidence from the lower page-one affixed label area and likely supplemental label pages.
-7. Compares application values to label evidence.
+3. Converts scanned image files to an in-memory single-application PDF representation.
+4. Tries `pypdf` AcroForm extraction for PDFs.
+5. Extracts mapped form regions from page one when needed.
+6. Parses an explicit application-data summary block when present.
+7. Extracts label evidence from the lower page-one affixed label area and likely supplemental label pages.
+8. Compares application values to label evidence.
 
 Label OCR text is never used to invent expected application values.
 
@@ -144,7 +146,7 @@ Uploaded files are processed in memory during the Streamlit session. The app doe
 
 ## Performance Notes
 
-Clean text-layer PDFs process quickly because the app avoids OCR when PDF text is available. Scanned PDFs and raster labels require local OCR and may take longer. Session caching avoids reprocessing unchanged files during Streamlit reruns.
+Clean text-layer PDFs process quickly because the app avoids OCR when PDF text is available. Scanned PDFs, scanned image files, and raster labels require local OCR and may take longer. Session caching avoids reprocessing unchanged files during Streamlit reruns.
 
 ## Error Handling
 
@@ -174,4 +176,3 @@ Unreadable PDFs, missing label areas, low OCR confidence, and missing expected v
 python scripts/create_sample_applications.py
 python -m pytest -q
 ```
-

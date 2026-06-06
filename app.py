@@ -15,17 +15,18 @@ from src.batch import (
     summary_metrics,
 )
 from src.constants import STATUS_FAIL, STATUS_PASS, STATUS_REVIEW
-from src.pdf_intake import expand_named_files, process_pdf_cached
+from src.pdf_intake import SUPPORTED_UPLOAD_TYPES, expand_named_files, process_application_file_cached
 
 
 st.set_page_config(page_title="Alcohol Label Verification", layout="wide")
 
 
 def main() -> None:
+    _render_theme_toggle()
     st.title("Alcohol Label Verification")
     st.write(
-        "Select completed TTB application PDFs. Each PDF is treated as its own self-contained "
-        "verification package with application data and affixed label artwork inside the same file."
+        "Select completed TTB application PDFs or scanned application images. Each file is treated "
+        "as its own self-contained verification package with application data and affixed label artwork inside."
     )
 
     if "result_cache" not in st.session_state:
@@ -35,18 +36,18 @@ def main() -> None:
     if "loaded_files" not in st.session_state:
         st.session_state.loaded_files = []
 
-    uploaded_pdfs = st.file_uploader(
-        "Select completed TTB application PDFs",
-        type=["pdf"],
+    uploaded_files = st.file_uploader(
+        "Select completed TTB application files",
+        type=SUPPORTED_UPLOAD_TYPES,
         accept_multiple_files=True,
     )
-    uploaded_zip = st.file_uploader("Or select a ZIP containing completed application PDFs", type=["zip"])
+    uploaded_zip = st.file_uploader("Or select a ZIP containing completed application files", type=["zip"])
 
     actions = st.columns([1, 1, 4])
     verify_clicked = actions[0].button("Verify Applications", type="primary", use_container_width=True)
     sample_clicked = actions[1].button("Load Sample Applications", use_container_width=True)
 
-    named_files = _uploaded_to_named_files(uploaded_pdfs, uploaded_zip)
+    named_files = _uploaded_to_named_files(uploaded_files, uploaded_zip)
     if sample_clicked:
         named_files = _load_sample_files()
         st.session_state.loaded_files = named_files
@@ -56,7 +57,7 @@ def main() -> None:
 
     if verify_clicked:
         if not st.session_state.loaded_files:
-            st.warning("Select one or more completed application PDFs, or load the sample applications.")
+            st.warning("Select one or more completed application files, or load the sample applications.")
         else:
             st.session_state.results = _run_batch(st.session_state.loaded_files, st.session_state.result_cache)
 
@@ -65,9 +66,48 @@ def main() -> None:
         _render_results(results)
 
 
-def _uploaded_to_named_files(uploaded_pdfs, uploaded_zip) -> list[tuple[str, bytes]]:
+def _render_theme_toggle() -> None:
+    top_cols = st.columns([5, 1])
+    dark_mode = top_cols[1].toggle("Dark mode", key="dark_mode")
+    _apply_theme(dark_mode)
+
+
+def _apply_theme(dark_mode: bool) -> None:
+    if dark_mode:
+        st.markdown(
+            """
+            <style>
+            [data-testid="stAppViewContainer"] { background: #0f172a; color: #e5e7eb; }
+            [data-testid="stHeader"] { background: rgba(15, 23, 42, 0.92); }
+            [data-testid="stToolbar"] { color: #e5e7eb; }
+            .stApp, .stMarkdown, .stText, label, p, span, h1, h2, h3 { color: #e5e7eb; }
+            [data-testid="stFileUploader"], [data-testid="stExpander"], [data-testid="stMetric"],
+            [data-testid="stDataFrame"], textarea, input {
+                background-color: #111827 !important;
+                color: #e5e7eb !important;
+                border-color: #334155 !important;
+            }
+            div[data-testid="stNotification"] { background-color: #1f2937; color: #f9fafb; }
+            button { border-color: #475569 !important; }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+    else:
+        st.markdown(
+            """
+            <style>
+            [data-testid="stAppViewContainer"] { background: #ffffff; color: #111827; }
+            [data-testid="stHeader"] { background: rgba(255, 255, 255, 0.92); }
+            </style>
+            """,
+            unsafe_allow_html=True,
+        )
+
+
+def _uploaded_to_named_files(uploaded_files, uploaded_zip) -> list[tuple[str, bytes]]:
     named_files: list[tuple[str, bytes]] = []
-    for uploaded in uploaded_pdfs or []:
+    for uploaded in uploaded_files or []:
         named_files.append((uploaded.name, uploaded.getvalue()))
     if uploaded_zip is not None:
         named_files.append((uploaded_zip.name, uploaded_zip.getvalue()))
@@ -88,7 +128,7 @@ def _run_batch(named_files: list[tuple[str, bytes]], cache: dict) -> list:
     total = len(pdfs)
     for index, (filename, data) in enumerate(pdfs, start=1):
         status.write(f"Processing {index} of {total}: {filename}")
-        results.append(process_pdf_cached(filename, data, cache=cache))
+        results.append(process_application_file_cached(filename, data, cache=cache))
         progress.progress(index / total)
     status.write("Verification complete.")
     return results
@@ -165,4 +205,3 @@ def _render_results(results: list) -> None:
 
 if __name__ == "__main__":
     main()
-

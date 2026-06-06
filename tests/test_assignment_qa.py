@@ -1,13 +1,16 @@
 from __future__ import annotations
 
+from io import BytesIO
 from pathlib import Path
+import zipfile
 
+from PIL import Image, ImageDraw
 from streamlit.testing.v1 import AppTest
 
 from src.constants import GOVERNMENT_WARNING, STATUS_REVIEW
 from src.extractors import extract_application, extract_label
 from src.models import ApplicationFields, LabelExtraction
-from src.pdf_intake import expand_named_files
+from src.pdf_intake import SUPPORTED_UPLOAD_TYPES, expand_named_files, process_application_file
 from src.verifier import verify_application
 
 
@@ -19,19 +22,23 @@ def test_streamlit_ui_exposes_only_completed_pdf_batch_workflow() -> None:
     app.run(timeout=20)
 
     assert app.title[0].value == "Alcohol Label Verification"
+    assert any(toggle.label == "Dark mode" for toggle in app.toggle)
     assert [uploader.label for uploader in app.file_uploader] == [
-        "Select completed TTB application PDFs",
-        "Or select a ZIP containing completed application PDFs",
+        "Select completed TTB application files",
+        "Or select a ZIP containing completed application files",
     ]
     assert any(button.label == "Verify Applications" for button in app.button)
     assert any(button.label == "Load Sample Applications" for button in app.button)
 
     source = (ROOT / "app.py").read_text(encoding="utf-8")
-    assert 'type=["pdf"]' in source
+    assert "SUPPORTED_UPLOAD_TYPES" in source
     assert 'type=["zip"]' in source
     assert 'type=["csv"]' not in source
     assert "read_csv" not in source
     assert "label image" not in source.lower()
+    assert "pdf" in SUPPORTED_UPLOAD_TYPES
+    assert "png" in SUPPORTED_UPLOAD_TYPES
+    assert "jpg" in SUPPORTED_UPLOAD_TYPES
 
 
 def test_csvs_are_download_outputs_only() -> None:
@@ -44,14 +51,30 @@ def test_csvs_are_download_outputs_only() -> None:
 
 def test_pdf_and_zip_intake_treat_each_pdf_as_own_package(sample_bytes: dict[str, bytes]) -> None:
     zip_bytes = (ROOT / "samples" / "sample_batch.zip").read_bytes()
+    image_bytes = _make_scanned_application_image()
+    mixed_zip = BytesIO()
+    with zipfile.ZipFile(mixed_zip, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("scan.png", image_bytes)
+        archive.writestr("notes.txt", b"not an application")
+
     expanded = expand_named_files(
         [
             ("one.pdf", sample_bytes["APP-001_old_tom_pass.pdf"]),
             ("batch.zip", zip_bytes),
+            ("scan.png", image_bytes),
+            ("mixed.zip", mixed_zip.getvalue()),
         ]
     )
-    assert len(expanded) == 7
-    assert all(name.lower().endswith(".pdf") for name, _ in expanded)
+    assert len(expanded) == 9
+    assert any(name.lower().endswith(".png") for name, _ in expanded)
+    assert all(name.lower().endswith((".pdf", ".png", ".jpg", ".jpeg", ".tif", ".tiff", ".bmp")) for name, _ in expanded)
+
+
+def test_scanned_image_application_is_processed_without_separate_label_upload() -> None:
+    result = process_application_file("scanned-application.png", _make_scanned_application_image())
+    assert result.filename == "scanned-application.png"
+    assert result.overall_status == STATUS_REVIEW
+    assert "separate" not in " ".join(result.warnings).lower()
 
 
 def test_application_and_label_text_are_extracted_from_separate_regions(sample_bytes: dict[str, bytes]) -> None:
@@ -132,3 +155,15 @@ def test_gitignore_excludes_source_docs_and_local_artifacts() -> None:
     assert ".venv/" in gitignore
     assert "uploads/" in gitignore
 
+
+def _make_scanned_application_image() -> bytes:
+    image = Image.new("RGB", (612, 1008), "white")
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((20, 20, 592, 988), outline="black")
+    draw.text((34, 155), "4. SERIAL NUMBER APP-SCAN", fill="black")
+    draw.text((34, 205), "6. BRAND NAME SCANNED SAMPLE", fill="black")
+    draw.text((34, 690), "AFFIX COMPLETE SET OF LABELS BELOW", fill="black")
+    draw.text((80, 740), "SCANNED SAMPLE 45% Alc./Vol. 750 mL", fill="black")
+    buffer = BytesIO()
+    image.save(buffer, format="PNG")
+    return buffer.getvalue()

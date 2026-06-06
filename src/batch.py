@@ -6,12 +6,12 @@ import pandas as pd
 
 from src.constants import STATUS_FAIL, STATUS_PASS, STATUS_REVIEW
 from src.models import ApplicationResult
-from src.pdf_intake import expand_named_files, process_pdf_cached
+from src.pdf_intake import expand_named_files, process_application_file_cached
 
 
 def process_batch(named_files: list[tuple[str, bytes]], cache: dict | None = None) -> list[ApplicationResult]:
-    pdfs = expand_named_files(named_files)
-    return [process_pdf_cached(filename, data, cache=cache) for filename, data in pdfs]
+    application_files = expand_named_files(named_files)
+    return [process_application_file_cached(filename, data, cache=cache) for filename, data in application_files]
 
 
 def summary_dataframe(results: list[ApplicationResult]) -> pd.DataFrame:
@@ -48,4 +48,3 @@ def summary_metrics(results: list[ApplicationResult]) -> dict[str, int]:
         "unreadable": sum(any("unreadable" in warning.lower() for warning in result.warnings) for result in results),
         "missing_label_area": sum(any("label area" in warning.lower() and "missing" in warning.lower() for warning in result.warnings) for result in results),
     }
-

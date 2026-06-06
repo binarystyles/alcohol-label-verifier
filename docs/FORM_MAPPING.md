@@ -1,6 +1,6 @@
 # Form Mapping
 
-The prototype uses normalized page coordinates in `src/form_mapping.py` so regions scale with page size. These regions are tuned around TTB F 5100.31 page one and are intended to be easy to adjust.
+The prototype uses normalized page coordinates in `src/form_mapping.py` so regions scale with page size. These regions are tuned around TTB F 5100.31 page one and are intended to be easy to adjust. Scanned application image files are converted to an in-memory PDF page first, then the same normalized regions are applied.
 
 | TTB item | Extracted field | Verification use |
 | --- | --- | --- |
@@ -22,4 +22,3 @@ The prototype uses normalized page coordinates in `src/form_mapping.py` so regio
 The blank TTB F 5100.31 form does not always expose class/type, alcohol content, net contents, bottler/producer, country of origin, or imported status as simple fields. For this reason, the extractor also looks for an explicit application-data summary block inside the completed PDF. That block is treated as application/package metadata, not label evidence.
 
 If source form PDFs are available locally, the sample generator uses the real first page as a visual base. If not, it creates a simplified TTB-like page with the same field concepts.
-

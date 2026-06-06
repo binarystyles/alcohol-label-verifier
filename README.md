@@ -1,6 +1,6 @@
 # Alcohol Label Verification
 
-Live demo URL: `https://your-streamlit-app-url.example`
+Live demo URL: https://alcohol-label-verifier-ttb.streamlit.app/
 
 ## Summary
 

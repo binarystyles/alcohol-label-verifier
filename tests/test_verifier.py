@@ -335,6 +335,7 @@ def test_imported_country_of_origin_allows_imported_by_from_wording() -> None:
 def test_imported_country_of_origin_allows_distilled_and_brewed_in_wording() -> None:
     assert verify_country_of_origin("Mexico", True, "Distilled in Mexico").status == STATUS_PASS
     assert verify_country_of_origin("United Kingdom", True, "Distilled in Scotland").status == STATUS_PASS
+    assert verify_country_of_origin("United Kingdom", True, "Blended in Scotland").status == STATUS_PASS
     assert verify_country_of_origin("Belgium", True, "Brewed in Belgium").status == STATUS_PASS
 
 

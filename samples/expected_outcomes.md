@@ -88,5 +88,6 @@
 | `APP-084_distilled_in_origin_pass.pdf` | Pass | Pass | Imported spirits origin is stated as Distilled in Scotland for a United Kingdom application country. |
 | `APP-085_brewed_in_origin_pass.pdf` | Pass | Pass | Imported malt beverage origin is stated as Brewed in Belgium. |
 | `APP-086_packed_by_responsible_party_pass.pdf` | Pass | Pass | Wine label uses Packed by as responsible-party wording. |
+| `APP-087_blended_in_origin_pass.pdf` | Pass | Pass | Imported spirits origin is stated as Blended in Scotland for a United Kingdom application country. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

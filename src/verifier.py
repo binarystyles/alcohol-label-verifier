@@ -645,6 +645,7 @@ def _country_origin_statement_present(expected: str, label_text: str) -> bool:
                 rf"\bPRODUCED\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bPRODUCED\s+AND\s+BOTTLED\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bDISTILLED\s+IN\s+(?:THE\s+)?{country}\b",
+                rf"\bBLENDED\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bBREWED\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bMADE\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bIMPORTED\s+FROM\s+(?:THE\s+)?{country}\b",

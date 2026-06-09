@@ -1655,6 +1655,35 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Wine label uses Packed by as responsible-party wording.",
         ),
+        SampleSpec(
+            filename="APP-087_blended_in_origin_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-087",
+                "brand_name": "HIGHLAND FORGE WHISKY",
+                "fanciful_name": "",
+                "formula": "F-8700",
+                "class_type": "Blended Scotch Whisky",
+                "alcohol_content": "43% ABV",
+                "net_contents": "750 mL",
+                "bottler_producer": "Highland Forge Blenders Ltd.",
+                "country_of_origin": "United Kingdom",
+                "imported": True,
+            },
+            label_lines=[
+                "HIGHLAND FORGE WHISKY",
+                "DISTILLED SPIRITS",
+                "Class/Type: Blended Scotch Whisky",
+                "43% Alc./Vol.",
+                "750 mL",
+                "Blended in Scotland",
+                "Bottled by Highland Forge Blenders Ltd.",
+                "Imported by Example Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported spirits origin is stated as Blended in Scotland for a United Kingdom application country.",
+        ),
     ]
 
 

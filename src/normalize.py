@@ -118,7 +118,7 @@ ABV_PATTERNS = (
         re.IGNORECASE,
     ),
     re.compile(
-        r"ALCOHOL\s+(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?\s*BY\s+VOL(?:UME)?\.?",
+        r"ALCOHOL(?:\s+CONTENT)?\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?\s*BY\s+VOL(?:UME)?\.?",
         re.IGNORECASE,
     ),
 )

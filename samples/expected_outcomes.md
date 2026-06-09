@@ -70,5 +70,6 @@
 | `APP-066_class_type_implies_distilled_spirits_pass.pdf` | Pass | Pass | Distilled spirits product type is supported by a clear Gin class/type statement even without the literal DISTILLED SPIRITS phrase. |
 | `APP-067_dual_unit_net_contents_pass.pdf` | Pass | Pass | Label states both metric and rounded U.S. customary net contents for the same 750 mL package. |
 | `APP-068_imported_by_from_origin_pass.pdf` | Pass | Pass | Imported wine origin is stated as Imported by Example Imports LLC from France. |
+| `APP-069_alcohol_colon_by_volume_pass.pdf` | Pass | Pass | Label states alcohol content with colon wording, Alcohol: 45% by Volume. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

@@ -118,6 +118,10 @@ def test_abv_match_accepts_alcohol_by_vol_abbreviation() -> None:
     assert verify_alcohol_content("45% ABV", "OLD TOM GIN Alcohol 45% by Vol.").status == STATUS_PASS
 
 
+def test_abv_match_accepts_alcohol_colon_by_volume_wording() -> None:
+    assert verify_alcohol_content("45% ABV", "OLD TOM GIN Alcohol: 45% by Volume").status == STATUS_PASS
+
+
 def test_proof_match_accepts_degrees_wording() -> None:
     assert verify_alcohol_content("45% ABV", "OLD TOM GIN 90 degrees proof").status == STATUS_PASS
     assert verify_alcohol_content("45% ABV", "OLD TOM GIN 90\u00b0 proof").status == STATUS_PASS

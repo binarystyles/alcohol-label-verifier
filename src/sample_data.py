@@ -1256,6 +1256,22 @@ def sample_specs() -> list[SampleSpec]:
             note="Imported wine origin is stated as Imported by Example Imports LLC from France.",
             include_formula_approval=False,
         ),
+        SampleSpec(
+            filename="APP-069_alcohol_colon_by_volume_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-069", "formula": "F-6900"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "Alcohol: 45% by Volume",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states alcohol content with colon wording, Alcohol: 45% by Volume.",
+        ),
     ]
 
 

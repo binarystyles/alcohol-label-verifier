@@ -55,6 +55,8 @@ def test_abv_and_proof_extraction_normalize_to_abv() -> None:
     assert extract_abv_values("45 percent alcohol by volume") == [45.0]
     assert extract_abv_values("Alc. 45% by Vol.") == [45.0]
     assert extract_abv_values("Alcohol 45% by Volume") == [45.0]
+    assert extract_abv_values("Alcohol: 45% by Volume") == [45.0]
+    assert extract_abv_values("Alcohol Content: 45% by Volume") == [45.0]
     assert extract_abv_values("Alcohol 45% by Vol.") == [45.0]
     assert extract_abv_values("45% Alc. by Vol.") == [45.0]
     assert extract_abv_values("45% Alcohol by Vol.") == [45.0]

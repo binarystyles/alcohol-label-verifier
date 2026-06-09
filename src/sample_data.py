@@ -1713,6 +1713,35 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Imported spirits origin is stated as Distilled and bottled in Scotland for a United Kingdom application country.",
         ),
+        SampleSpec(
+            filename="APP-089_distilled_matured_bottled_origin_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-089",
+                "brand_name": "HIGHLAND FORGE WHISKY",
+                "fanciful_name": "",
+                "formula": "F-8900",
+                "class_type": "Single Malt Scotch Whisky",
+                "alcohol_content": "46% ABV",
+                "net_contents": "750 mL",
+                "bottler_producer": "Highland Forge Distilling Co.",
+                "country_of_origin": "United Kingdom",
+                "imported": True,
+            },
+            label_lines=[
+                "HIGHLAND FORGE WHISKY",
+                "DISTILLED SPIRITS",
+                "Class/Type: Single Malt Scotch Whisky",
+                "46% Alc./Vol.",
+                "750 mL",
+                "Distilled, matured and bottled in Scotland",
+                "Bottled by Highland Forge Distilling Co.",
+                "Imported by Example Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported spirits origin is stated as Distilled, matured and bottled in Scotland for a United Kingdom application country.",
+        ),
     ]
 
 

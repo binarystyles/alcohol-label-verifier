@@ -336,8 +336,11 @@ def test_imported_country_of_origin_allows_distilled_and_brewed_in_wording() -> 
     assert verify_country_of_origin("Mexico", True, "Distilled in Mexico").status == STATUS_PASS
     assert verify_country_of_origin("United Kingdom", True, "Distilled in Scotland").status == STATUS_PASS
     assert verify_country_of_origin("United Kingdom", True, "Distilled and bottled in Scotland").status == STATUS_PASS
+    assert verify_country_of_origin("United Kingdom", True, "Distilled, matured and bottled in Scotland").status == STATUS_PASS
+    assert verify_country_of_origin("United Kingdom", True, "Distilled and aged in Scotland").status == STATUS_PASS
     assert verify_country_of_origin("United Kingdom", True, "Blended in Scotland").status == STATUS_PASS
     assert verify_country_of_origin("United Kingdom", True, "Blended and bottled in Scotland").status == STATUS_PASS
+    assert verify_country_of_origin("United Kingdom", True, "Blended, matured and bottled in Scotland").status == STATUS_PASS
     assert verify_country_of_origin("Belgium", True, "Brewed in Belgium").status == STATUS_PASS
     assert verify_country_of_origin("Belgium", True, "Brewed and bottled in Belgium").status == STATUS_PASS
 
@@ -389,6 +392,7 @@ def test_imported_country_adjective_alone_is_not_enough() -> None:
 def test_imported_country_unhandled_origin_shorthand_needs_review() -> None:
     assert verify_country_of_origin("France", True, "Wine of France").status == STATUS_REVIEW
     assert verify_country_of_origin("France", True, "Vinted in France").status == STATUS_REVIEW
+    assert verify_country_of_origin("United Kingdom", True, "Aged in Scotland").status == STATUS_REVIEW
 
 
 def test_net_contents_match_passes_with_liters() -> None:

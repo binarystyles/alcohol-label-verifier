@@ -1766,6 +1766,31 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Malt beverage product type is inferred from IPA class/type shorthand.",
         ),
+        SampleSpec(
+            filename="APP-091_canned_by_responsible_party_pass.pdf",
+            fields={
+                **malt_fields,
+                "serial_number": "APP-091",
+                "brand_name": "HARBOR LIGHT LAGER",
+                "fanciful_name": "",
+                "formula": "MB-9100",
+                "class_type": "Lager",
+                "alcohol_content": "5.5% ABV",
+                "net_contents": "12 fl oz",
+                "bottler_producer": "Harbor Light Brewing Co.",
+            },
+            label_lines=[
+                "HARBOR LIGHT LAGER",
+                "MALT BEVERAGE",
+                "Class/Type: Lager",
+                "5.5% Alc./Vol.",
+                "12 fl oz",
+                "Brewed and canned by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Malt beverage label uses Brewed and canned by as responsible-party wording.",
+        ),
     ]
 
 

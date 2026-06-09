@@ -93,6 +93,14 @@ def test_bottler_producer_accepts_packed_by_statement() -> None:
     assert verify_bottler_producer("Example Winery", "Packed and bottled by Example Winery").status == STATUS_PASS
 
 
+def test_bottler_producer_accepts_canned_by_statement() -> None:
+    assert verify_bottler_producer("Harbor Light Brewing Co.", "Canned by Harbor Light Brewing Co.").status == STATUS_PASS
+    assert (
+        verify_bottler_producer("Harbor Light Brewing Co.", "Brewed and canned by Harbor Light Brewing Co.").status
+        == STATUS_PASS
+    )
+
+
 def test_government_warning_strict_title_case_behavior() -> None:
     result = verify_government_warning("Government Warning: Drinking may cause health problems.", 0.95)
     assert result.status == STATUS_FAIL

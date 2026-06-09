@@ -39,7 +39,7 @@ Fail is reserved for critical checks with extractable expected values:
 
 - Government warning missing or materially altered on a readable label.
 - Required brand materially mismatched.
-- Product type materially mismatched.
+- Product type materially mismatched. Explicit `DISTILLED SPIRITS` and `MALT BEVERAGE(S)` phrases are prioritized over incidental descriptors such as `Wine Cask Finish`.
 - Material ABV mismatch.
 - Material net contents mismatch.
 

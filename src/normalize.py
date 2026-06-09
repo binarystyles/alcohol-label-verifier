@@ -8,7 +8,7 @@ from typing import Iterable
 
 from rapidfuzz import fuzz
 
-from src.constants import GOVERNMENT_WARNING, PRODUCT_TYPES
+from src.constants import GOVERNMENT_WARNING
 
 
 def normalize_text(value: str | None) -> str:
@@ -61,13 +61,16 @@ def extract_product_type(text: str | None) -> str:
     normalized = normalize_text(text)
     if not normalized:
         return ""
-    for product_type in PRODUCT_TYPES:
-        if product_type in normalized:
-            return product_type
+    if "DISTILLED SPIRITS" in normalized:
+        return "DISTILLED SPIRITS"
+    if "MALT BEVERAGES" in normalized or "MALT BEVERAGE" in normalized:
+        return "MALT BEVERAGES"
     if "SPIRIT" in normalized or "LIQUOR" in normalized:
         return "DISTILLED SPIRITS"
     if "BEER" in normalized or "ALE" in normalized or "LAGER" in normalized:
         return "MALT BEVERAGES"
+    if re.search(r"\bWINE\b", normalized):
+        return "WINE"
     return ""
 
 

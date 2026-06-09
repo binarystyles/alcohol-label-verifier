@@ -26,6 +26,8 @@ def test_product_type_matching() -> None:
     assert extract_product_type("distilled spirits") == "DISTILLED SPIRITS"
     assert extract_product_type("malt beverage lager") == "MALT BEVERAGES"
     assert extract_product_type("wine") == "WINE"
+    assert extract_product_type("Wine Cask Finish DISTILLED SPIRITS") == "DISTILLED SPIRITS"
+    assert extract_product_type("Wine barrel aged ale") == "MALT BEVERAGES"
 
 
 def test_abv_and_proof_extraction_normalize_to_abv() -> None:

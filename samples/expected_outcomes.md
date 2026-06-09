@@ -31,5 +31,6 @@
 | `APP-027_product_type_mismatch_fail.pdf` | Fail | Fail | Readable label shows a different product type than the completed application. |
 | `APP-028_formula_document_missing_final_alcohol_review.pdf` | Needs Review | Needs Review | Matching formula approval document is present but lacks extractable final alcohol content. |
 | `APP-029_formula_id_prefix_mismatch_review.pdf` | Needs Review | Needs Review | Formula approval page has a longer prefix-sharing ID and must not satisfy the Item 9 Formula ID. |
+| `APP-030_wine_cask_spirits_pass.pdf` | Pass | Needs Review | Distilled spirits label mentions wine as a cask-finish descriptor without changing product type. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

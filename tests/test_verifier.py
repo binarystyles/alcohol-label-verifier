@@ -99,6 +99,11 @@ def test_product_type_mismatch_fails() -> None:
     assert "different product type" in result.reason
 
 
+def test_product_type_descriptor_does_not_override_explicit_product_type() -> None:
+    result = verify_product_type("DISTILLED SPIRITS", "CELLAR CASK WHISKEY Wine Cask Finish DISTILLED SPIRITS")
+    assert result.status == STATUS_PASS
+
+
 def test_imported_country_of_origin_passes_when_present() -> None:
     result = verify_country_of_origin("Mexico", True, "CASA VERDE TEQUILA Product of Mexico")
     assert result.status == STATUS_PASS

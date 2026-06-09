@@ -530,6 +530,33 @@ def sample_specs() -> list[SampleSpec]:
             note="Formula approval page has a longer prefix-sharing ID and must not satisfy the Item 9 Formula ID.",
             formula_approval_id="F-29001",
         ),
+        SampleSpec(
+            filename="APP-030_wine_cask_spirits_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-030",
+                "brand_name": "CELLAR CASK WHISKEY",
+                "fanciful_name": "Wine Cask Finish",
+                "formula": "F-3000",
+                "class_type": "Whiskey",
+                "alcohol_content": "45% ABV",
+                "bottler_producer": "Cellar Cask Distilling Co.",
+            },
+            label_lines=[
+                "CELLAR CASK WHISKEY",
+                "Wine Cask Finish",
+                "DISTILLED SPIRITS",
+                "Class/Type: Whiskey",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Cellar Cask Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            expected_status_without_ocr="Needs Review",
+            note="Distilled spirits label mentions wine as a cask-finish descriptor without changing product type.",
+            artwork_label=True,
+        ),
     ]
 
 

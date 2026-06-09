@@ -8,6 +8,7 @@ import fitz
 from PIL import Image, ImageDraw
 
 from src.constants import GOVERNMENT_WARNING, STATUS_PASS, STATUS_REVIEW
+from src.batch import process_batch
 from src.pdf_intake import (
     expand_named_files,
     extract_application_files_from_zip,
@@ -79,6 +80,27 @@ def test_zip_expansion_includes_scanned_images() -> None:
     files = extract_application_files_from_zip(zip_buffer.getvalue())
     assert len(files) == 1
     assert files[0][0].endswith("scan.png")
+
+
+def test_bad_zip_returns_clear_review_result() -> None:
+    result = process_batch([("bad.zip", b"not a zip file")], cache={})[0]
+    assert result.filename == "bad.zip"
+    assert result.overall_status == STATUS_REVIEW
+    assert any("ZIP archive could not be opened" in error for error in result.errors)
+
+
+def test_zip_without_supported_applications_returns_clear_review_result() -> None:
+    zip_buffer = BytesIO()
+    with zipfile.ZipFile(zip_buffer, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr("notes.txt", b"not an application")
+
+    expanded = expand_named_files([("empty.zip", zip_buffer.getvalue())])
+    assert expanded == [("empty.zip", zip_buffer.getvalue())]
+
+    result = process_batch([("empty.zip", zip_buffer.getvalue())], cache={})[0]
+    assert result.filename == "empty.zip"
+    assert result.overall_status == STATUS_REVIEW
+    assert any("did not contain any completed application" in error for error in result.errors)
 
 
 def _make_scanned_application_image() -> bytes:

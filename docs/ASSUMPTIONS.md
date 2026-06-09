@@ -4,6 +4,7 @@
 - Each completed application PDF or scanned application image is self-contained and includes both application data and label artwork.
 - Users do not upload separate label images.
 - Users do not create CSV input files. CSVs are outputs for reviewer convenience.
+- ZIP uploads may contain unsupported non-application files; those entries are ignored. A malformed ZIP, or a ZIP with no supported completed application PDFs/images, is reported as Needs Review with a clear reason instead of crashing the app.
 - Uploaded files are processed from memory or temporary library buffers and are not permanently stored by the app.
 - No cloud AI APIs, remote ML endpoints, or runtime network calls are used.
 - Tesseract is installed locally in deployment environments through `packages.txt` or the Dockerfile, especially for scanned images and raster-only PDFs.

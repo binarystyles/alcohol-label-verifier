@@ -108,6 +108,17 @@ def test_scanned_image_application_is_processed_without_separate_label_upload() 
     assert "separate" not in " ".join(result.warnings).lower()
 
 
+def test_streamlit_bad_zip_upload_renders_review_without_exception() -> None:
+    app = AppTest.from_file(str(ROOT / "app.py"))
+    app.run(timeout=20)
+    app.file_uploader[1].set_value([("bad.zip", b"not a zip file", "application/zip")]).run(timeout=20)
+    app.button[0].click().run(timeout=60)
+
+    assert len(app.exception) == 0
+    assert app.selectbox[0].label == "Status filter"
+    assert any("bad.zip" in str(dataframe.value) for dataframe in app.dataframe)
+
+
 def test_application_and_label_text_are_extracted_from_separate_regions(sample_bytes: dict[str, bytes]) -> None:
     pdf_bytes = sample_bytes["APP-001_old_tom_pass.pdf"]
     application = extract_application(pdf_bytes)

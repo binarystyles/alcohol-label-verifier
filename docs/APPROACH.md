@@ -46,6 +46,7 @@ Fail is reserved for critical checks with extractable expected values:
 Needs Review is used for uncertainty:
 
 - Missing or unreadable label area.
+- Malformed ZIP archive or ZIP with no supported completed application files.
 - Low OCR confidence.
 - Low-confidence form OCR for an expected application value.
 - Unreadable PDF.

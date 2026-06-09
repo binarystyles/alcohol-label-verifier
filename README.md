@@ -142,7 +142,7 @@ Clean text-layer PDFs process quickly because the app avoids OCR when PDF text i
 
 ## Error Handling
 
-Unreadable PDFs, missing label areas, low OCR confidence, low-confidence form OCR, missing expected values, and close-but-not-exact OCR reads of the government warning produce plain-English Needs Review reasons. Critical mismatches on readable evidence produce Fail.
+Unreadable PDFs, malformed ZIP archives, ZIPs with no supported application files, missing label areas, low OCR confidence, low-confidence form OCR, missing expected values, and close-but-not-exact OCR reads of the government warning produce plain-English Needs Review reasons. Critical mismatches on readable evidence produce Fail.
 
 ## Known Limitations And Tradeoffs
 

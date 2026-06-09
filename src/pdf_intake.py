@@ -32,7 +32,12 @@ def expand_named_files(named_files: list[tuple[str, bytes]]) -> list[tuple[str, 
         if is_supported_application_file(filename):
             expanded.append((filename, data))
         elif lower.endswith(".zip"):
-            expanded.extend(extract_application_files_from_zip(data, prefix=filename))
+            try:
+                extracted = extract_application_files_from_zip(data, prefix=filename)
+            except zipfile.BadZipFile:
+                expanded.append((filename, data))
+            else:
+                expanded.extend(extracted or [(filename, data)])
     return expanded
 
 
@@ -91,6 +96,18 @@ def normalize_application_file_to_pdf(filename: str, file_bytes: bytes) -> bytes
         return file_bytes
     if lower.endswith(SUPPORTED_IMAGE_EXTENSIONS):
         return image_bytes_to_pdf_bytes(file_bytes)
+    if lower.endswith(".zip"):
+        try:
+            extracted = extract_application_files_from_zip(file_bytes, prefix=filename)
+        except zipfile.BadZipFile as exc:
+            raise ValueError(
+                "ZIP archive could not be opened. Upload a valid ZIP containing completed application PDFs or scanned image files."
+            ) from exc
+        if not extracted:
+            raise ValueError(
+                "ZIP archive did not contain any completed application PDFs or scanned image files."
+            )
+        raise ValueError("ZIP archive was not expanded before processing.")
     raise ValueError("Unsupported file type. Use a completed application PDF or scanned image file.")
 
 

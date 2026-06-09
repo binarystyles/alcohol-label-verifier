@@ -89,6 +89,15 @@ def test_bad_zip_returns_clear_review_result() -> None:
     assert any("ZIP archive could not be opened" in error for error in result.errors)
 
 
+def test_cached_invalid_files_keep_current_filename_as_application_id() -> None:
+    data = b"not a zip file"
+    results = process_batch([("first.zip", data), ("second.zip", data)], cache={})
+    assert [(result.filename, result.application_id) for result in results] == [
+        ("first.zip", "first.zip"),
+        ("second.zip", "second.zip"),
+    ]
+
+
 def test_zip_without_supported_applications_returns_clear_review_result() -> None:
     zip_buffer = BytesIO()
     with zipfile.ZipFile(zip_buffer, "w", compression=zipfile.ZIP_DEFLATED) as archive:

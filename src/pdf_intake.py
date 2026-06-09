@@ -150,6 +150,8 @@ def process_application_file_cached(filename: str, file_bytes: bytes, cache: dic
         cache[key] = process_application_file(filename, file_bytes)
     result = deepcopy(cache[key])
     result.filename = filename
+    if not result.serial_number:
+        result.application_id = filename
     return result
 
 

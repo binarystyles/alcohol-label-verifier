@@ -40,7 +40,7 @@ Fail is reserved for critical checks with extractable expected values:
 - Government warning missing or materially altered on a readable label.
 - Required brand materially mismatched.
 - Product type materially mismatched. Explicit `DISTILLED SPIRITS` and `MALT BEVERAGE(S)` phrases are prioritized over incidental descriptors such as `Wine Cask Finish`.
-- Material ABV mismatch.
+- Material ABV mismatch. Non-alcohol percentages such as `100% Agave` are ignored for ABV/proof matching and become Needs Review if no actual alcohol statement is found.
 - Material net contents mismatch.
 
 Needs Review is used for uncertainty:

@@ -76,11 +76,15 @@ def extract_product_type(text: str | None) -> str:
 
 ABV_PATTERNS = (
     re.compile(
-        r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)\s*(?:ALC\.?\s*/?\s*VOL\.?|ABV|ALCOHOL BY VOLUME)?",
+        r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)\s*(?:ALC\.?\s*/?\s*VOL\.?|ABV|ALCOHOL BY VOLUME)",
         re.IGNORECASE,
     ),
     re.compile(
         r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:ALC\.?\s*/?\s*VOL\.?|ABV)",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"(?:ALC\.?\s*/?\s*VOL\.?|ABV|ALCOHOL BY VOLUME)\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?",
         re.IGNORECASE,
     ),
 )

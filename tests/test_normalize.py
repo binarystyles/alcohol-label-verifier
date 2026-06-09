@@ -34,6 +34,8 @@ def test_abv_and_proof_extraction_normalize_to_abv() -> None:
     assert extract_abv_values("45% Alc./Vol.") == [45.0]
     assert extract_abv_values("90 Proof") == [45.0]
     assert extract_abv_values("45 percent alcohol by volume") == [45.0]
+    assert extract_abv_values("100% Agave") == []
+    assert extract_abv_values("100% Agave 40% Alc./Vol.") == [40.0]
 
 
 def test_net_contents_extraction_normalizes_units() -> None:

@@ -557,6 +557,35 @@ def sample_specs() -> list[SampleSpec]:
             note="Distilled spirits label mentions wine as a cask-finish descriptor without changing product type.",
             artwork_label=True,
         ),
+        SampleSpec(
+            filename="APP-031_tequila_agave_missing_abv_review.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-031",
+                "brand_name": "CASA VERDE TEQUILA",
+                "fanciful_name": "Blanco",
+                "formula": "F-3100",
+                "class_type": "Tequila",
+                "alcohol_content": "40% ABV",
+                "bottler_producer": "Borderland Imports LLC",
+                "country_of_origin": "Mexico",
+                "imported": True,
+            },
+            label_lines=[
+                "CASA VERDE TEQUILA",
+                "Blanco",
+                "100% Agave",
+                "DISTILLED SPIRITS",
+                "Class/Type: Tequila",
+                "750 mL",
+                "Product of Mexico",
+                "Imported by Borderland Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Label has a non-alcohol percentage but no readable ABV/proof statement.",
+            artwork_label=True,
+        ),
     ]
 
 

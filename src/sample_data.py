@@ -32,6 +32,7 @@ class SampleSpec:
     blank_label: bool = False
     include_formula_approval: bool = True
     formula_approval_id: str | None = None
+    formula_approval_unit: str = "% by Volume"
     expected_status_without_ocr: str | None = None
 
 
@@ -586,6 +587,32 @@ def sample_specs() -> list[SampleSpec]:
             note="Label has a non-alcohol percentage but no readable ABV/proof statement.",
             artwork_label=True,
         ),
+        SampleSpec(
+            filename="APP-032_low_proof_liqueur_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-032",
+                "brand_name": "ORCHARD CREAM LIQUEUR",
+                "fanciful_name": "Vanilla Pear",
+                "formula": "L-4001",
+                "class_type": "Liqueur",
+                "alcohol_content": "40 Proof",
+                "bottler_producer": "Orchard House Spirits LLC",
+            },
+            label_lines=[
+                "ORCHARD CREAM LIQUEUR",
+                "Vanilla Pear",
+                "DISTILLED SPIRITS",
+                "Class/Type: Liqueur",
+                "20% Alc./Vol.",
+                "750 mL",
+                "Bottled by Orchard House Spirits LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Approved formula gives final alcohol as 40 proof, which should normalize to 20% ABV.",
+            formula_approval_unit="Proof",
+        ),
     ]
 
 
@@ -621,7 +648,12 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
     else:
         _draw_text_label(page, spec.label_lines)
     if spec.include_formula_approval:
-        _append_formula_approval_page(document, spec.fields, formula_id_override=spec.formula_approval_id)
+        _append_formula_approval_page(
+            document,
+            spec.fields,
+            formula_id_override=spec.formula_approval_id,
+            formula_unit=spec.formula_approval_unit,
+        )
     document.set_metadata({"title": spec.filename, "subject": "Synthetic completed TTB application"})
     document.save(output_path, garbage=4, deflate=True)
     document.close()
@@ -778,6 +810,7 @@ def _append_formula_approval_page(
     fields: dict[str, str | bool],
     *,
     formula_id_override: str | None = None,
+    formula_unit: str = "% by Volume",
 ) -> None:
     page = document.new_page(width=612, height=792)
     formula_id = formula_id_override or str(fields.get("formula", "") or "")
@@ -793,7 +826,7 @@ def _append_formula_approval_page(
         "",
         "Yield Summary",
         "Total Yield: 100.0 Percentage",
-        f"Alcohol Content of Finished Product: Low {low_alcohol} High {high_alcohol} Unit % by Volume",
+        f"Alcohol Content of Finished Product: Low {low_alcohol} High {high_alcohol} Unit {formula_unit}",
         "",
         "Ingredients List:",
         "Finished alcohol, botanicals, purified water, and approved flavor materials.",

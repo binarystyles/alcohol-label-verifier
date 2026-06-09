@@ -129,6 +129,19 @@ def test_formula_approval_parser_converts_proof_before_later_percent_rows() -> N
     assert fields["alcohol_content"] == "45% ABV"
 
 
+def test_formula_approval_parser_converts_low_proof_to_abv() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: L-4001
+    Yield Summary
+    Final Alcohol Content: 40 Proof
+    Ingredients List
+    Finished alcohol, sugar, and natural flavors
+    """
+    fields = parse_formula_approval_fields(text, "L-4001")
+    assert fields["alcohol_content"] == "20% ABV"
+
+
 def test_formula_approval_parser_handles_ocr_values_before_finished_product_label() -> None:
     text = """
     Formulas Online Entry

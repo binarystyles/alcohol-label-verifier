@@ -554,7 +554,7 @@ def _formula_alcohol_numbers(segment: str) -> list[float]:
 
 def _format_formula_abv_values(values: list[float], snippet: str) -> str:
     uses_proof = "PROOF" in normalize_text(snippet) and "%" not in snippet and "ABV" not in normalize_text(snippet)
-    converted = [value / 2.0 if uses_proof and value > 50 else value for value in values]
+    converted = [value / 2.0 if uses_proof else value for value in values]
     low = min(converted)
     high = max(converted)
     if abs(low - high) <= 0.01:

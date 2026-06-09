@@ -33,5 +33,6 @@
 | `APP-029_formula_id_prefix_mismatch_review.pdf` | Needs Review | Needs Review | Formula approval page has a longer prefix-sharing ID and must not satisfy the Item 9 Formula ID. |
 | `APP-030_wine_cask_spirits_pass.pdf` | Pass | Needs Review | Distilled spirits label mentions wine as a cask-finish descriptor without changing product type. |
 | `APP-031_tequila_agave_missing_abv_review.pdf` | Needs Review | Needs Review | Label has a non-alcohol percentage but no readable ABV/proof statement. |
+| `APP-032_low_proof_liqueur_pass.pdf` | Pass | Pass | Approved formula gives final alcohol as 40 proof, which should normalize to 20% ABV. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

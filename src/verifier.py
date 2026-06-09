@@ -319,8 +319,9 @@ def verify_net_contents(expected: str, label_text: str) -> FieldResult:
     if not found_values:
         return _result("net_contents", expected, "", snippet_around(label_text), STATUS_REVIEW, 0.45, "Net contents were not clearly found on the label.")
     closest = min(found_values, key=lambda value: abs(value - expected_ml))
-    matching_values = [value for value in found_values if abs(value - expected_ml) <= 1.0]
-    conflicting_values = [value for value in found_values if abs(value - expected_ml) > 1.0]
+    tolerance = _net_contents_tolerance(expected_ml)
+    matching_values = [value for value in found_values if abs(value - expected_ml) <= tolerance]
+    conflicting_values = [value for value in found_values if abs(value - expected_ml) > tolerance]
     if matching_values and conflicting_values:
         return _result(
             "net_contents",
@@ -334,6 +335,10 @@ def verify_net_contents(expected: str, label_text: str) -> FieldResult:
     if matching_values:
         return _result("net_contents", f"{expected_ml:g} mL", f"{closest:g} mL", snippet_around(label_text, str(int(closest))), STATUS_PASS, 0.95, "Net contents match after unit normalization.")
     return _result("net_contents", f"{expected_ml:g} mL", f"{closest:g} mL", snippet_around(label_text), STATUS_FAIL, 0.95, "Material net-contents mismatch.")
+
+
+def _net_contents_tolerance(expected_ml: float) -> float:
+    return max(1.0, expected_ml * 0.003)
 
 
 def verify_country_of_origin(expected: str, imported: bool, label_text: str) -> FieldResult:

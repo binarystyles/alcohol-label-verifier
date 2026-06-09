@@ -320,6 +320,12 @@ def test_net_contents_match_passes_with_plain_ounces() -> None:
     assert verify_net_contents("8 fl oz", "Serving size 1/2 Pint").status == STATUS_REVIEW
 
 
+def test_net_contents_match_passes_with_rounded_dual_unit_equivalents() -> None:
+    assert verify_net_contents("750 mL", "Net Contents 750 mL / 25.4 FL OZ").status == STATUS_PASS
+    assert verify_net_contents("1 L", "Net Contents 1 L / 33.8 FL OZ").status == STATUS_PASS
+    assert verify_net_contents("750 mL", "Net Contents 750 mL / 24 FL OZ").status == STATUS_REVIEW
+
+
 def test_net_contents_match_passes_with_written_number_words() -> None:
     assert verify_net_contents("750 mL", "Net Contents Seven Hundred Fifty Milliliters").status == STATUS_PASS
     assert verify_net_contents("1 L", "Net Contents one liter").status == STATUS_PASS

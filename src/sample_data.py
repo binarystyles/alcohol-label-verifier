@@ -1213,6 +1213,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Distilled spirits product type is supported by a clear Gin class/type statement even without the literal DISTILLED SPIRITS phrase.",
         ),
+        SampleSpec(
+            filename="APP-067_dual_unit_net_contents_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-067", "formula": "F-6700"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "Net Contents 750 mL / 25.4 FL OZ",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states both metric and rounded U.S. customary net contents for the same 750 mL package.",
+        ),
     ]
 
 

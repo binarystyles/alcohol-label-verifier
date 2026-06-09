@@ -851,6 +851,29 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Fail",
             note="Brand tokens are reordered, which should not pass as a harmless brand variation.",
         ),
+        SampleSpec(
+            filename="APP-047_wine_brand_contains_spirit_pass.pdf",
+            fields={
+                **wine_fields,
+                "serial_number": "APP-047",
+                "brand_name": "SPIRIT HILL WINE",
+                "fanciful_name": "Estate Red",
+                "formula": "W-4700",
+                "bottler_producer": "Spirit Hill Winery",
+            },
+            label_lines=[
+                "SPIRIT HILL WINE",
+                "Estate Red",
+                "WINE",
+                "Class/Type: Red Wine",
+                "13.5% Alc./Vol.",
+                "750 mL",
+                "Bottled by Spirit Hill Winery",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Wine brand contains the word Spirit, but explicit wine label text controls product-type matching.",
+        ),
     ]
 
 

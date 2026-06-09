@@ -190,6 +190,11 @@ def test_product_type_descriptor_does_not_override_explicit_product_type() -> No
     assert result.status == STATUS_PASS
 
 
+def test_wine_brand_with_spirit_word_does_not_fail_product_type() -> None:
+    result = verify_product_type("WINE", "SPIRIT HILL WINE\nWINE\nClass/Type: Red Wine\n13% Alc./Vol.")
+    assert result.status == STATUS_PASS
+
+
 def test_class_type_in_brand_line_only_needs_review() -> None:
     result = verify_class_type("Gin", "OLD TOM GIN\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL")
     assert result.status == STATUS_REVIEW

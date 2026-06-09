@@ -282,6 +282,16 @@ def test_imported_country_of_origin_allows_produce_of_wording() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_imported_country_of_origin_allows_imported_by_from_wording() -> None:
+    result = verify_country_of_origin("France", True, "Imported by Example Imports LLC from France")
+    assert result.status == STATUS_PASS
+
+
+def test_imported_country_of_origin_allows_produced_and_bottled_in_wording() -> None:
+    result = verify_country_of_origin("France", True, "Produced and bottled in France")
+    assert result.status == STATUS_PASS
+
+
 def test_imported_country_of_origin_allows_us_abbreviations() -> None:
     assert verify_country_of_origin("United States", True, "Product of USA").status == STATUS_PASS
     assert verify_country_of_origin("United States", True, "Product of U.S.A.").status == STATUS_PASS
@@ -295,6 +305,11 @@ def test_imported_country_of_origin_needs_review_when_missing_from_label() -> No
 
 def test_imported_country_name_in_importer_name_is_not_enough() -> None:
     result = verify_country_of_origin("Mexico", True, "CASA VERDE TEQUILA Imported by Mexico Trading LLC")
+    assert result.status == STATUS_REVIEW
+
+
+def test_imported_country_adjective_alone_is_not_enough() -> None:
+    result = verify_country_of_origin("France", True, "French Wine")
     assert result.status == STATUS_REVIEW
 
 

@@ -1229,6 +1229,33 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states both metric and rounded U.S. customary net contents for the same 750 mL package.",
         ),
+        SampleSpec(
+            filename="APP-068_imported_by_from_origin_pass.pdf",
+            fields={
+                **wine_fields,
+                "serial_number": "APP-068",
+                "brand_name": "CHATEAU LUMIERE",
+                "fanciful_name": "Estate Red",
+                "formula": "NO FORMULA REQUIRED",
+                "alcohol_content": "13% ABV",
+                "bottler_producer": "Example Imports LLC",
+                "country_of_origin": "France",
+                "imported": True,
+            },
+            label_lines=[
+                "CHATEAU LUMIERE",
+                "Estate Red",
+                "WINE",
+                "Class/Type: Red Wine",
+                "13% Alc./Vol.",
+                "750 mL",
+                "Imported by Example Imports LLC from France",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported wine origin is stated as Imported by Example Imports LLC from France.",
+            include_formula_approval=False,
+        ),
     ]
 
 

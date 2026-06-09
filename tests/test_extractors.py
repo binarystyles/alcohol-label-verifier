@@ -142,6 +142,46 @@ def test_formula_approval_parser_converts_low_proof_to_abv() -> None:
     assert fields["alcohol_content"] == "20% ABV"
 
 
+def test_formula_approval_parser_accepts_finished_alcohol_content_wording() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: F-8200
+    Yield Summary
+    Finished Alcohol Content: 45% ABV
+    Ingredients List
+    Finished alcohol, botanicals, and water
+    """
+    fields = parse_formula_approval_fields(text, "F-8200")
+    assert fields["alcohol_content"] == "45% ABV"
+
+
+def test_formula_approval_parser_accepts_final_product_alcohol_content_wording() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: F-8300
+    Yield Summary
+    Final Product Alcohol Content: 40 Proof
+    Ingredients List
+    Finished alcohol, botanicals, and water
+    """
+    fields = parse_formula_approval_fields(text, "F-8300")
+    assert fields["alcohol_content"] == "20% ABV"
+
+
+def test_formula_approval_parser_ignores_generic_alcohol_content_wording() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: F-8400
+    Ingredients List
+    Neutral spirits
+    Alcohol Content: 95% ABV
+    Method of Manufacture
+    Blend and bottle.
+    """
+    fields = parse_formula_approval_fields(text, "F-8400")
+    assert fields == {"alcohol_content": ""}
+
+
 def test_formula_approval_parser_accepts_ttb_id_number_reference() -> None:
     text = """
     FORMULAS ONLINE APPROVAL DETERMINATION

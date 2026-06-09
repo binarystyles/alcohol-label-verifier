@@ -99,6 +99,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-079_british_millilitres_pass.pdf" in specs
     assert "APP-080_scotland_origin_pass.pdf" in specs
     assert "APP-081_republic_ireland_origin_pass.pdf" in specs
+    assert "APP-082_finished_alcohol_formula_pass.pdf" in specs
+    assert "APP-083_final_product_alcohol_formula_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
@@ -171,6 +173,10 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-080_scotland_origin_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-081_republic_ireland_origin_pass.pdf"].fields["country_of_origin"] == "Ireland"
     assert specs["APP-081_republic_ireland_origin_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-082_finished_alcohol_formula_pass.pdf"].formula_approval_alcohol_label == "Finished Alcohol Content"
+    assert specs["APP-082_finished_alcohol_formula_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-083_final_product_alcohol_formula_pass.pdf"].formula_approval_alcohol_label == "Final Product Alcohol Content"
+    assert specs["APP-083_final_product_alcohol_formula_pass.pdf"].expected_status == STATUS_PASS
 
 
 def test_sample_generator_uses_real_source_form_when_available(sample_paths: list[Path]) -> None:

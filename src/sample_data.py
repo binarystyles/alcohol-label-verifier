@@ -34,6 +34,7 @@ class SampleSpec:
     formula_approval_id: str | None = None
     formula_approval_unit: str = "% by Volume"
     formula_approval_identifier_label: str = "TTB Formula ID"
+    formula_approval_alcohol_label: str = "Alcohol Content of Finished Product"
     expected_status_without_ocr: str | None = None
 
 
@@ -1542,6 +1543,46 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Imported origin names Republic of Ireland while the application country is Ireland.",
         ),
+        SampleSpec(
+            filename="APP-082_finished_alcohol_formula_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-082", "formula": "F-8200"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Formula support states final ABV as Finished Alcohol Content.",
+            formula_approval_alcohol_label="Finished Alcohol Content",
+        ),
+        SampleSpec(
+            filename="APP-083_final_product_alcohol_formula_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-083",
+                "formula": "F-8300",
+                "alcohol_content": "40 Proof",
+            },
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "40 Proof",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Formula support states final proof as Final Product Alcohol Content.",
+            formula_approval_unit="Proof",
+            formula_approval_alcohol_label="Final Product Alcohol Content",
+        ),
     ]
 
 
@@ -1583,6 +1624,7 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
             formula_id_override=spec.formula_approval_id,
             formula_unit=spec.formula_approval_unit,
             formula_identifier_label=spec.formula_approval_identifier_label,
+            formula_alcohol_label=spec.formula_approval_alcohol_label,
         )
     document.set_metadata({"title": spec.filename, "subject": "Synthetic completed TTB application"})
     document.save(output_path, garbage=4, deflate=True)
@@ -1742,6 +1784,7 @@ def _append_formula_approval_page(
     formula_id_override: str | None = None,
     formula_unit: str = "% by Volume",
     formula_identifier_label: str = "TTB Formula ID",
+    formula_alcohol_label: str = "Alcohol Content of Finished Product",
 ) -> None:
     page = document.new_page(width=612, height=792)
     formula_id = formula_id_override or str(fields.get("formula", "") or "")
@@ -1757,7 +1800,7 @@ def _append_formula_approval_page(
         "",
         "Yield Summary",
         "Total Yield: 100.0 Percentage",
-        f"Alcohol Content of Finished Product: Low {low_alcohol} High {high_alcohol} Unit {formula_unit}",
+        f"{formula_alcohol_label}: Low {low_alcohol} High {high_alcohol} Unit {formula_unit}",
         "",
         "Ingredients List:",
         "Finished alcohol, botanicals, purified water, and approved flavor materials.",

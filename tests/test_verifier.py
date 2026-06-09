@@ -231,6 +231,14 @@ def test_product_type_first_label_line_passes_when_explicit() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_distilled_spirits_product_type_passes_from_class_type_context() -> None:
+    assert verify_product_type("DISTILLED SPIRITS", "OLD TOM GIN\nClass/Type: Gin\n45% Alc./Vol.").status == STATUS_PASS
+    assert (
+        verify_product_type("DISTILLED SPIRITS", "RIVER BEND BOURBON\nStraight Bourbon Whiskey\n90 Proof").status
+        == STATUS_PASS
+    )
+
+
 def test_malt_product_type_first_label_line_passes_when_explicit() -> None:
     assert verify_product_type("MALT BEVERAGES", "BEER\nSUNNY FARMS\n5.5% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "MALT LIQUOR\nSUNNY FARMS\n5.5% Alc./Vol.").status == STATUS_PASS

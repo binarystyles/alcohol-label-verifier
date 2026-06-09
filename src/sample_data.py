@@ -1198,6 +1198,21 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states proof with degrees wording, which should normalize to 45% ABV.",
         ),
+        SampleSpec(
+            filename="APP-066_class_type_implies_distilled_spirits_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-066", "formula": "F-6600"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Distilled spirits product type is supported by a clear Gin class/type statement even without the literal DISTILLED SPIRITS phrase.",
+        ),
     ]
 
 

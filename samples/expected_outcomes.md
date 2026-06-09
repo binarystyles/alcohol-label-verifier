@@ -67,5 +67,6 @@
 | `APP-063_written_net_contents_pass.pdf` | Pass | Pass | Label spells out net contents as Seven Hundred Fifty Milliliters, equivalent to the application 750 mL value. |
 | `APP-064_alcohol_by_vol_abbreviation_pass.pdf` | Pass | Pass | Label states alcohol content as Alcohol 45% by Vol., which should normalize as ABV. |
 | `APP-065_degrees_proof_pass.pdf` | Pass | Pass | Label states proof with degrees wording, which should normalize to 45% ABV. |
+| `APP-066_class_type_implies_distilled_spirits_pass.pdf` | Pass | Pass | Distilled spirits product type is supported by a clear Gin class/type statement even without the literal DISTILLED SPIRITS phrase. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

@@ -153,11 +153,11 @@ def _keyword_follows_completed_abv_statement(text: str, start: int) -> bool:
 
 
 NET_CONTENTS_COMPOUND_PATTERN = re.compile(
-    r"(?<![A-Z0-9])(?P<pints>\d+(?:\.\d+)?)\s*(?:PT\.?|PINTS?)\s+(?P<ounces>\d+(?:\.\d+)?)\s*(?:FL\.?\s*OZ\.?|FLUID\s+OUNCES?)\b",
+    r"(?<![A-Z0-9])(?P<pints>\d+(?:\.\d+)?)\s*(?:PT\.?|PINTS?)\s+(?P<ounces>\d+(?:\.\d+)?)\s*(?:FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)\b",
     re.IGNORECASE,
 )
 NET_CONTENTS_PATTERN = re.compile(
-    r"(?<![A-Z0-9])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|PT\.?|PINTS?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?)\b",
+    r"(?<![A-Z0-9])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|PT\.?|PINTS?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)\b",
     re.IGNORECASE,
 )
 

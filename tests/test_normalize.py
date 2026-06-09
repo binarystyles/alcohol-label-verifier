@@ -64,11 +64,12 @@ def test_abv_and_proof_extraction_normalize_to_abv() -> None:
 def test_net_contents_extraction_normalizes_units() -> None:
     values = extract_net_contents_values("750ML 0.75 L .75 liters 750 milliliters")
     assert values == [750.0]
-    assert extract_net_contents_values("12 fl oz") == [354.882]
+    assert extract_net_contents_values("12 fl oz 12 oz 12 ounces") == [354.882]
     assert extract_net_contents_values("75 cL 75cl 70 centiliters") == [750.0, 700.0]
     assert extract_net_contents_values("1 pint 1 pt") == [473.176]
-    assert extract_net_contents_values("1 Pint 0.9 FL OZ") == [499.792]
+    assert extract_net_contents_values("1 Pint 0.9 FL OZ 1 Pint 0.9 OZ") == [499.792]
     assert extract_net_contents_values("Serving size 50 mL") == []
+    assert extract_net_contents_values("Serving size 12 oz") == []
     assert extract_net_contents_values("Net Contents 750 mL\nServing size 50 mL") == [750.0]
 
 

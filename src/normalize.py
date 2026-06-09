@@ -178,7 +178,7 @@ NET_CONTENTS_WORD_PATTERN = re.compile(
     re.IGNORECASE,
 )
 NET_CONTENTS_PATTERN = re.compile(
-    rf"(?<![A-Z0-9/])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\b",
+    rf"(?<![A-Z0-9/])(?P<num>(?:\d{{1,3}}(?:,\d{{3}})+(?:\.\d+)?)|(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\b",
     re.IGNORECASE,
 )
 
@@ -227,7 +227,7 @@ def extract_net_contents_values(text: str | None) -> list[float]:
             continue
         if _is_non_net_contents_volume(text, match.start(), match.end()):
             continue
-        number = float(match.group("num"))
+        number = float(match.group("num").replace(",", ""))
         milliliters = _net_unit_to_milliliters(number, match.group("unit"))
         if 0 < milliliters < 100000:
             values.append(round(milliliters, 3))

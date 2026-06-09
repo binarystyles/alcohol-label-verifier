@@ -322,6 +322,10 @@ def test_net_contents_match_passes_with_liters() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_net_contents_match_passes_with_comma_thousands() -> None:
+    assert verify_net_contents("1000 mL", "Net Contents 1,000 mL").status == STATUS_PASS
+
+
 def test_net_contents_match_passes_with_centiliters() -> None:
     assert verify_net_contents("750 mL", "Net Contents 75 cL").status == STATUS_PASS
     assert verify_net_contents("75 cL", "Net Contents 750 mL").status == STATUS_PASS

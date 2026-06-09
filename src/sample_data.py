@@ -1272,6 +1272,21 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states alcohol content with colon wording, Alcohol: 45% by Volume.",
         ),
+        SampleSpec(
+            filename="APP-070_comma_thousands_net_contents_pass.pdf",
+            fields={**small_batch_fields, "serial_number": "APP-070", "formula": "F-7000"},
+            label_lines=[
+                "COPPER RIDGE VODKA",
+                "DISTILLED SPIRITS",
+                "Class/Type: Vodka",
+                "40% Alc./Vol.",
+                "Net Contents 1,000 mL",
+                "Bottled by Copper Ridge Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states net contents with a comma thousands separator, 1,000 mL.",
+        ),
     ]
 
 

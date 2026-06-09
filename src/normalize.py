@@ -152,8 +152,12 @@ def _keyword_follows_completed_abv_statement(text: str, start: int) -> bool:
     return bool(re.search(r"\d{1,3}(?:\.\d+)?\s*(?:%|PERCENT)\s*$", prefix, flags=re.IGNORECASE))
 
 
+NET_CONTENTS_COMPOUND_PATTERN = re.compile(
+    r"(?<![A-Z0-9])(?P<pints>\d+(?:\.\d+)?)\s*(?:PT\.?|PINTS?)\s+(?P<ounces>\d+(?:\.\d+)?)\s*(?:FL\.?\s*OZ\.?|FLUID\s+OUNCES?)\b",
+    re.IGNORECASE,
+)
 NET_CONTENTS_PATTERN = re.compile(
-    r"(?<![A-Z0-9])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?)\b",
+    r"(?<![A-Z0-9])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|PT\.?|PINTS?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?)\b",
     re.IGNORECASE,
 )
 
@@ -162,13 +166,27 @@ def extract_net_contents_values(text: str | None) -> list[float]:
     if not text:
         return []
     values: list[float] = []
+    compound_spans: list[tuple[int, int]] = []
+    for match in NET_CONTENTS_COMPOUND_PATTERN.finditer(text):
+        if _is_non_net_contents_volume(text, match.start(), match.end()):
+            continue
+        pints = float(match.group("pints"))
+        ounces = float(match.group("ounces"))
+        milliliters = (pints * 473.176) + (ounces * 29.5735)
+        if 0 < milliliters < 100000:
+            values.append(round(milliliters, 3))
+            compound_spans.append(match.span())
     for match in NET_CONTENTS_PATTERN.finditer(text):
+        if any(start <= match.start() and match.end() <= end for start, end in compound_spans):
+            continue
         if _is_non_net_contents_volume(text, match.start(), match.end()):
             continue
         number = float(match.group("num"))
         unit = re.sub(r"[^A-Z]+", "", match.group("unit").upper())
         if "OZ" in unit or "OUNCE" in unit:
             milliliters = number * 29.5735
+        elif unit in {"PT", "PINT", "PINTS"}:
+            milliliters = number * 473.176
         elif unit.startswith("C"):
             milliliters = number * 10
         elif unit.startswith("M"):

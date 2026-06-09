@@ -1028,6 +1028,26 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Imported wine uses common Produce of France origin wording.",
         ),
+        SampleSpec(
+            filename="APP-056_pint_net_contents_pass.pdf",
+            fields={
+                **malt_fields,
+                "serial_number": "APP-056",
+                "formula": "MB-5600",
+                "net_contents": "500 mL",
+            },
+            label_lines=[
+                "HARBOR LIGHT LAGER",
+                "MALT BEVERAGES",
+                "Class/Type: Flavored Malt Beverage",
+                "5.5% Alc./Vol.",
+                "1 Pint 0.9 FL OZ",
+                "Brewed by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states net contents as a compound pint and fluid-ounce amount equivalent to 500 mL.",
+        ),
     ]
 
 

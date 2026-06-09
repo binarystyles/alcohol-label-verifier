@@ -118,7 +118,7 @@ def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> li
         ]
     results = [
         verify_brand(fields.brand_name, label_text),
-        verify_optional_fuzzy("fanciful_name", fields.fanciful_name, label_text),
+        verify_optional_fuzzy("fanciful_name", fields.fanciful_name, label_text, missing_status=STATUS_REVIEW),
         verify_product_type(fields.product_type, label_text),
         verify_class_type(fields.class_type, label_text),
         verify_formula_alcohol_content(fields.formula, fields.alcohol_content, fields.raw_sources.get("alcohol_content", ""), label_text),

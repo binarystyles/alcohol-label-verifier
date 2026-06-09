@@ -665,6 +665,53 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states alcohol content as Alc. value by Vol., which should normalize as ABV.",
         ),
+        SampleSpec(
+            filename="APP-036_missing_fanciful_name_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-036", "formula": "F-3600"},
+            label_lines=[
+                "OLD TOM GIN",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Application supplies a fanciful name, but the label does not clearly show it.",
+        ),
+        SampleSpec(
+            filename="APP-037_proof_before_value_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-037", "formula": "F-3700"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "Proof 90",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states proof before the value, which should normalize to ABV.",
+        ),
+        SampleSpec(
+            filename="APP-038_alcohol_by_volume_order_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-038", "formula": "F-3800"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "Alcohol 45% by Volume",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states alcohol value before by-volume wording, which should normalize as ABV.",
+        ),
     ]
 
 

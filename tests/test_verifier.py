@@ -87,6 +87,35 @@ def test_formula_alcohol_content_mismatch_fails() -> None:
     assert result.status == STATUS_FAIL
 
 
+def test_supplied_fanciful_name_missing_needs_review() -> None:
+    fields = ApplicationFields(
+        serial_number="APP-FANCIFUL",
+        product_type="DISTILLED SPIRITS",
+        brand_name="OLD TOM GIN",
+        fanciful_name="Botanical Reserve",
+        formula="F-1001",
+        class_type="Gin",
+        alcohol_content="45% ABV",
+        net_contents="750 mL",
+        raw_sources={"alcohol_content": "formula-approval"},
+    )
+    label = LabelExtraction(
+        text=f"OLD TOM GIN DISTILLED SPIRITS Gin 45% Alc./Vol. 750 mL {GOVERNMENT_WARNING}",
+        confidence=0.97,
+    )
+
+    result = verify_application(
+        filename="fanciful.pdf",
+        fields=fields,
+        label=label,
+        application_ocr_text="",
+        processing_time_seconds=0.1,
+    )
+    fanciful = next(field for field in result.field_results if field.field == "fanciful_name")
+    assert result.overall_status == STATUS_REVIEW
+    assert fanciful.status == STATUS_REVIEW
+
+
 def test_no_formula_required_passes_formula_check() -> None:
     result = verify_formula_alcohol_content("NO FORMULA REQUIRED", "", "", "VALLEY TABLE WINE 13% Alc./Vol.")
     assert result.status == STATUS_PASS

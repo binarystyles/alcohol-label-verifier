@@ -37,5 +37,8 @@
 | `APP-033_serving_size_missing_net_contents_review.pdf` | Needs Review | Needs Review | Label has a serving-size volume but no clear net contents statement, so net contents need review rather than a false mismatch. |
 | `APP-034_formula_ttb_id_number_pass.pdf` | Pass | Pass | Formula support uses a TTB ID Number label instead of a TTB Formula ID label. |
 | `APP-035_alc_by_vol_order_pass.pdf` | Pass | Pass | Label states alcohol content as Alc. value by Vol., which should normalize as ABV. |
+| `APP-036_missing_fanciful_name_review.pdf` | Needs Review | Needs Review | Application supplies a fanciful name, but the label does not clearly show it. |
+| `APP-037_proof_before_value_pass.pdf` | Pass | Pass | Label states proof before the value, which should normalize to ABV. |
+| `APP-038_alcohol_by_volume_order_pass.pdf` | Pass | Pass | Label states alcohol value before by-volume wording, which should normalize as ABV. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

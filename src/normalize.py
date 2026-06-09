@@ -91,8 +91,15 @@ ABV_PATTERNS = (
         r"ALC\.?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?\s*(?:BY\s+VOL\.?|BY\s+VOLUME)",
         re.IGNORECASE,
     ),
+    re.compile(
+        r"ALCOHOL\s+(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?\s*BY\s+VOLUME",
+        re.IGNORECASE,
+    ),
 )
-PROOF_PATTERN = re.compile(r"(?P<num>\d{1,3}(?:\.\d+)?)\s*PROOF", re.IGNORECASE)
+PROOF_PATTERNS = (
+    re.compile(r"(?P<num>\d{1,3}(?:\.\d+)?)\s*PROOF", re.IGNORECASE),
+    re.compile(r"PROOF\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)", re.IGNORECASE),
+)
 
 
 def extract_abv_values(text: str | None) -> list[float]:
@@ -104,10 +111,11 @@ def extract_abv_values(text: str | None) -> list[float]:
             value = float(match.group("num"))
             if 0 < value <= 100:
                 values.append(round(value, 3))
-    for match in PROOF_PATTERN.finditer(text):
-        proof = float(match.group("num"))
-        if 0 < proof <= 200:
-            values.append(round(proof / 2.0, 3))
+    for pattern in PROOF_PATTERNS:
+        for match in pattern.finditer(text):
+            proof = float(match.group("num"))
+            if 0 < proof <= 200:
+                values.append(round(proof / 2.0, 3))
     return _dedupe_floats(values)
 
 

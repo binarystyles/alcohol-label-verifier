@@ -23,6 +23,13 @@ def test_brand_fuzzy_matching_allows_harmless_variations() -> None:
     assert score >= 88
 
 
+def test_fuzzy_score_does_not_match_inside_larger_words() -> None:
+    assert fuzzy_score("Gin", "Ginger Liqueur") < 74
+    assert fuzzy_score("Reserve", "Reserved Batch") < 86
+    assert fuzzy_score("Reserve", "Reserve Selection") == 100
+    assert fuzzy_score("Example Distilling Co.", "Bottled by Example Distilling Company") >= 86
+
+
 def test_ordered_fuzzy_score_preserves_brand_word_order() -> None:
     assert ordered_fuzzy_score("OLD TOM GIN", "OLD TOM GIN Reserve") == 100
     assert ordered_fuzzy_score("OLD TOM GIN", "TOM OLD GIN") < 74

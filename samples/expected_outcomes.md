@@ -49,5 +49,6 @@
 | `APP-045_conflicting_net_contents_review.pdf` | Needs Review | Needs Review | Label contains both matching and conflicting net-contents values. |
 | `APP-046_brand_word_order_mismatch_fail.pdf` | Fail | Fail | Brand tokens are reordered, which should not pass as a harmless brand variation. |
 | `APP-047_wine_brand_contains_spirit_pass.pdf` | Pass | Pass | Wine brand contains the word Spirit, but explicit wine label text controls product-type matching. |
+| `APP-048_class_type_substring_review.pdf` | Needs Review | Needs Review | Expected class/type Gin appears only as a word fragment inside Ginger and must not pass. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

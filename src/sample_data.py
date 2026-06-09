@@ -874,6 +874,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Wine brand contains the word Spirit, but explicit wine label text controls product-type matching.",
         ),
+        SampleSpec(
+            filename="APP-048_class_type_substring_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-048", "formula": "F-4800"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Ginger Liqueur",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Expected class/type Gin appears only as a word fragment inside Ginger and must not pass.",
+        ),
     ]
 
 

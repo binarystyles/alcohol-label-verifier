@@ -52,6 +52,7 @@ Needs Review is used for uncertainty:
 - Unreadable PDF.
 - Missing expected application value.
 - Supplied optional application value, such as a fanciful name, is not clearly found on the label.
+- Expected text appears only as a fragment inside a larger word, such as `Gin` inside `Ginger`.
 - Class/type text appears only in brand, producer, warning, or other non-class context.
 - Bottler/producer text appears only in brand or other non-responsible-party context instead of wording such as `Bottled by`, `Imported by`, or `Produced and bottled by`.
 - Label contains both matching and conflicting alcohol-content or net-contents values.

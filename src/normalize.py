@@ -48,7 +48,7 @@ def fuzzy_score(expected: str | None, actual: str | None) -> float:
     actual_norm = normalize_name(actual)
     if not expected_norm or not actual_norm:
         return 0.0
-    if expected_norm in actual_norm:
+    if _contains_token_sequence(expected_norm.split(), actual_norm.split()):
         return 100.0
     return float(fuzz.token_set_ratio(expected_norm, actual_norm))
 

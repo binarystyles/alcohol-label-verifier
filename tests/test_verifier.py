@@ -201,6 +201,12 @@ def test_class_type_in_brand_line_only_needs_review() -> None:
     assert "non-class context" in result.reason
 
 
+def test_class_type_does_not_match_inside_larger_word() -> None:
+    result = verify_class_type("Gin", "Class/Type: Ginger Liqueur\n45% Alc./Vol.")
+    assert result.status == STATUS_REVIEW
+    assert "not clearly found" in result.reason
+
+
 def test_imported_country_of_origin_passes_when_present() -> None:
     result = verify_country_of_origin("Mexico", True, "CASA VERDE TEQUILA Product of Mexico")
     assert result.status == STATUS_PASS

@@ -81,6 +81,12 @@ FORMULA_FINAL_ALCOHOL_PATTERN = re.compile(
     r"(?:ALCOHOL\s+CONTENT\s+OF\s+FINISHED\s+PRODUCT|FINAL\s+ALCOHOL\s+CONTENT|FINISHED\s+PRODUCT\s+ALCOHOL\s+CONTENT|TARGET\s+ALCOHOL\s+CONTENT)",
     flags=re.IGNORECASE,
 )
+FORMULA_ID_PATTERNS = (
+    re.compile(r"(?:TTB\s+)?FORMULA\s+ID\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})", re.IGNORECASE),
+    re.compile(r"TTB\s+ID\s*(?:NO\.?|NUMBER)?\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})", re.IGNORECASE),
+    re.compile(r"FORMULA\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})", re.IGNORECASE),
+    re.compile(r"LAB\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})", re.IGNORECASE),
+)
 LOW_LABEL_SHARPNESS_THRESHOLD = 250.0
 
 FIELD_LABEL_PATTERNS: dict[str, tuple[re.Pattern[str], ...]] = {
@@ -304,7 +310,7 @@ def parse_formula_approval_fields(text: str, formula_id: str) -> dict[str, str]:
     lines = [line.strip() for line in text.splitlines() if line.strip()]
     windows: list[str] = []
     for index, line in enumerate(lines):
-        if normalized_id in _normalize_formula_id(line):
+        if _line_matches_formula_id(line, normalized_id):
             start = max(0, index - 18)
             end = min(len(lines), index + 40)
             windows.append("\n".join(lines[start:end]))
@@ -337,18 +343,26 @@ def parse_formula_approval_fields(text: str, formula_id: str) -> dict[str, str]:
 def extract_formula_identifier(text: str) -> str:
     if not text:
         return ""
-    for pattern in (
-        r"(?:TTB\s+)?FORMULA\s+ID\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})",
-        r"TTB\s+ID\s*(?:NO\.?|NUMBER)?\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})",
-        r"FORMULA\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})",
-    ):
-        labeled_match = re.search(pattern, text, flags=re.IGNORECASE)
-        if labeled_match:
-            return labeled_match.group("id").strip().upper()
+    labeled_identifier = _extract_labeled_formula_identifier(text)
+    if labeled_identifier:
+        return labeled_identifier
 
     first_part = re.split(r"[;\n]", text, maxsplit=1)[0]
     generic_match = re.search(r"\b(?=[A-Z0-9-]*\d)[A-Z]{1,8}-?\d[A-Z0-9-]*\b", first_part, flags=re.IGNORECASE)
     return generic_match.group(0).strip().upper() if generic_match else ""
+
+
+def _extract_labeled_formula_identifier(text: str) -> str:
+    for pattern in FORMULA_ID_PATTERNS:
+        labeled_match = pattern.search(text)
+        if labeled_match:
+            return labeled_match.group("id").strip().upper()
+    return ""
+
+
+def _line_matches_formula_id(line: str, normalized_id: str) -> bool:
+    candidate = _extract_labeled_formula_identifier(line)
+    return bool(candidate and _normalize_formula_id(candidate) == normalized_id)
 
 
 def clean_region_value(field_name: str, text: str) -> str:

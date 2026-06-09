@@ -155,6 +155,17 @@ def test_formula_approval_parser_marks_matching_document_without_final_alcohol()
     assert fields == {"alcohol_content": ""}
 
 
+def test_formula_approval_parser_does_not_match_prefix_formula_id() -> None:
+    text = """
+    FORMULAS ONLINE APPROVAL DETERMINATION
+    TTB Formula ID: F-29001
+    Status: Approved
+    Final Alcohol Content: 45% ABV
+    """
+    fields = parse_formula_approval_fields(text, "F-2900")
+    assert fields == {}
+
+
 def test_application_derives_alcohol_content_from_matching_formula_approval() -> None:
     document = fitz.open()
     page = document.new_page(width=612, height=1008)

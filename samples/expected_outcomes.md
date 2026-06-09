@@ -30,5 +30,6 @@
 | `APP-026_missing_expected_brand_review.pdf` | Needs Review | Needs Review | Required brand value is missing from the application extraction and must not be invented from label OCR. |
 | `APP-027_product_type_mismatch_fail.pdf` | Fail | Fail | Readable label shows a different product type than the completed application. |
 | `APP-028_formula_document_missing_final_alcohol_review.pdf` | Needs Review | Needs Review | Matching formula approval document is present but lacks extractable final alcohol content. |
+| `APP-029_formula_id_prefix_mismatch_review.pdf` | Needs Review | Needs Review | Formula approval page has a longer prefix-sharing ID and must not satisfy the Item 9 Formula ID. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

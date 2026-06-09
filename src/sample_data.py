@@ -31,6 +31,7 @@ class SampleSpec:
     artwork_label: bool = False
     blank_label: bool = False
     include_formula_approval: bool = True
+    formula_approval_id: str | None = None
     expected_status_without_ocr: str | None = None
 
 
@@ -521,6 +522,14 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Matching formula approval document is present but lacks extractable final alcohol content.",
         ),
+        SampleSpec(
+            filename="APP-029_formula_id_prefix_mismatch_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-029", "formula": "F-2900"},
+            label_lines=good_label,
+            expected_status="Needs Review",
+            note="Formula approval page has a longer prefix-sharing ID and must not satisfy the Item 9 Formula ID.",
+            formula_approval_id="F-29001",
+        ),
     ]
 
 
@@ -556,7 +565,7 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
     else:
         _draw_text_label(page, spec.label_lines)
     if spec.include_formula_approval:
-        _append_formula_approval_page(document, spec.fields)
+        _append_formula_approval_page(document, spec.fields, formula_id_override=spec.formula_approval_id)
     document.set_metadata({"title": spec.filename, "subject": "Synthetic completed TTB application"})
     document.save(output_path, garbage=4, deflate=True)
     document.close()
@@ -708,9 +717,14 @@ def _draw_hidden_summary_block(page: fitz.Page, fields: dict[str, str | bool]) -
         page.insert_text((8, 600 + index * 1.35), line, fontsize=1, fontname="helv", color=(1, 1, 1), overlay=True)
 
 
-def _append_formula_approval_page(document: fitz.Document, fields: dict[str, str | bool]) -> None:
+def _append_formula_approval_page(
+    document: fitz.Document,
+    fields: dict[str, str | bool],
+    *,
+    formula_id_override: str | None = None,
+) -> None:
     page = document.new_page(width=612, height=792)
-    formula_id = str(fields.get("formula", "") or "")
+    formula_id = formula_id_override or str(fields.get("formula", "") or "")
     low_alcohol, high_alcohol = _low_high_values(fields.get("alcohol_content", ""))
     lines = [
         "FORMULAS ONLINE APPROVAL DETERMINATION",

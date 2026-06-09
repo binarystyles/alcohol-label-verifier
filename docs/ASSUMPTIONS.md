@@ -12,6 +12,7 @@
 - The normalized form coordinates in `src/form_mapping.py` are prototype heuristics and may need tuning against real agency PDF samples.
 - Item 9 on current TTB F 5100.31 is treated as a Formula ID/reference. The app looks for an exact normalized matching approved formula/source document inside the same uploaded application package and derives expected alcohol content from that matched document, not from label OCR and not from a runtime network lookup. Prefix-sharing Formula IDs are not considered matches.
 - Expected values such as class/type, ABV, net contents, bottler/producer, and country of origin may not be explicit on every blank form. The app supports an application-data summary block inside the same PDF for those application/package values.
+- Net contents and imported country checks are context-aware. Serving-size volumes are not treated as net contents, and a country name must appear in origin wording rather than only in unrelated importer or brand text.
 - If an expected application value cannot be extracted, the field is marked Needs Review instead of being inferred from the label.
 - If an expected application value comes only from low-confidence form OCR, mismatches are marked Needs Review instead of Fail because the source value itself may be wrong.
 - OCR can be unreliable for low-resolution, rotated, distorted, or low-contrast labels. A government warning must match strictly to Pass, but OCR-imperfect warning text that is close to the canonical statement is routed to Needs Review rather than treated as a confirmed material alteration.

@@ -274,9 +274,7 @@ def verify_country_of_origin(expected: str, imported: bool, label_text: str) -> 
         return _result("country_of_origin", "", "", "", STATUS_PASS, 1.0, "Country of origin was not required for this application.")
     if not expected:
         return _expected_missing("country_of_origin")
-    normalized_expected = normalize_for_match(expected)
-    normalized_label = normalize_for_match(label_text)
-    if normalized_expected and normalized_expected in normalized_label:
+    if _country_origin_statement_present(expected, label_text):
         return _result("country_of_origin", expected, expected, snippet_around(label_text, expected), STATUS_PASS, 0.95, "Country of origin appears on the label.")
     return _result("country_of_origin", expected, "", snippet_around(label_text), STATUS_REVIEW, 0.6, "Country of origin was expected but not clearly found.")
 
@@ -372,6 +370,24 @@ def _abv_display(low: float, high: float) -> str:
     if abs(low - high) <= 0.01:
         return f"{low:g}% ABV"
     return f"{low:g}-{high:g}% ABV"
+
+
+def _country_origin_statement_present(expected: str, label_text: str) -> bool:
+    normalized_country = normalize_for_match(expected)
+    normalized_label = normalize_for_match(label_text)
+    if not normalized_country or not normalized_label:
+        return False
+    country = re.escape(normalized_country)
+    patterns = (
+        rf"\bPRODUCT\s+(?:OF|FROM)\s+(?:THE\s+)?{country}\b",
+        rf"\bPRODUCED\s+IN\s+(?:THE\s+)?{country}\b",
+        rf"\bMADE\s+IN\s+(?:THE\s+)?{country}\b",
+        rf"\bIMPORTED\s+FROM\s+(?:THE\s+)?{country}\b",
+        rf"\bCOUNTRY\s+OF\s+ORIGIN\s+(?:THE\s+)?{country}\b",
+        rf"\bORIGIN\s+(?:THE\s+)?{country}\b",
+        rf"\b{country}\s+ORIGIN\b",
+    )
+    return any(re.search(pattern, normalized_label) for pattern in patterns)
 
 
 def _label_unavailable_result(field: str, expected: str, reason: str, optional: bool = False) -> FieldResult:

@@ -87,6 +87,10 @@ ABV_PATTERNS = (
         r"(?:ALC\.?\s*/?\s*VOL\.?|ABV|ALCOHOL BY VOLUME)\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?",
         re.IGNORECASE,
     ),
+    re.compile(
+        r"ALC\.?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?\s*(?:BY\s+VOL\.?|BY\s+VOLUME)",
+        re.IGNORECASE,
+    ),
 )
 PROOF_PATTERN = re.compile(r"(?P<num>\d{1,3}(?:\.\d+)?)\s*PROOF", re.IGNORECASE)
 
@@ -123,6 +127,8 @@ def extract_net_contents_values(text: str | None) -> list[float]:
         return []
     values: list[float] = []
     for match in NET_CONTENTS_PATTERN.finditer(text):
+        if _is_non_net_contents_volume(text, match.start(), match.end()):
+            continue
         number = float(match.group("num"))
         unit = re.sub(r"[^A-Z]+", "", match.group("unit").upper())
         if "OZ" in unit or "OUNCE" in unit:
@@ -189,3 +195,17 @@ def _dedupe_floats(values: list[float]) -> list[float]:
         if not any(abs(value - seen) < 0.01 for seen in deduped):
             deduped.append(value)
     return deduped
+
+
+def _is_non_net_contents_volume(text: str, start: int, end: int) -> bool:
+    line_start = text.rfind("\n", 0, start) + 1
+    line_end = text.find("\n", end)
+    if line_end < 0:
+        line_end = len(text)
+    line = normalize_text(text[line_start:line_end])
+    return bool(
+        re.search(
+            r"\b(SERVING\s+SIZE|SERVINGS?|PER\s+SERVING|CALORIES?|CARBS?|CARBOHYDRATES?|SUGARS?|RECIPE|MIX\s+WITH)\b",
+            line,
+        )
+    )

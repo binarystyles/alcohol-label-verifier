@@ -142,6 +142,18 @@ def test_formula_approval_parser_converts_low_proof_to_abv() -> None:
     assert fields["alcohol_content"] == "20% ABV"
 
 
+def test_formula_approval_parser_accepts_ttb_id_number_reference() -> None:
+    text = """
+    FORMULAS ONLINE APPROVAL DETERMINATION
+    TTB ID Number: DS-3400
+    Status: Approved
+    Yield Summary
+    Alcohol Content of Finished Product: Low 46 High 46 Unit % by Volume
+    """
+    fields = parse_formula_approval_fields(text, "DS-3400")
+    assert fields["alcohol_content"] == "46% ABV"
+
+
 def test_formula_approval_parser_handles_ocr_values_before_finished_product_label() -> None:
     text = """
     Formulas Online Entry

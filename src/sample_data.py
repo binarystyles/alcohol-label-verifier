@@ -33,6 +33,7 @@ class SampleSpec:
     include_formula_approval: bool = True
     formula_approval_id: str | None = None
     formula_approval_unit: str = "% by Volume"
+    formula_approval_identifier_label: str = "TTB Formula ID"
     expected_status_without_ocr: str | None = None
 
 
@@ -613,6 +614,57 @@ def sample_specs() -> list[SampleSpec]:
             note="Approved formula gives final alcohol as 40 proof, which should normalize to 20% ABV.",
             formula_approval_unit="Proof",
         ),
+        SampleSpec(
+            filename="APP-033_serving_size_missing_net_contents_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-033"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "Serving size 50 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            expected_status_without_ocr="Needs Review",
+            note="Label has a serving-size volume but no clear net contents statement, so net contents need review rather than a false mismatch.",
+            artwork_label=True,
+        ),
+        SampleSpec(
+            filename="APP-034_formula_ttb_id_number_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-034", "formula": "DS-3400", "alcohol_content": "46% ABV"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "46% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Formula support uses a TTB ID Number label instead of a TTB Formula ID label.",
+            formula_approval_identifier_label="TTB ID Number",
+        ),
+        SampleSpec(
+            filename="APP-035_alc_by_vol_order_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-035", "formula": "F-3500"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "Alc. 45% by Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states alcohol content as Alc. value by Vol., which should normalize as ABV.",
+        ),
     ]
 
 
@@ -653,6 +705,7 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
             spec.fields,
             formula_id_override=spec.formula_approval_id,
             formula_unit=spec.formula_approval_unit,
+            formula_identifier_label=spec.formula_approval_identifier_label,
         )
     document.set_metadata({"title": spec.filename, "subject": "Synthetic completed TTB application"})
     document.save(output_path, garbage=4, deflate=True)
@@ -811,6 +864,7 @@ def _append_formula_approval_page(
     *,
     formula_id_override: str | None = None,
     formula_unit: str = "% by Volume",
+    formula_identifier_label: str = "TTB Formula ID",
 ) -> None:
     page = document.new_page(width=612, height=792)
     formula_id = formula_id_override or str(fields.get("formula", "") or "")
@@ -818,7 +872,7 @@ def _append_formula_approval_page(
     lines = [
         "FORMULAS ONLINE APPROVAL DETERMINATION",
         "",
-        f"TTB Formula ID: {formula_id}",
+        f"{formula_identifier_label}: {formula_id}",
         "Status: Approved",
         f"Company Formula Number: {formula_id}",
         f"Brand Name: {fields.get('brand_name', '')}",

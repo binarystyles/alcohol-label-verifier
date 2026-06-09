@@ -34,5 +34,8 @@
 | `APP-030_wine_cask_spirits_pass.pdf` | Pass | Needs Review | Distilled spirits label mentions wine as a cask-finish descriptor without changing product type. |
 | `APP-031_tequila_agave_missing_abv_review.pdf` | Needs Review | Needs Review | Label has a non-alcohol percentage but no readable ABV/proof statement. |
 | `APP-032_low_proof_liqueur_pass.pdf` | Pass | Pass | Approved formula gives final alcohol as 40 proof, which should normalize to 20% ABV. |
+| `APP-033_serving_size_missing_net_contents_review.pdf` | Needs Review | Needs Review | Label has a serving-size volume but no clear net contents statement, so net contents need review rather than a false mismatch. |
+| `APP-034_formula_ttb_id_number_pass.pdf` | Pass | Pass | Formula support uses a TTB ID Number label instead of a TTB Formula ID label. |
+| `APP-035_alc_by_vol_order_pass.pdf` | Pass | Pass | Label states alcohol content as Alc. value by Vol., which should normalize as ABV. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

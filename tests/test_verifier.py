@@ -115,14 +115,30 @@ def test_imported_country_of_origin_passes_when_present() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_imported_country_of_origin_allows_the_before_country() -> None:
+    result = verify_country_of_origin("United States", True, "Product of the United States")
+    assert result.status == STATUS_PASS
+
+
 def test_imported_country_of_origin_needs_review_when_missing_from_label() -> None:
     result = verify_country_of_origin("Mexico", True, "CASA VERDE TEQUILA Imported by Borderland Imports LLC")
+    assert result.status == STATUS_REVIEW
+
+
+def test_imported_country_name_in_importer_name_is_not_enough() -> None:
+    result = verify_country_of_origin("Mexico", True, "CASA VERDE TEQUILA Imported by Mexico Trading LLC")
     assert result.status == STATUS_REVIEW
 
 
 def test_net_contents_match_passes_with_liters() -> None:
     result = verify_net_contents("750 mL", "Net Contents .75 L")
     assert result.status == STATUS_PASS
+
+
+def test_serving_size_volume_does_not_create_net_contents_mismatch() -> None:
+    result = verify_net_contents("750 mL", "OLD TOM GIN Serving size 50 mL")
+    assert result.status == STATUS_REVIEW
+    assert "not clearly found" in result.reason
 
 
 def test_expected_value_missing_behavior() -> None:

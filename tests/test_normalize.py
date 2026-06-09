@@ -34,6 +34,7 @@ def test_abv_and_proof_extraction_normalize_to_abv() -> None:
     assert extract_abv_values("45% Alc./Vol.") == [45.0]
     assert extract_abv_values("90 Proof") == [45.0]
     assert extract_abv_values("45 percent alcohol by volume") == [45.0]
+    assert extract_abv_values("Alc. 45% by Vol.") == [45.0]
     assert extract_abv_values("100% Agave") == []
     assert extract_abv_values("100% Agave 40% Alc./Vol.") == [40.0]
 
@@ -42,6 +43,8 @@ def test_net_contents_extraction_normalizes_units() -> None:
     values = extract_net_contents_values("750ML 0.75 L .75 liters 750 milliliters")
     assert values == [750.0]
     assert extract_net_contents_values("12 fl oz") == [354.882]
+    assert extract_net_contents_values("Serving size 50 mL") == []
+    assert extract_net_contents_values("Net Contents 750 mL\nServing size 50 mL") == [750.0]
 
 
 def test_government_warning_validation_exact_statement() -> None:

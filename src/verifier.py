@@ -658,6 +658,24 @@ def _country_origin_statement_present(expected: str, label_text: str) -> bool:
 def _country_origin_name_variants(normalized_country: str) -> tuple[str, ...]:
     if normalized_country in {"UNITED STATES", "UNITED STATES OF AMERICA", "USA", "U S A", "US", "U S"}:
         return ("UNITED STATES", "UNITED STATES OF AMERICA", "USA", "U S A", "US", "U S")
+    if normalized_country in {
+        "UNITED KINGDOM",
+        "UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND",
+        "GREAT BRITAIN",
+        "BRITAIN",
+        "UK",
+        "U K",
+    }:
+        return (
+            "UNITED KINGDOM",
+            "UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND",
+            "GREAT BRITAIN",
+            "BRITAIN",
+            "UK",
+            "U K",
+        )
+    if normalized_country in {"NETHERLANDS", "THE NETHERLANDS"}:
+        return ("NETHERLANDS", "THE NETHERLANDS")
     return (normalized_country,)
 
 

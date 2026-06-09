@@ -1314,6 +1314,34 @@ def sample_specs() -> list[SampleSpec]:
             note="Wine product type is supported by hard-cider label and class/type wording.",
             include_formula_approval=False,
         ),
+        SampleSpec(
+            filename="APP-072_uk_origin_abbreviation_pass.pdf",
+            fields={
+                **wine_fields,
+                "serial_number": "APP-072",
+                "brand_name": "THAMES CELLARS",
+                "fanciful_name": "Reserve Red",
+                "formula": "NO FORMULA REQUIRED",
+                "alcohol_content": "13% ABV",
+                "bottler_producer": "Example Imports LLC",
+                "country_of_origin": "United Kingdom",
+                "imported": True,
+            },
+            label_lines=[
+                "THAMES CELLARS",
+                "Reserve Red",
+                "WINE",
+                "Class/Type: Red Wine",
+                "13% Alc./Vol.",
+                "750 mL",
+                "Product of U.K.",
+                "Imported by Example Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported wine origin uses U.K. abbreviation for application country United Kingdom.",
+            include_formula_approval=False,
+        ),
     ]
 
 

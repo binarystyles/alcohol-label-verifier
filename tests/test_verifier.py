@@ -308,6 +308,17 @@ def test_imported_country_of_origin_allows_us_abbreviations() -> None:
     assert verify_country_of_origin("United States", True, "Made in U.S.").status == STATUS_PASS
 
 
+def test_imported_country_of_origin_allows_uk_abbreviations() -> None:
+    assert verify_country_of_origin("United Kingdom", True, "Product of UK").status == STATUS_PASS
+    assert verify_country_of_origin("United Kingdom", True, "Product of U.K.").status == STATUS_PASS
+    assert verify_country_of_origin("United Kingdom", True, "Product of Great Britain").status == STATUS_PASS
+
+
+def test_imported_country_of_origin_allows_the_netherlands_variants() -> None:
+    assert verify_country_of_origin("The Netherlands", True, "Product of Netherlands").status == STATUS_PASS
+    assert verify_country_of_origin("Netherlands", True, "Product of the Netherlands").status == STATUS_PASS
+
+
 def test_imported_country_of_origin_needs_review_when_missing_from_label() -> None:
     result = verify_country_of_origin("Mexico", True, "CASA VERDE TEQUILA Imported by Borderland Imports LLC")
     assert result.status == STATUS_REVIEW

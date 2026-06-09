@@ -40,7 +40,8 @@ def normalize_name(value: str | None) -> str:
     value = value.replace("&", " AND ")
     value = re.sub(r"['`]", "", value)
     value = re.sub(r"[^A-Z0-9]+", " ", value)
-    return re.sub(r"\s+", " ", value).strip()
+    tokens = ["COMPANY" if token == "CO" else token for token in re.sub(r"\s+", " ", value).strip().split()]
+    return " ".join(tokens)
 
 
 def fuzzy_score(expected: str | None, actual: str | None) -> float:

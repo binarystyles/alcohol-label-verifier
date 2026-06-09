@@ -1384,6 +1384,32 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Brand ampersand in the application matches AND on the label as a harmless text variation.",
         ),
+        SampleSpec(
+            filename="APP-075_company_abbreviation_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-075",
+                "brand_name": "ACME DISTILLING CO.",
+                "fanciful_name": "Fieldhouse Vodka",
+                "formula": "F-7500",
+                "class_type": "Vodka",
+                "alcohol_content": "40% ABV",
+                "net_contents": "750 mL",
+                "bottler_producer": "Acme Distilling Co.",
+            },
+            label_lines=[
+                "ACME DISTILLING COMPANY",
+                "Fieldhouse Vodka",
+                "DISTILLED SPIRITS",
+                "Class/Type: Vodka",
+                "40% Alc./Vol.",
+                "750 mL",
+                "Bottled by Acme Distilling Company",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Brand and bottler Co. abbreviations match Company on the label as harmless legal-suffix variations.",
+        ),
     ]
 
 

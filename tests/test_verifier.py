@@ -31,6 +31,11 @@ def test_brand_ampersand_and_variation_passes() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_brand_company_abbreviation_passes() -> None:
+    result = verify_brand("ACME DISTILLING CO.", "ACME DISTILLING COMPANY Vodka")
+    assert result.status == STATUS_PASS
+
+
 def test_brand_word_order_mismatch_fails() -> None:
     result = verify_brand("OLD TOM GIN", "TOM OLD GIN\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL")
     assert result.status == STATUS_FAIL
@@ -55,6 +60,11 @@ def test_bottler_producer_requires_responsible_party_context() -> None:
 def test_bottler_producer_accepts_combined_responsible_party_statement() -> None:
     result = verify_bottler_producer("Example Distilling Co.", "Produced and bottled by Example Distilling Co.")
     assert result.status == STATUS_PASS
+
+
+def test_bottler_producer_company_abbreviation_passes() -> None:
+    assert verify_bottler_producer("Acme Distilling Co.", "Bottled by Acme Distilling Company").status == STATUS_PASS
+    assert verify_bottler_producer("Acme Distilling Company", "Bottled by Acme Distilling Co.").status == STATUS_PASS
 
 
 def test_bottler_producer_accepts_distilled_by_statement() -> None:

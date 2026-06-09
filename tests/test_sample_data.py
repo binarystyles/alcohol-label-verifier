@@ -105,6 +105,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-085_brewed_in_origin_pass.pdf" in specs
     assert "APP-086_packed_by_responsible_party_pass.pdf" in specs
     assert "APP-087_blended_in_origin_pass.pdf" in specs
+    assert "APP-088_distilled_and_bottled_in_origin_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
@@ -189,6 +190,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-086_packed_by_responsible_party_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-087_blended_in_origin_pass.pdf"].fields["country_of_origin"] == "United Kingdom"
     assert specs["APP-087_blended_in_origin_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-088_distilled_and_bottled_in_origin_pass.pdf"].fields["country_of_origin"] == "United Kingdom"
+    assert specs["APP-088_distilled_and_bottled_in_origin_pass.pdf"].expected_status == STATUS_PASS
 
 
 def test_sample_generator_uses_real_source_form_when_available(sample_paths: list[Path]) -> None:

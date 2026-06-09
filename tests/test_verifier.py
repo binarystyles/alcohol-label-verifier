@@ -21,6 +21,11 @@ def test_brand_variation_passes() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_assignment_brand_case_example_passes() -> None:
+    result = verify_brand("Stone's Throw", "STONE'S THROW Straight Bourbon Whiskey")
+    assert result.status == STATUS_PASS
+
+
 def test_brand_word_order_mismatch_fails() -> None:
     result = verify_brand("OLD TOM GIN", "TOM OLD GIN\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL")
     assert result.status == STATUS_FAIL
@@ -86,6 +91,11 @@ def test_government_warning_damaged_heading_needs_review_when_statement_is_close
 def test_abv_mismatch_fails() -> None:
     result = verify_alcohol_content("45% ABV", "OLD TOM GIN 40% Alc./Vol.")
     assert result.status == STATUS_FAIL
+
+
+def test_abv_match_accepts_percent_alc_by_vol_wording() -> None:
+    result = verify_alcohol_content("45% ABV", "OLD TOM GIN 45% Alc. by Vol.")
+    assert result.status == STATUS_PASS
 
 
 def test_conflicting_alcohol_values_need_review() -> None:

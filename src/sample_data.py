@@ -966,6 +966,42 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states net contents in centiliters, equivalent to the application 750 mL value.",
         ),
+        SampleSpec(
+            filename="APP-053_percent_alc_by_vol_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-053", "formula": "F-5300"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc. by Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states alcohol content with the common percent Alc. by Vol. wording.",
+        ),
+        SampleSpec(
+            filename="APP-054_stones_throw_case_pass.pdf",
+            fields={
+                **stones_fields,
+                "serial_number": "APP-054",
+                "brand_name": "Stone's Throw",
+                "formula": "F-5400",
+            },
+            label_lines=[
+                "STONE'S THROW",
+                "DISTILLED SPIRITS",
+                "Class/Type: Straight Bourbon Whiskey",
+                "90 Proof",
+                "750ML",
+                "Bottled by Stone Throw Spirits LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Assignment example: application brand Stone's Throw matches label brand STONE'S THROW despite capitalization.",
+        ),
     ]
 
 

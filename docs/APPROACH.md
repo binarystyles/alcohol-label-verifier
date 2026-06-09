@@ -39,7 +39,7 @@ Fail is reserved for critical checks with extractable expected values:
 
 - Government warning missing or materially altered on a readable label.
 - Required brand materially mismatched. Brand matching is limited to primary label text and preserves word order, so a brand name appearing only in producer, importer, warning, or other non-brand context, or with reordered brand words, does not create a false pass.
-- Product type materially mismatched. Explicit `DISTILLED SPIRITS`, `MALT BEVERAGE(S)`, and wine statements are prioritized over incidental descriptors or brand words such as `Wine Cask Finish` or `Spirit` inside a wine brand.
+- Product type materially mismatched. Explicit `DISTILLED SPIRITS`, `MALT BEVERAGE(S)`, and wine statements in product/class label context are prioritized over incidental descriptors or brand words such as `Wine Cask Finish` or `Spirit` inside a wine brand.
 - Material ABV mismatch. Proof values from labels and formula support are converted to ABV, including low-proof values such as `40 Proof` = `20% ABV` and label wording such as `Proof 90`. Common label wording such as `Alc. 45% by Vol.` and `Alcohol 45% by Volume` is normalized to ABV. Non-alcohol percentages such as `100% Agave` are ignored for ABV/proof matching and become Needs Review if no actual alcohol statement is found.
 - Material net contents mismatch. Serving-size, recipe, calorie, or per-serving volumes are ignored so they do not create false net-contents mismatches.
 
@@ -53,6 +53,7 @@ Needs Review is used for uncertainty:
 - Missing expected application value.
 - Supplied optional application value, such as a fanciful name, is not clearly found on the label.
 - Expected text appears only as a fragment inside a larger word, such as `Gin` inside `Ginger`.
+- Product-type words appear only in primary brand text, with no clear product/class label statement.
 - Class/type text appears only in brand, producer, warning, or other non-class context.
 - Bottler/producer text appears only in brand or other non-responsible-party context instead of wording such as `Bottled by`, `Imported by`, or `Produced and bottled by`.
 - Label contains both matching and conflicting alcohol-content or net-contents values.

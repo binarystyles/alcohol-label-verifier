@@ -195,6 +195,12 @@ def test_wine_brand_with_spirit_word_does_not_fail_product_type() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_product_type_word_in_brand_only_needs_review() -> None:
+    result = verify_product_type("WINE", "SPIRIT HILL ESTATE RED\nEstate Red\n13% Alc./Vol.")
+    assert result.status == STATUS_REVIEW
+    assert "not clearly found" in result.reason
+
+
 def test_class_type_in_brand_line_only_needs_review() -> None:
     result = verify_class_type("Gin", "OLD TOM GIN\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL")
     assert result.status == STATUS_REVIEW

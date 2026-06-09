@@ -890,6 +890,27 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Expected class/type Gin appears only as a word fragment inside Ginger and must not pass.",
         ),
+        SampleSpec(
+            filename="APP-049_product_type_brand_word_review.pdf",
+            fields={
+                **wine_fields,
+                "serial_number": "APP-049",
+                "brand_name": "SPIRIT HILL ESTATE RED",
+                "fanciful_name": "Estate Red",
+                "formula": "W-4900",
+                "bottler_producer": "Spirit Hill Winery",
+            },
+            label_lines=[
+                "SPIRIT HILL ESTATE RED",
+                "Estate Red",
+                "13.5% Alc./Vol.",
+                "750 mL",
+                "Bottled by Spirit Hill Winery",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Product-type word appears only in the brand while explicit wine/class wording is missing.",
+        ),
     ]
 
 

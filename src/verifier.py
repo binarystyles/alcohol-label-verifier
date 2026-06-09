@@ -188,11 +188,12 @@ def verify_product_type(expected: str, label_text: str) -> FieldResult:
     expected_type = extract_product_type(expected)
     if not expected_type:
         return _expected_missing("product_type")
-    found = extract_product_type(label_text)
+    candidate_text = _product_type_candidate_text(label_text)
+    found = extract_product_type(candidate_text)
     if found == expected_type:
-        return _result("product_type", expected_type, found, snippet_around(label_text, found), STATUS_PASS, 0.95, "Product type matches.")
+        return _result("product_type", expected_type, found, snippet_around(candidate_text, found), STATUS_PASS, 0.95, "Product type matches.")
     if found:
-        return _result("product_type", expected_type, found, snippet_around(label_text, found), STATUS_FAIL, 0.9, "Label shows a different product type than the completed application.")
+        return _result("product_type", expected_type, found, snippet_around(candidate_text, found), STATUS_FAIL, 0.9, "Label shows a different product type than the completed application.")
     return _result("product_type", expected_type, "", snippet_around(label_text), STATUS_REVIEW, 0.45, "Product type was not clearly found on the label.")
 
 
@@ -402,6 +403,26 @@ def _primary_brand_text(label_text: str) -> str:
         if primary and not _is_obvious_non_brand_line(primary):
             candidates.append(primary)
     return "\n".join(candidates)
+
+
+def _product_type_candidate_text(label_text: str) -> str:
+    return "\n".join(
+        line
+        for index, line in enumerate(_label_lines(label_text))
+        if index > 0 and not _is_obvious_non_product_type_line(line)
+    )
+
+
+def _is_obvious_non_product_type_line(line: str) -> bool:
+    normalized = normalize_text(line)
+    if not normalized:
+        return True
+    return bool(
+        re.search(
+            r"\b(GOVERNMENT\s+WARNING|PRODUCT\s+OF|PRODUCED\s+IN|MADE\s+IN|COUNTRY\s+OF\s+ORIGIN|BOTTLED\s+BY|PRODUCED\s+BY|IMPORTED\s+BY|BREWED\s+BY|NET\s+CONTENTS?|SERVING\s+SIZE|ALC|ALCOHOL|PROOF)\b",
+            normalized,
+        )
+    )
 
 
 def _class_type_candidate_text(label_text: str) -> str:

@@ -81,5 +81,7 @@
 | `APP-077_percent_by_volume_pass.pdf` | Pass | Pass | Label states alcohol content with percent-by-volume shorthand. |
 | `APP-078_decimal_comma_litre_pass.pdf` | Pass | Pass | Label states net contents as decimal-comma litres. |
 | `APP-079_british_millilitres_pass.pdf` | Pass | Pass | Label states net contents with British millilitres spelling. |
+| `APP-080_scotland_origin_pass.pdf` | Pass | Pass | Imported origin names Scotland while the application country is United Kingdom. |
+| `APP-081_republic_ireland_origin_pass.pdf` | Pass | Pass | Imported origin names Republic of Ireland while the application country is Ireland. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

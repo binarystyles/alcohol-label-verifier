@@ -673,7 +673,13 @@ def _country_origin_name_variants(normalized_country: str) -> tuple[str, ...]:
             "BRITAIN",
             "UK",
             "U K",
+            "ENGLAND",
+            "SCOTLAND",
+            "WALES",
+            "NORTHERN IRELAND",
         )
+    if normalized_country in {"IRELAND", "REPUBLIC OF IRELAND"}:
+        return ("IRELAND", "REPUBLIC OF IRELAND")
     if normalized_country in {"NETHERLANDS", "THE NETHERLANDS"}:
         return ("NETHERLANDS", "THE NETHERLANDS")
     return (normalized_country,)

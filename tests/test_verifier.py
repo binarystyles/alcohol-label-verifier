@@ -342,11 +342,18 @@ def test_imported_country_of_origin_allows_uk_abbreviations() -> None:
     assert verify_country_of_origin("United Kingdom", True, "Product of UK").status == STATUS_PASS
     assert verify_country_of_origin("United Kingdom", True, "Product of U.K.").status == STATUS_PASS
     assert verify_country_of_origin("United Kingdom", True, "Product of Great Britain").status == STATUS_PASS
+    assert verify_country_of_origin("United Kingdom", True, "Product of Scotland").status == STATUS_PASS
+    assert verify_country_of_origin("United Kingdom", True, "Product of England").status == STATUS_PASS
 
 
 def test_imported_country_of_origin_allows_the_netherlands_variants() -> None:
     assert verify_country_of_origin("The Netherlands", True, "Product of Netherlands").status == STATUS_PASS
     assert verify_country_of_origin("Netherlands", True, "Product of the Netherlands").status == STATUS_PASS
+
+
+def test_imported_country_of_origin_allows_republic_of_ireland_variants() -> None:
+    assert verify_country_of_origin("Ireland", True, "Product of Republic of Ireland").status == STATUS_PASS
+    assert verify_country_of_origin("Republic of Ireland", True, "Product of Ireland").status == STATUS_PASS
 
 
 def test_imported_country_of_origin_needs_review_when_missing_from_label() -> None:

@@ -68,9 +68,12 @@ def test_net_contents_extraction_normalizes_units() -> None:
     assert extract_net_contents_values("12 fl oz 12 oz 12 ounces") == [354.882]
     assert extract_net_contents_values("75 cL 75cl 70 centiliters") == [750.0, 700.0]
     assert extract_net_contents_values("1 pint 1 pt") == [473.176]
+    assert extract_net_contents_values("1/2 Pint 1/2 pt") == [236.588]
+    assert extract_net_contents_values("3/4 Pint") == [354.882]
     assert extract_net_contents_values("1 Pint 0.9 FL OZ 1 Pint 0.9 OZ") == [499.792]
     assert extract_net_contents_values("Serving size 50 mL") == []
     assert extract_net_contents_values("Serving size 12 oz") == []
+    assert extract_net_contents_values("Serving size 1/2 Pint") == []
     assert extract_net_contents_values("Net Contents 750 mL\nServing size 50 mL") == [750.0]
 
 

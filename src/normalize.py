@@ -156,8 +156,12 @@ NET_CONTENTS_COMPOUND_PATTERN = re.compile(
     r"(?<![A-Z0-9])(?P<pints>\d+(?:\.\d+)?)\s*(?:PT\.?|PINTS?)\s+(?P<ounces>\d+(?:\.\d+)?)\s*(?:FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)\b",
     re.IGNORECASE,
 )
+NET_CONTENTS_FRACTION_PATTERN = re.compile(
+    r"(?<![A-Z0-9])(?P<num>\d+)\s*/\s*(?P<den>\d+)\s*(?P<unit>ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|PT\.?|PINTS?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)\b",
+    re.IGNORECASE,
+)
 NET_CONTENTS_PATTERN = re.compile(
-    r"(?<![A-Z0-9])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|PT\.?|PINTS?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)\b",
+    r"(?<![A-Z0-9/])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|PT\.?|PINTS?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)\b",
     re.IGNORECASE,
 )
 
@@ -176,23 +180,26 @@ def extract_net_contents_values(text: str | None) -> list[float]:
         if 0 < milliliters < 100000:
             values.append(round(milliliters, 3))
             compound_spans.append(match.span())
+    for match in NET_CONTENTS_FRACTION_PATTERN.finditer(text):
+        if any(start <= match.start() and match.end() <= end for start, end in compound_spans):
+            continue
+        if _is_non_net_contents_volume(text, match.start(), match.end()):
+            continue
+        denominator = float(match.group("den"))
+        if denominator == 0:
+            continue
+        number = float(match.group("num")) / denominator
+        milliliters = _net_unit_to_milliliters(number, match.group("unit"))
+        if 0 < milliliters < 100000:
+            values.append(round(milliliters, 3))
+            compound_spans.append(match.span())
     for match in NET_CONTENTS_PATTERN.finditer(text):
         if any(start <= match.start() and match.end() <= end for start, end in compound_spans):
             continue
         if _is_non_net_contents_volume(text, match.start(), match.end()):
             continue
         number = float(match.group("num"))
-        unit = re.sub(r"[^A-Z]+", "", match.group("unit").upper())
-        if "OZ" in unit or "OUNCE" in unit:
-            milliliters = number * 29.5735
-        elif unit in {"PT", "PINT", "PINTS"}:
-            milliliters = number * 473.176
-        elif unit.startswith("C"):
-            milliliters = number * 10
-        elif unit.startswith("M"):
-            milliliters = number
-        else:
-            milliliters = number * 1000
+        milliliters = _net_unit_to_milliliters(number, match.group("unit"))
         if 0 < milliliters < 100000:
             values.append(round(milliliters, 3))
     return _dedupe_floats(values)
@@ -251,6 +258,19 @@ def _dedupe_floats(values: list[float]) -> list[float]:
         if not any(abs(value - seen) < 0.01 for seen in deduped):
             deduped.append(value)
     return deduped
+
+
+def _net_unit_to_milliliters(number: float, unit_text: str) -> float:
+    unit = re.sub(r"[^A-Z]+", "", unit_text.upper())
+    if "OZ" in unit or "OUNCE" in unit:
+        return number * 29.5735
+    if unit in {"PT", "PINT", "PINTS"}:
+        return number * 473.176
+    if unit.startswith("C"):
+        return number * 10
+    if unit.startswith("M"):
+        return number
+    return number * 1000
 
 
 def _is_non_net_contents_volume(text: str, start: int, end: int) -> bool:

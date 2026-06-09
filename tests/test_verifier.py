@@ -292,12 +292,14 @@ def test_net_contents_match_passes_with_centiliters() -> None:
 
 def test_net_contents_match_passes_with_pints() -> None:
     assert verify_net_contents("16 fl oz", "Net Contents 1 Pint").status == STATUS_PASS
+    assert verify_net_contents("8 fl oz", "Net Contents 1/2 Pint").status == STATUS_PASS
     assert verify_net_contents("500 mL", "Net Contents 1 Pint 0.9 FL OZ").status == STATUS_PASS
 
 
 def test_net_contents_match_passes_with_plain_ounces() -> None:
     assert verify_net_contents("12 fl oz", "Net Contents 12 OZ").status == STATUS_PASS
     assert verify_net_contents("12 fl oz", "Serving size 12 OZ").status == STATUS_REVIEW
+    assert verify_net_contents("8 fl oz", "Serving size 1/2 Pint").status == STATUS_REVIEW
 
 
 def test_conflicting_net_contents_need_review() -> None:

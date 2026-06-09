@@ -1134,6 +1134,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Distilled spirits label uses Bottled for as responsible-party wording.",
         ),
+        SampleSpec(
+            filename="APP-062_fractional_pint_net_contents_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-062", "formula": "F-6200", "net_contents": "8 fl oz"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "1/2 Pint",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states net contents as fractional 1/2 Pint, equivalent to the application 8 fl oz value.",
+        ),
     ]
 
 

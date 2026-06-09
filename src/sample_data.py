@@ -1342,6 +1342,22 @@ def sample_specs() -> list[SampleSpec]:
             note="Imported wine origin uses U.K. abbreviation for application country United Kingdom.",
             include_formula_approval=False,
         ),
+        SampleSpec(
+            filename="APP-073_compact_percent_vol_pass.pdf",
+            fields={**wine_fields, "serial_number": "APP-073", "formula": "W-7300"},
+            label_lines=[
+                "SUNSET HOLLOW",
+                "Red Blend",
+                "WINE",
+                "Class/Type: Red Wine",
+                "13.5% vol",
+                "750 mL",
+                "Bottled by Sunset Hollow Winery",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states alcohol content with compact percent-vol wording.",
+        ),
     ]
 
 

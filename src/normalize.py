@@ -108,6 +108,8 @@ def extract_abv_values(text: str | None) -> list[float]:
     values: list[float] = []
     for pattern in ABV_PATTERNS:
         for match in pattern.finditer(text):
+            if _keyword_follows_completed_abv_statement(text, match.start()):
+                continue
             value = float(match.group("num"))
             if 0 < value <= 100:
                 values.append(round(value, 3))
@@ -122,6 +124,11 @@ def extract_abv_values(text: str | None) -> list[float]:
 def normalize_abv(text: str | None) -> float | None:
     values = extract_abv_values(text)
     return values[0] if values else None
+
+
+def _keyword_follows_completed_abv_statement(text: str, start: int) -> bool:
+    prefix = text[max(0, start - 16) : start]
+    return bool(re.search(r"\d{1,3}(?:\.\d+)?\s*(?:%|PERCENT)\s*$", prefix, flags=re.IGNORECASE))
 
 
 NET_CONTENTS_PATTERN = re.compile(

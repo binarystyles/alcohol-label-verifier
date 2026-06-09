@@ -220,7 +220,19 @@ def verify_alcohol_content(expected: str, label_text: str) -> FieldResult:
     low, high = expected_bounds
     closest = min(found_values, key=lambda value: _distance_from_range(value, low, high))
     expected_display = _abv_display(low, high)
-    if low - 0.3 <= closest <= high + 0.3:
+    matching_values = _values_inside_range(found_values, low, high, tolerance=0.3)
+    conflicting_values = _values_outside_range(found_values, low, high, tolerance=0.3)
+    if matching_values and conflicting_values:
+        return _result(
+            "alcohol_content",
+            expected_display,
+            _format_found_values(found_values, "% ABV"),
+            snippet_around(label_text),
+            STATUS_REVIEW,
+            0.75,
+            "Label contains conflicting alcohol-content values; reviewer should confirm the intended statement.",
+        )
+    if matching_values:
         return _result("alcohol_content", expected_display, f"{closest:g}% ABV", snippet_around(label_text, str(closest)), STATUS_PASS, 0.95, "Alcohol content matches after normalizing proof/ABV formats.")
     return _result("alcohol_content", expected_display, f"{closest:g}% ABV", snippet_around(label_text), STATUS_FAIL, 0.95, "Material alcohol-content mismatch.")
 
@@ -264,7 +276,19 @@ def verify_formula_alcohol_content(formula: str, approved_alcohol_content: str, 
             "Alcohol content from the approved formula was not clearly found on the label.",
         )
     closest = min(found_values, key=lambda value: _distance_from_range(value, low, high))
-    if low - 0.3 <= closest <= high + 0.3:
+    matching_values = _values_inside_range(found_values, low, high, tolerance=0.3)
+    conflicting_values = _values_outside_range(found_values, low, high, tolerance=0.3)
+    if matching_values and conflicting_values:
+        return _result(
+            "formula",
+            f"{_abv_display(low, high)} from approved formula {formula}",
+            _format_found_values(found_values, "% ABV"),
+            snippet_around(label_text),
+            STATUS_REVIEW,
+            0.75,
+            "Label contains conflicting alcohol-content values; reviewer should confirm the value that corresponds to the approved formula.",
+        )
+    if matching_values:
         return _result(
             "formula",
             f"{_abv_display(low, high)} from approved formula {formula}",
@@ -293,7 +317,19 @@ def verify_net_contents(expected: str, label_text: str) -> FieldResult:
     if not found_values:
         return _result("net_contents", expected, "", snippet_around(label_text), STATUS_REVIEW, 0.45, "Net contents were not clearly found on the label.")
     closest = min(found_values, key=lambda value: abs(value - expected_ml))
-    if abs(closest - expected_ml) <= 1.0:
+    matching_values = [value for value in found_values if abs(value - expected_ml) <= 1.0]
+    conflicting_values = [value for value in found_values if abs(value - expected_ml) > 1.0]
+    if matching_values and conflicting_values:
+        return _result(
+            "net_contents",
+            f"{expected_ml:g} mL",
+            _format_found_values(found_values, " mL"),
+            snippet_around(label_text),
+            STATUS_REVIEW,
+            0.75,
+            "Label contains conflicting net-contents values; reviewer should confirm the intended statement.",
+        )
+    if matching_values:
         return _result("net_contents", f"{expected_ml:g} mL", f"{closest:g} mL", snippet_around(label_text, str(int(closest))), STATUS_PASS, 0.95, "Net contents match after unit normalization.")
     return _result("net_contents", f"{expected_ml:g} mL", f"{closest:g} mL", snippet_around(label_text), STATUS_FAIL, 0.95, "Material net-contents mismatch.")
 
@@ -537,6 +573,18 @@ def _distance_from_range(value: float, low: float, high: float) -> float:
     if low <= value <= high:
         return 0.0
     return min(abs(value - low), abs(value - high))
+
+
+def _values_inside_range(values: list[float], low: float, high: float, *, tolerance: float) -> list[float]:
+    return [value for value in values if low - tolerance <= value <= high + tolerance]
+
+
+def _values_outside_range(values: list[float], low: float, high: float, *, tolerance: float) -> list[float]:
+    return [value for value in values if value < low - tolerance or value > high + tolerance]
+
+
+def _format_found_values(values: list[float], suffix: str) -> str:
+    return ", ".join(f"{value:g}{suffix}" for value in values)
 
 
 def _abv_display(low: float, high: float) -> str:

@@ -801,6 +801,40 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Warning statement is close to canonical, but the all-caps heading has OCR-like character damage.",
         ),
+        SampleSpec(
+            filename="APP-044_conflicting_abv_values_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-044", "formula": "F-4400"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "Back label states 40% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Label contains both matching and conflicting alcohol-content values.",
+        ),
+        SampleSpec(
+            filename="APP-045_conflicting_net_contents_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-045", "formula": "F-4500"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "Net Contents 750 mL",
+                "Back label states 1 L",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Label contains both matching and conflicting net-contents values.",
+        ),
     ]
 
 

@@ -82,6 +82,12 @@ def test_abv_mismatch_fails() -> None:
     assert result.status == STATUS_FAIL
 
 
+def test_conflicting_alcohol_values_need_review() -> None:
+    result = verify_alcohol_content("45% ABV", "OLD TOM GIN 45% Alc./Vol. Back label says 40% Alc./Vol.")
+    assert result.status == STATUS_REVIEW
+    assert "conflicting alcohol-content" in result.reason
+
+
 def test_non_alcohol_percentage_does_not_create_abv_mismatch() -> None:
     result = verify_alcohol_content("40% ABV", "CASA VERDE TEQUILA 100% Agave Product of Mexico")
     assert result.status == STATUS_REVIEW
@@ -113,6 +119,17 @@ def test_formula_approval_missing_needs_review() -> None:
 def test_formula_alcohol_content_mismatch_fails() -> None:
     result = verify_formula_alcohol_content("F-1001", "45% ABV", "formula-approval", "OLD TOM GIN 40% Alc./Vol.")
     assert result.status == STATUS_FAIL
+
+
+def test_formula_alcohol_content_conflicting_label_values_need_review() -> None:
+    result = verify_formula_alcohol_content(
+        "F-1001",
+        "45% ABV",
+        "formula-approval",
+        "OLD TOM GIN 45% Alc./Vol. Back label says 40% Alc./Vol.",
+    )
+    assert result.status == STATUS_REVIEW
+    assert "conflicting alcohol-content" in result.reason
 
 
 def test_supplied_fanciful_name_missing_needs_review() -> None:
@@ -196,6 +213,12 @@ def test_imported_country_name_in_importer_name_is_not_enough() -> None:
 def test_net_contents_match_passes_with_liters() -> None:
     result = verify_net_contents("750 mL", "Net Contents .75 L")
     assert result.status == STATUS_PASS
+
+
+def test_conflicting_net_contents_need_review() -> None:
+    result = verify_net_contents("750 mL", "Net Contents 750 mL Back label says 1 L")
+    assert result.status == STATUS_REVIEW
+    assert "conflicting net-contents" in result.reason
 
 
 def test_serving_size_volume_does_not_create_net_contents_mismatch() -> None:

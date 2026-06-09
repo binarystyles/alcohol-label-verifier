@@ -45,5 +45,7 @@
 | `APP-041_bottler_only_in_brand_review.pdf` | Needs Review | Needs Review | Expected bottler/producer appears as brand text only, with no responsible-party statement. |
 | `APP-042_produced_and_bottled_by_pass.pdf` | Pass | Pass | Responsible-party statement uses combined produced-and-bottled wording. |
 | `APP-043_ocr_damaged_warning_heading_review.pdf` | Needs Review | Needs Review | Warning statement is close to canonical, but the all-caps heading has OCR-like character damage. |
+| `APP-044_conflicting_abv_values_review.pdf` | Needs Review | Needs Review | Label contains both matching and conflicting alcohol-content values. |
+| `APP-045_conflicting_net_contents_review.pdf` | Needs Review | Needs Review | Label contains both matching and conflicting net-contents values. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

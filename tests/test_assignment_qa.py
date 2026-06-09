@@ -209,6 +209,22 @@ def _make_scanned_application_image() -> bytes:
     draw.text((34, 205), "6. BRAND NAME SCANNED SAMPLE", fill="black")
     draw.text((34, 690), "AFFIX COMPLETE SET OF LABELS BELOW", fill="black")
     draw.text((80, 740), "SCANNED SAMPLE 45% Alc./Vol. 750 mL", fill="black")
+    draw.multiline_text((80, 790), _wrap(GOVERNMENT_WARNING, 82), fill="black", spacing=2)
     buffer = BytesIO()
     image.save(buffer, format="PNG")
     return buffer.getvalue()
+
+
+def _wrap(text: str, width: int) -> str:
+    words = text.split()
+    lines: list[str] = []
+    current: list[str] = []
+    for word in words:
+        if sum(len(item) + 1 for item in current) + len(word) > width:
+            lines.append(" ".join(current))
+            current = [word]
+        else:
+            current.append(word)
+    if current:
+        lines.append(" ".join(current))
+    return "\n".join(lines)

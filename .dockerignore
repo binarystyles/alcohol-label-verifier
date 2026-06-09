@@ -11,6 +11,7 @@ env/
 docs/source/*
 !docs/source/f510031.pdf
 uploads/
+samples/applications/*.zip
 tmp/
 temp/
 *.log

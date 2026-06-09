@@ -28,6 +28,7 @@ class ApplicationFields:
     country_of_origin: str = ""
     imported: bool = False
     raw_sources: dict[str, str] = field(default_factory=dict)
+    raw_confidences: dict[str, float] = field(default_factory=dict)
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -101,4 +102,3 @@ class ApplicationResult:
         data = asdict(self)
         data["field_results"] = [result.to_dict() for result in self.field_results]
         return data
-

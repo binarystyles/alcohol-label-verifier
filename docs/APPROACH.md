@@ -39,6 +39,7 @@ Fail is reserved for critical checks with extractable expected values:
 
 - Government warning missing or materially altered on a readable label.
 - Required brand materially mismatched.
+- Product type materially mismatched.
 - Material ABV mismatch.
 - Material net contents mismatch.
 
@@ -46,9 +47,12 @@ Needs Review is used for uncertainty:
 
 - Missing or unreadable label area.
 - Low OCR confidence.
+- Low-confidence form OCR for an expected application value.
 - Unreadable PDF.
 - Missing expected application value.
 - Missing matching formula approval content for an Item 9 Formula ID.
+- Matching formula approval/source document found but no final alcohol content is extractable.
+- Government warning heading present with text close to canonical, but OCR/text is not exact enough for a strict pass.
 - Optional supplied value not clearly found.
 - Item 15 supplied but not clearly found.
 

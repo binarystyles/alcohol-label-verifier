@@ -103,7 +103,7 @@ Open the app, select PDFs from `samples/applications` or upload `samples/sample_
 
 The sample generator uses the public TTB F 5100.31 template at `docs/source/f510031.pdf` when present, so generated samples resemble the current agency form with completed fields and affixed label artwork. If that template is absent, the generator falls back to a controlled one-page layout for tests.
 
-The generated set covers passing applications, readable critical mismatches, missing labels, low-quality OCR review cases, Formula ID support, final-alcohol ranges, proof/ABV normalization, net contents normalization, imported-country review, Item 15 review, and color-artwork labels. See `samples/expected_outcomes.md` for the full sample list and expected Pass / Needs Review / Fail outcomes.
+The generated set currently includes 28 samples covering passing applications, readable critical mismatches, missing labels, low-quality OCR review cases, Formula ID support, no-formula-required applications, final-alcohol ranges, matched formula documents without final alcohol content, proof/ABV normalization, net contents normalization, imported-country pass/review cases, missing required application values, product-type mismatch failures, Item 15 review, and color-artwork labels. See `samples/expected_outcomes.md` for the full sample list and expected Pass / Needs Review / Fail outcomes.
 
 ## Application File Intake
 
@@ -142,7 +142,7 @@ Clean text-layer PDFs process quickly because the app avoids OCR when PDF text i
 
 ## Error Handling
 
-Unreadable PDFs, missing label areas, low OCR confidence, and missing expected values produce plain-English Needs Review reasons. Critical mismatches on readable evidence produce Fail.
+Unreadable PDFs, missing label areas, low OCR confidence, low-confidence form OCR, missing expected values, and close-but-not-exact OCR reads of the government warning produce plain-English Needs Review reasons. Critical mismatches on readable evidence produce Fail.
 
 ## Known Limitations And Tradeoffs
 

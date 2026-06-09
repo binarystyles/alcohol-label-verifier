@@ -15,6 +15,7 @@ PRODUCT_TYPES = ("WINE", "DISTILLED SPIRITS", "MALT BEVERAGES")
 
 CRITICAL_FIELDS = {
     "brand_name",
+    "product_type",
     "formula",
     "government_warning",
     "alcohol_content",

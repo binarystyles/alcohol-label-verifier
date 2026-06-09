@@ -25,12 +25,16 @@ from src.normalize import (
     extract_product_type,
     fuzzy_score,
     government_warning_matches,
+    government_warning_similarity,
     normalize_abv,
     normalize_for_match,
     normalize_net_contents,
     normalize_text,
     snippet_around,
 )
+
+WARNING_OCR_REVIEW_THRESHOLD = 86.0
+LOW_FORM_OCR_CONFIDENCE_THRESHOLD = 0.9
 
 
 def verify_application(
@@ -112,7 +116,7 @@ def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> li
             _result("government_warning", GOVERNMENT_WARNING, "", "", STATUS_REVIEW, label.confidence, warning_reason),
             _label_unavailable_result("item_15", fields.item_15, reason, optional=True),
         ]
-    return [
+    results = [
         verify_brand(fields.brand_name, label_text),
         verify_optional_fuzzy("fanciful_name", fields.fanciful_name, label_text),
         verify_product_type(fields.product_type, label_text),
@@ -125,6 +129,7 @@ def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> li
         verify_government_warning(label_text, label.confidence),
         verify_item_15(fields.item_15, label_text),
     ]
+    return [_downgrade_low_confidence_expected_result(result, fields) for result in results]
 
 
 def verify_brand(expected: str, label_text: str) -> FieldResult:
@@ -161,7 +166,7 @@ def verify_product_type(expected: str, label_text: str) -> FieldResult:
     if found == expected_type:
         return _result("product_type", expected_type, found, snippet_around(label_text, found), STATUS_PASS, 0.95, "Product type matches.")
     if found:
-        return _result("product_type", expected_type, found, snippet_around(label_text, found), STATUS_REVIEW, 0.7, "A different product type may appear on the label.")
+        return _result("product_type", expected_type, found, snippet_around(label_text, found), STATUS_FAIL, 0.9, "Label shows a different product type than the completed application.")
     return _result("product_type", expected_type, "", snippet_around(label_text), STATUS_REVIEW, 0.45, "Product type was not clearly found on the label.")
 
 
@@ -292,6 +297,17 @@ def verify_government_warning(label_text: str, label_confidence: float) -> Field
     if government_warning_matches(label_text):
         return _result("government_warning", GOVERNMENT_WARNING, GOVERNMENT_WARNING, snippet_around(label_text, "GOVERNMENT WARNING"), STATUS_PASS, min(0.98, max(label_confidence, 0.9)), "Government warning text and all-caps heading match the canonical statement.")
     if "GOVERNMENT WARNING" in normalize_text(label_text):
+        similarity = government_warning_similarity(label_text)
+        if similarity >= WARNING_OCR_REVIEW_THRESHOLD:
+            return _result(
+                "government_warning",
+                GOVERNMENT_WARNING,
+                "GOVERNMENT WARNING",
+                snippet_around(label_text, "GOVERNMENT WARNING"),
+                STATUS_REVIEW,
+                min(0.85, max(label_confidence, 0.6)),
+                "Government warning heading is present and the statement is close to canonical, but OCR/text is not exact; reviewer should confirm the warning.",
+            )
         return _result("government_warning", GOVERNMENT_WARNING, "", snippet_around(label_text, "GOVERNMENT WARNING"), STATUS_FAIL, 0.9, "Government warning appears reworded, truncated, or materially altered.")
     return _result("government_warning", GOVERNMENT_WARNING, "", snippet_around(label_text), STATUS_FAIL, 0.9, "Government warning is missing.")
 
@@ -307,6 +323,25 @@ def verify_item_15(expected: str, label_text: str) -> FieldResult:
 
 def _expected_missing(field: str) -> FieldResult:
     return _result(field, "", "", "", STATUS_REVIEW, 0.0, "Expected application value could not be extracted.")
+
+
+def _downgrade_low_confidence_expected_result(result: FieldResult, fields: ApplicationFields) -> FieldResult:
+    if result.status != STATUS_FAIL:
+        return result
+    if fields.raw_sources.get(result.field) != "form-region":
+        return result
+    source_confidence = fields.raw_confidences.get(result.field, 1.0)
+    if source_confidence >= LOW_FORM_OCR_CONFIDENCE_THRESHOLD:
+        return result
+    return _result(
+        result.field,
+        result.expected,
+        result.found,
+        result.evidence_snippet,
+        STATUS_REVIEW,
+        min(result.confidence, source_confidence),
+        "Expected application value came from low-confidence form OCR; reviewer should confirm it before treating this as a mismatch.",
+    )
 
 
 def _expected_abv_bounds(expected: str) -> tuple[float, float] | None:

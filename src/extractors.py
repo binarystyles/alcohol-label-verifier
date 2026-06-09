@@ -86,7 +86,7 @@ LOW_LABEL_SHARPNESS_THRESHOLD = 250.0
 FIELD_LABEL_PATTERNS: dict[str, tuple[re.Pattern[str], ...]] = {
     "serial_number": (re.compile(r"^\s*4\.?\s*SERIAL\s+NUMBER\s*[:\-]?\s*", re.IGNORECASE),),
     "product_type": (re.compile(r"^\s*5\.?\s*TYPE\s+OF\s+PRODUCT\s*[:\-]?\s*", re.IGNORECASE),),
-    "brand_name": (re.compile(r"^\s*6\.?\s*BRAND\s+NAME\s*[:\-]?\s*", re.IGNORECASE),),
+    "brand_name": (re.compile(r"^\s*6\.?\s*BRAND\s+(?:NAME|WAME)\s*[:\-]?\s*", re.IGNORECASE),),
     "fanciful_name": (re.compile(r"^\s*7\.?\s*FANCIFUL\s+NAME\s*[:\-]?\s*", re.IGNORECASE),),
     "applicant_name_address": (
         re.compile(r"^\s*8\.?\s*NAME\s+AND\s+ADDRESS\s+OF\s+APPLICANT\s*[:\-]?\s*", re.IGNORECASE),
@@ -174,6 +174,7 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
                 if cleaned:
                     setattr(fields, field_name, cleaned)
                     fields.raw_sources[field_name] = "form-region"
+                    fields.raw_confidences[field_name] = extracted.confidence
             elif extracted.warning:
                 warnings.append(extracted.warning)
         _merge_formula_approval(fields, package_text)
@@ -308,17 +309,27 @@ def parse_formula_approval_fields(text: str, formula_id: str) -> dict[str, str]:
             end = min(len(lines), index + 40)
             windows.append("\n".join(lines[start:end]))
 
+    matched_formula_document = False
+    matched_class_type = ""
     for window in windows:
         normalized_window = normalize_text(window)
         if not _looks_like_formula_approval_text(normalized_window):
             continue
+        matched_formula_document = True
         alcohol_content = _extract_formula_final_alcohol_content(window)
+        class_type = _extract_labeled_value(window, ("class/type", "class type", "classification"))
+        if class_type and not matched_class_type:
+            matched_class_type = class_type
         if not alcohol_content:
             continue
         fields = {"alcohol_content": alcohol_content}
-        class_type = _extract_labeled_value(window, ("class/type", "class type", "classification"))
         if class_type:
             fields["class_type"] = class_type
+        return fields
+    if matched_formula_document:
+        fields = {"alcohol_content": ""}
+        if matched_class_type:
+            fields["class_type"] = matched_class_type
         return fields
     return {}
 
@@ -396,6 +407,7 @@ def _merge_fields(fields: ApplicationFields, values: dict[str, Any], source: str
             if value:
                 fields.imported = bool(value)
                 fields.raw_sources[key] = source
+                fields.raw_confidences[key] = 1.0
             continue
         value = str(value).strip()
         existing_source = fields.raw_sources.get(key, "")
@@ -403,6 +415,7 @@ def _merge_fields(fields: ApplicationFields, values: dict[str, Any], source: str
         if value and (not getattr(fields, key) or may_override_existing):
             setattr(fields, key, value)
             fields.raw_sources[key] = source
+            fields.raw_confidences[key] = 1.0
 
 
 def _merge_formula_approval(fields: ApplicationFields, package_text: str) -> None:
@@ -418,6 +431,7 @@ def _merge_formula_approval(fields: ApplicationFields, package_text: str) -> Non
             continue
         setattr(fields, key, value)
         fields.raw_sources[key] = "formula-approval"
+        fields.raw_confidences[key] = 1.0
 
 
 def _application_package_text(document: fitz.Document) -> str:

@@ -24,5 +24,11 @@
 | `APP-020_item15_missing_review.pdf` | Needs Review | Needs Review | Item 15 container text is supplied in the application but not found on the label. |
 | `APP-021_apostrophe_artwork_pass.pdf` | Pass | Needs Review | Color-artwork label confirms apostrophe-insensitive brand matching. |
 | `APP-022_artwork_wrong_bottler_review.pdf` | Needs Review | Needs Review | Color-artwork label has a bottler/producer difference that should be reviewed. |
+| `APP-023_no_formula_required_pass.pdf` | Pass | Pass | Item 9 states no formula is required and the label still matches application alcohol content. |
+| `APP-024_import_country_artwork_pass.pdf` | Pass | Needs Review | Imported color-artwork label includes the expected country of origin. |
+| `APP-025_import_country_missing_on_label_review.pdf` | Needs Review | Needs Review | Imported application has an expected country of origin that is not clearly on the label. |
+| `APP-026_missing_expected_brand_review.pdf` | Needs Review | Needs Review | Required brand value is missing from the application extraction and must not be invented from label OCR. |
+| `APP-027_product_type_mismatch_fail.pdf` | Fail | Fail | Readable label shows a different product type than the completed application. |
+| `APP-028_formula_document_missing_final_alcohol_review.pdf` | Needs Review | Needs Review | Matching formula approval document is present but lacks extractable final alcohol content. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

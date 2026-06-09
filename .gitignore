@@ -16,6 +16,7 @@ env/
 tmp/
 temp/
 uploads/
+samples/applications/*.zip
 
 docs/source/*
 !docs/source/.gitkeep

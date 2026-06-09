@@ -146,6 +146,14 @@ def government_warning_matches(text: str | None) -> bool:
     return bool(canonical and canonical in label)
 
 
+def government_warning_similarity(text: str | None) -> float:
+    label = normalize_warning_for_compare(text)
+    canonical = normalize_warning_for_compare(GOVERNMENT_WARNING)
+    if not label or not canonical:
+        return 0.0
+    return float(fuzz.partial_ratio(canonical, label))
+
+
 def contains_title_case_warning(text: str | None) -> bool:
     if not text:
         return False

@@ -141,6 +141,20 @@ def test_formula_approval_parser_handles_ocr_values_before_finished_product_labe
     assert fields["alcohol_content"] == "5.5-5.8% ABV"
 
 
+def test_formula_approval_parser_marks_matching_document_without_final_alcohol() -> None:
+    text = """
+    FORMULAS ONLINE APPROVAL DETERMINATION
+    TTB Formula ID: F-2800
+    Status: Approved
+    Ingredients List
+    Finished alcohol, botanicals, and water.
+    Method of Manufacture
+    Blend, filter, and bottle.
+    """
+    fields = parse_formula_approval_fields(text, "F-2800")
+    assert fields == {"alcohol_content": ""}
+
+
 def test_application_derives_alcohol_content_from_matching_formula_approval() -> None:
     document = fitz.open()
     page = document.new_page(width=612, height=1008)
@@ -214,6 +228,7 @@ def test_generated_pdf_application_fields_do_not_keep_form_boilerplate(sample_by
 def test_region_cleaning_preserves_values_after_printed_field_labels() -> None:
     assert clean_region_value("serial_number", "4. SERIAL NUMBER APP-SCAN") == "APP-SCAN"
     assert clean_region_value("brand_name", "6. BRAND NAME SCANNED SAMPLE") == "SCANNED SAMPLE"
+    assert clean_region_value("brand_name", "6. BRAND WAME SCANNED SAMPLE") == "SCANNED SAMPLE"
     assert clean_region_value("phone", "EMAIL A\n202 555 0100") == "202-555-0100"
     assert clean_region_value("email", 'DDRESS\n"For sale in only"\nlabels@example.test') == "labels@example.test"
     assert clean_region_value("item_15", "Item 15 container and translation info") == ""

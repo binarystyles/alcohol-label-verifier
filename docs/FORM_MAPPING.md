@@ -7,12 +7,12 @@ Sources reviewed: the TTB Forms page lists current TTB F 5100.31 as `Application
 | TTB item | Extracted field | Verification use |
 | --- | --- | --- |
 | Item 4 | `serial_number` | Application identifier and result table reference. |
-| Item 5 | `product_type` | Compared to label evidence for Wine, Distilled Spirits, or Malt Beverages. |
+| Item 5 | `product_type` | Compared to label evidence for Wine, Distilled Spirits, or Malt Beverages. A readable, different product type is a critical mismatch. |
 | Item 6 | `brand_name` | Required critical check against label brand text. |
 | Item 7 | `fanciful_name` | Optional check when supplied. |
 | Item 8 | `applicant_name_address` | Application context and possible bottler/producer support. |
 | Item 8a | `mailing_address` | Extracted for reviewer context. |
-| Item 9 | `formula` | Formula ID/reference, such as a TTB Formula ID, TTB ID, lab number, pre-import approval reference, or no-formula-required note. When a Formula ID is present, the extractor looks for a matching formula approval/source document inside the same uploaded PDF package and derives expected `alcohol_content` from that matched document's `Alcohol Content of Finished Product` or final-alcohol-content field. Low/high ranges are preserved for label comparison. Malt beverage rows for `Alcohol From Flavors` and `Alcohol From Base` are ignored as the expected label ABV source. Missing matching formula alcohol content becomes Needs Review. A readable approved-formula alcohol mismatch becomes Fail. |
+| Item 9 | `formula` | Formula ID/reference, such as a TTB Formula ID, TTB ID, lab number, pre-import approval reference, or no-formula-required note. When a Formula ID is present, the extractor looks for a matching formula approval/source document inside the same uploaded PDF package and derives expected `alcohol_content` from that matched document's `Alcohol Content of Finished Product` or final-alcohol-content field. Low/high ranges are preserved for label comparison. Malt beverage rows for `Alcohol From Flavors` and `Alcohol From Base` are ignored as the expected label ABV source. Missing matching formula support, or matched support with no extractable final alcohol content, becomes Needs Review. A readable approved-formula alcohol mismatch becomes Fail. |
 | Item 10 | `grape_varietals` | Extracted for reviewer context for wine applications. |
 | Item 11 | `wine_appellation` | Extracted for reviewer context and possible label comparison. |
 | Item 12 | `phone` | Extracted for reviewer context. |

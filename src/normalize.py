@@ -174,7 +174,7 @@ def _keyword_follows_completed_abv_statement(text: str, start: int) -> bool:
 
 
 NET_CONTENTS_UNIT_PATTERN = (
-    r"ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|"
+    r"ML|MLS|M\.L\.|MILLILITERS?|MILLILITRES?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|"
     r"PT\.?|PINTS?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?"
 )
 NUMBER_WORD_PATTERN = (
@@ -191,6 +191,10 @@ NET_CONTENTS_FRACTION_PATTERN = re.compile(
 )
 NET_CONTENTS_WORD_PATTERN = re.compile(
     rf"(?<![A-Z0-9])(?P<words>(?:{NUMBER_WORD_PATTERN})(?:[\s-]+(?:{NUMBER_WORD_PATTERN}))*)\s+(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\b",
+    re.IGNORECASE,
+)
+NET_CONTENTS_DECIMAL_COMMA_PATTERN = re.compile(
+    rf"(?<![A-Z0-9/])(?P<num>\d+,\d{{1,2}})\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\b",
     re.IGNORECASE,
 )
 NET_CONTENTS_PATTERN = re.compile(
@@ -234,6 +238,16 @@ def extract_net_contents_values(text: str | None) -> list[float]:
         number = _parse_number_words(match.group("words"))
         if number is None:
             continue
+        milliliters = _net_unit_to_milliliters(number, match.group("unit"))
+        if 0 < milliliters < 100000:
+            values.append(round(milliliters, 3))
+            compound_spans.append(match.span())
+    for match in NET_CONTENTS_DECIMAL_COMMA_PATTERN.finditer(text):
+        if any(start <= match.start() and match.end() <= end for start, end in compound_spans):
+            continue
+        if _is_non_net_contents_volume(text, match.start(), match.end()):
+            continue
+        number = float(match.group("num").replace(",", "."))
         milliliters = _net_unit_to_milliliters(number, match.group("unit"))
         if 0 < milliliters < 100000:
             values.append(round(milliliters, 3))

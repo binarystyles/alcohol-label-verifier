@@ -1452,6 +1452,38 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states alcohol content with percent-by-volume shorthand.",
         ),
+        SampleSpec(
+            filename="APP-078_decimal_comma_litre_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-078", "formula": "F-7800"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "0,75 L",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states net contents as decimal-comma litres.",
+        ),
+        SampleSpec(
+            filename="APP-079_british_millilitres_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-079", "formula": "F-7900"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 millilitres",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states net contents with British millilitres spelling.",
+        ),
     ]
 
 

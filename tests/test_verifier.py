@@ -367,6 +367,7 @@ def test_imported_country_adjective_alone_is_not_enough() -> None:
 def test_net_contents_match_passes_with_liters() -> None:
     result = verify_net_contents("750 mL", "Net Contents .75 L")
     assert result.status == STATUS_PASS
+    assert verify_net_contents("750 mL", "Net Contents 0,75 L").status == STATUS_PASS
 
 
 def test_net_contents_match_passes_with_comma_thousands() -> None:
@@ -398,6 +399,8 @@ def test_net_contents_match_passes_with_rounded_dual_unit_equivalents() -> None:
 
 def test_net_contents_match_passes_with_written_number_words() -> None:
     assert verify_net_contents("750 mL", "Net Contents Seven Hundred Fifty Milliliters").status == STATUS_PASS
+    assert verify_net_contents("750 mL", "Net Contents 750 millilitres").status == STATUS_PASS
+    assert verify_net_contents("750 mL", "Net Contents 750 mls").status == STATUS_PASS
     assert verify_net_contents("1 L", "Net Contents one liter").status == STATUS_PASS
     assert verify_net_contents("1 L", "Serving size one liter").status == STATUS_REVIEW
 

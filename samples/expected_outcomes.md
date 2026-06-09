@@ -79,5 +79,7 @@
 | `APP-075_company_abbreviation_pass.pdf` | Pass | Pass | Brand and bottler Co. abbreviations match Company on the label as harmless legal-suffix variations. |
 | `APP-076_saint_abbreviation_brand_pass.pdf` | Pass | Pass | Brand Saint abbreviation in the label matches Saint in the application as a harmless word variation. |
 | `APP-077_percent_by_volume_pass.pdf` | Pass | Pass | Label states alcohol content with percent-by-volume shorthand. |
+| `APP-078_decimal_comma_litre_pass.pdf` | Pass | Pass | Label states net contents as decimal-comma litres. |
+| `APP-079_british_millilitres_pass.pdf` | Pass | Pass | Label states net contents with British millilitres spelling. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

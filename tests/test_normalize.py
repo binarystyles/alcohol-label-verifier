@@ -18,6 +18,8 @@ def test_text_normalization_handles_brand_punctuation() -> None:
     assert normalize_name("Stone's   Throw") == "STONES THROW"
     assert normalize_name("Smith & Sons") == "SMITH AND SONS"
     assert normalize_name("Acme Distilling Co.") == "ACME DISTILLING COMPANY"
+    assert normalize_name("St. George Gin") == "SAINT GEORGE GIN"
+    assert normalize_name("Mt. Hood Vodka") == "MOUNT HOOD VODKA"
 
 
 def test_brand_fuzzy_matching_allows_harmless_variations() -> None:

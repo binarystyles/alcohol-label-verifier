@@ -40,7 +40,12 @@ def normalize_name(value: str | None) -> str:
     value = value.replace("&", " AND ")
     value = re.sub(r"['`]", "", value)
     value = re.sub(r"[^A-Z0-9]+", " ", value)
-    tokens = ["COMPANY" if token == "CO" else token for token in re.sub(r"\s+", " ", value).strip().split()]
+    token_aliases = {
+        "CO": "COMPANY",
+        "MT": "MOUNT",
+        "ST": "SAINT",
+    }
+    tokens = [token_aliases.get(token, token) for token in re.sub(r"\s+", " ", value).strip().split()]
     return " ".join(tokens)
 
 

@@ -1410,6 +1410,32 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Brand and bottler Co. abbreviations match Company on the label as harmless legal-suffix variations.",
         ),
+        SampleSpec(
+            filename="APP-076_saint_abbreviation_brand_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-076",
+                "brand_name": "SAINT GEORGE GIN",
+                "fanciful_name": "Coastal Dry",
+                "formula": "F-7600",
+                "class_type": "Gin",
+                "alcohol_content": "45% ABV",
+                "net_contents": "750 mL",
+                "bottler_producer": "Saint George Distilling Co.",
+            },
+            label_lines=[
+                "ST. GEORGE GIN",
+                "Coastal Dry",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by St. George Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Brand Saint abbreviation in the label matches Saint in the application as a harmless word variation.",
+        ),
     ]
 
 

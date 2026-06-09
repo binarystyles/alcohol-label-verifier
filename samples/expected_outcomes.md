@@ -77,5 +77,6 @@
 | `APP-073_compact_percent_vol_pass.pdf` | Pass | Pass | Label states alcohol content with compact percent-vol wording. |
 | `APP-074_ampersand_brand_pass.pdf` | Pass | Pass | Brand ampersand in the application matches AND on the label as a harmless text variation. |
 | `APP-075_company_abbreviation_pass.pdf` | Pass | Pass | Brand and bottler Co. abbreviations match Company on the label as harmless legal-suffix variations. |
+| `APP-076_saint_abbreviation_brand_pass.pdf` | Pass | Pass | Brand Saint abbreviation in the label matches Saint in the application as a harmless word variation. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

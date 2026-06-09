@@ -36,6 +36,11 @@ def test_brand_company_abbreviation_passes() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_brand_common_word_abbreviations_pass() -> None:
+    assert verify_brand("SAINT GEORGE GIN", "ST. GEORGE GIN\nDISTILLED SPIRITS").status == STATUS_PASS
+    assert verify_brand("MT. HOOD VODKA", "MOUNT HOOD VODKA\nDISTILLED SPIRITS").status == STATUS_PASS
+
+
 def test_brand_word_order_mismatch_fails() -> None:
     result = verify_brand("OLD TOM GIN", "TOM OLD GIN\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL")
     assert result.status == STATUS_FAIL

@@ -1639,6 +1639,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Imported malt beverage origin is stated as Brewed in Belgium.",
         ),
+        SampleSpec(
+            filename="APP-086_packed_by_responsible_party_pass.pdf",
+            fields={**wine_fields, "serial_number": "APP-086", "formula": "W-8600"},
+            label_lines=[
+                "SUNSET HOLLOW",
+                "Red Blend",
+                "WINE",
+                "Class/Type: Red Wine",
+                "13.5% Alc./Vol.",
+                "750 mL",
+                "Packed by Sunset Hollow Winery",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Wine label uses Packed by as responsible-party wording.",
+        ),
     ]
 
 

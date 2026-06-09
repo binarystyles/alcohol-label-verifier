@@ -88,6 +88,11 @@ def test_bottler_producer_accepts_bottled_for_statement() -> None:
     assert verify_bottler_producer("Example Distilling Co.", "For sale in Oregon only").status == STATUS_REVIEW
 
 
+def test_bottler_producer_accepts_packed_by_statement() -> None:
+    assert verify_bottler_producer("Example Winery", "Packed by Example Winery").status == STATUS_PASS
+    assert verify_bottler_producer("Example Winery", "Packed and bottled by Example Winery").status == STATUS_PASS
+
+
 def test_government_warning_strict_title_case_behavior() -> None:
     result = verify_government_warning("Government Warning: Drinking may cause health problems.", 0.95)
     assert result.status == STATUS_FAIL

@@ -55,7 +55,7 @@ Needs Review is used for uncertainty:
 - Expected text appears only as a fragment inside a larger word, such as `Gin` inside `Ginger`.
 - Product-type words appear only in primary brand text, with no clear product/class label statement.
 - Class/type text appears only in brand, producer, warning, or other non-class context.
-- Bottler/producer text appears only in brand or other non-responsible-party context instead of wording such as `Bottled by`, `Distilled by`, `Blended by`, `Imported by`, or `Produced and bottled by`.
+- Bottler/producer text appears only in brand or other non-responsible-party context instead of wording such as `Bottled by`, `Bottled for`, `Distilled by`, `Blended by`, `Imported by`, or `Produced and bottled by`.
 - Label contains both matching and conflicting alcohol-content or net-contents values.
 - Missing matching formula approval content for an Item 9 Formula ID.
 - Matching formula approval/source document found but no final alcohol content is extractable.

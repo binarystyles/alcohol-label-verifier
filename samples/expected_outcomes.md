@@ -62,5 +62,6 @@
 | `APP-058_distilled_by_responsible_party_pass.pdf` | Pass | Pass | Distilled spirits label uses Distilled by as responsible-party wording. |
 | `APP-059_beer_product_type_first_line_pass.pdf` | Pass | Pass | Malt beverage label puts BEER before a brand that does not itself contain beer-style product words. |
 | `APP-060_blended_by_responsible_party_pass.pdf` | Pass | Pass | Distilled spirits label uses Blended by as responsible-party wording. |
+| `APP-061_bottled_for_responsible_party_pass.pdf` | Pass | Pass | Distilled spirits label uses Bottled for as responsible-party wording. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

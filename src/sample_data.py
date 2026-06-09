@@ -1118,6 +1118,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Distilled spirits label uses Blended by as responsible-party wording.",
         ),
+        SampleSpec(
+            filename="APP-061_bottled_for_responsible_party_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-061", "formula": "F-6100"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled for Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Distilled spirits label uses Bottled for as responsible-party wording.",
+        ),
     ]
 
 

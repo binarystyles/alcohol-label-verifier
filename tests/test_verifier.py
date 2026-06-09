@@ -20,6 +20,15 @@ def test_brand_variation_passes() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_brand_in_bottler_line_only_does_not_pass() -> None:
+    result = verify_brand(
+        "OLD TOM GIN",
+        "MOUNTAIN FORK VODKA\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL\nBottled by Old Tom Gin",
+    )
+    assert result.status == STATUS_FAIL
+    assert "non-brand context" in result.reason
+
+
 def test_government_warning_strict_title_case_behavior() -> None:
     result = verify_government_warning("Government Warning: Drinking may cause health problems.", 0.95)
     assert result.status == STATUS_FAIL
@@ -139,6 +148,12 @@ def test_product_type_descriptor_does_not_override_explicit_product_type() -> No
     assert result.status == STATUS_PASS
 
 
+def test_class_type_in_brand_line_only_needs_review() -> None:
+    result = verify_class_type("Gin", "OLD TOM GIN\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL")
+    assert result.status == STATUS_REVIEW
+    assert "non-class context" in result.reason
+
+
 def test_imported_country_of_origin_passes_when_present() -> None:
     result = verify_country_of_origin("Mexico", True, "CASA VERDE TEQUILA Product of Mexico")
     assert result.status == STATUS_PASS
@@ -190,9 +205,8 @@ def test_overall_status_aggregation_pass() -> None:
     )
     label = LabelExtraction(
         text=(
-            "OLD TOM GIN DISTILLED SPIRITS Gin 45% Alc./Vol. 750 mL "
-            "Bottled by Example Distilling Co. "
-            f"{GOVERNMENT_WARNING}"
+            "OLD TOM GIN\nDISTILLED SPIRITS\nClass/Type: Gin\n45% Alc./Vol.\n750 mL\n"
+            f"Bottled by Example Distilling Co.\n{GOVERNMENT_WARNING}"
         ),
         confidence=0.97,
     )

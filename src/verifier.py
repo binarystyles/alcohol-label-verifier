@@ -135,12 +135,16 @@ def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> li
 def verify_brand(expected: str, label_text: str) -> FieldResult:
     if not expected:
         return _expected_missing("brand_name")
-    score = fuzzy_score(expected, label_text)
-    if score >= BRAND_PASS_THRESHOLD:
-        return _result("brand_name", expected, expected, snippet_around(label_text, expected), STATUS_PASS, score / 100, "Brand name matches with harmless formatting variation allowed.")
-    if score >= BRAND_REVIEW_THRESHOLD:
-        return _result("brand_name", expected, "", snippet_around(label_text), STATUS_REVIEW, score / 100, "Brand name is similar but should be checked by a reviewer.")
-    return _result("brand_name", expected, "", snippet_around(label_text), STATUS_FAIL, score / 100, "Required brand name appears materially different or missing.")
+    primary_text = _primary_brand_text(label_text)
+    primary_score = fuzzy_score(expected, primary_text)
+    full_score = fuzzy_score(expected, label_text)
+    if primary_score >= BRAND_PASS_THRESHOLD:
+        return _result("brand_name", expected, expected, snippet_around(primary_text, expected), STATUS_PASS, primary_score / 100, "Brand name matches with harmless formatting variation allowed.")
+    if primary_score >= BRAND_REVIEW_THRESHOLD:
+        return _result("brand_name", expected, "", snippet_around(primary_text), STATUS_REVIEW, primary_score / 100, "Brand name is similar but should be checked by a reviewer.")
+    if full_score >= BRAND_PASS_THRESHOLD and primary_text:
+        return _result("brand_name", expected, "", snippet_around(label_text, expected), STATUS_FAIL, full_score / 100, "Expected brand appears only in producer, importer, warning, or other non-brand context.")
+    return _result("brand_name", expected, "", snippet_around(primary_text or label_text), STATUS_FAIL, max(primary_score, full_score) / 100, "Required brand name appears materially different or missing.")
 
 
 def verify_optional_fuzzy(
@@ -173,12 +177,16 @@ def verify_product_type(expected: str, label_text: str) -> FieldResult:
 def verify_class_type(expected: str, label_text: str) -> FieldResult:
     if not expected:
         return _expected_missing("class_type")
-    score = fuzzy_score(expected, label_text)
+    class_text = _class_type_candidate_text(label_text)
+    score = fuzzy_score(expected, class_text)
     if score >= CLASS_TYPE_PASS_THRESHOLD:
-        return _result("class_type", expected, expected, snippet_around(label_text, expected), STATUS_PASS, score / 100, "Class/type designation matches.")
+        return _result("class_type", expected, expected, snippet_around(class_text, expected), STATUS_PASS, score / 100, "Class/type designation matches.")
     if score >= CLASS_TYPE_REVIEW_THRESHOLD:
-        return _result("class_type", expected, "", snippet_around(label_text), STATUS_REVIEW, score / 100, "Class/type is similar but should be checked.")
-    return _result("class_type", expected, "", snippet_around(label_text), STATUS_REVIEW, score / 100, "Class/type was not clearly found on the label.")
+        return _result("class_type", expected, "", snippet_around(class_text), STATUS_REVIEW, score / 100, "Class/type is similar but should be checked.")
+    full_score = fuzzy_score(expected, label_text)
+    if full_score >= CLASS_TYPE_PASS_THRESHOLD and class_text:
+        return _result("class_type", expected, "", snippet_around(label_text, expected), STATUS_REVIEW, full_score / 100, "Class/type appears only in brand, producer, warning, or other non-class context.")
+    return _result("class_type", expected, "", snippet_around(class_text or label_text), STATUS_REVIEW, max(score, full_score) / 100, "Class/type was not clearly found on the label.")
 
 
 def verify_alcohol_content(expected: str, label_text: str) -> FieldResult:
@@ -319,18 +327,135 @@ def verify_item_15(expected: str, label_text: str) -> FieldResult:
     return _result("item_15", expected, "", snippet_around(label_text), STATUS_REVIEW, score / 100, "Item 15 information was supplied but not clearly found.")
 
 
+def _primary_brand_text(label_text: str) -> str:
+    candidates: list[str] = []
+    for line in _label_lines(label_text):
+        primary = _line_before_non_brand_context(line)
+        if primary and not _is_obvious_non_brand_line(primary):
+            candidates.append(primary)
+    return "\n".join(candidates)
+
+
+def _class_type_candidate_text(label_text: str) -> str:
+    candidates: list[str] = []
+    lines = _label_lines(label_text)
+    for index, line in enumerate(lines):
+        normalized_line = normalize_text(line)
+        if "CLASS/TYPE" in normalized_line or "CLASS TYPE" in normalized_line:
+            value = re.split(r"CLASS\s*/?\s*TYPE\s*:?", line, maxsplit=1, flags=re.IGNORECASE)[-1].strip(" :-")
+            if value:
+                candidates.append(value)
+            continue
+        if index == 0:
+            continue
+        if _is_obvious_non_class_line(line):
+            continue
+        candidates.append(line)
+    return "\n".join(candidates)
+
+
+def _label_lines(label_text: str) -> list[str]:
+    lines: list[str] = []
+    for raw_line in re.split(r"[\r\n]+", label_text or ""):
+        line = raw_line.strip()
+        if not line:
+            continue
+        if re.fullmatch(r"\[[^\]]+\]", line):
+            continue
+        lines.append(line)
+    if len(lines) == 1:
+        return _split_flat_label_line(lines[0])
+    return lines
+
+
+def _split_flat_label_line(line: str) -> list[str]:
+    split_markers = (
+        r"\bCLASS\s*/?\s*TYPE\s*:?",
+        r"\b(?:DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?)\b",
+        r"\b(?:BOTTLED|PRODUCED|IMPORTED|BREWED|VINTED|CELLARED|PACKAGED|MANUFACTURED|DISTRIBUTED)\s+BY\b",
+        r"\bGOVERNMENT\s+WARNING\b",
+        r"\b(?:NET\s+CONTENTS?|SERVING\s+SIZE)\b",
+        r"\b(?:ALC\.?\s*/?\s*VOL\.?|ALCOHOL\s+\d|PROOF\s*\d|\d{1,3}(?:\.\d+)?\s*(?:%|PERCENT|PROOF))\b",
+    )
+    pattern = "(" + "|".join(split_markers) + ")"
+    pieces = re.split(pattern, line, flags=re.IGNORECASE)
+    if len(pieces) == 1:
+        return [line]
+    lines: list[str] = []
+    current = ""
+    for piece in pieces:
+        if not piece:
+            continue
+        if re.match(pattern, piece, flags=re.IGNORECASE):
+            if current.strip():
+                lines.append(current.strip())
+            current = piece
+        else:
+            current += piece
+    if current.strip():
+        lines.append(current.strip())
+    return lines
+
+
+def _line_before_non_brand_context(line: str) -> str:
+    context_pattern = (
+        r"\b(?:BOTTLED|PRODUCED|IMPORTED|BREWED|VINTED|CELLARED|PACKAGED|MANUFACTURED|DISTRIBUTED)\s+BY\b"
+        r"|\bGOVERNMENT\s+WARNING\b"
+        r"|\bCLASS\s*/?\s*TYPE\s*:?"
+        r"|\b(?:DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?)\b"
+        r"|\b(?:NET\s+CONTENTS?|SERVING\s+SIZE)\b"
+        r"|\b(?:ALC\.?\s*/?\s*VOL\.?|ALCOHOL\s+\d|PROOF\s*\d|\d{1,3}(?:\.\d+)?\s*(?:%|PERCENT|PROOF))\b"
+    )
+    parts = re.split(context_pattern, line, maxsplit=1, flags=re.IGNORECASE)
+    return parts[0].strip(" :-")
+
+
+def _is_obvious_non_brand_line(line: str) -> bool:
+    normalized = normalize_text(line)
+    if not normalized:
+        return True
+    return bool(
+        re.search(
+            r"\b(CLASS\s*/?\s*TYPE|DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?|GOVERNMENT\s+WARNING|BOTTLED\s+BY|PRODUCED\s+BY|IMPORTED\s+BY|BREWED\s+BY|NET\s+CONTENTS?|SERVING\s+SIZE|ALC|ALCOHOL|PROOF)\b",
+            normalized,
+        )
+    )
+
+
+def _is_obvious_non_class_line(line: str) -> bool:
+    normalized = normalize_text(line)
+    if not normalized:
+        return True
+    return bool(
+        re.search(
+            r"\b(DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?|GOVERNMENT\s+WARNING|BOTTLED\s+BY|PRODUCED\s+BY|IMPORTED\s+BY|BREWED\s+BY|NET\s+CONTENTS?|SERVING\s+SIZE|ALC|ALCOHOL|PROOF)\b",
+            normalized,
+        )
+    )
+
+
 def _expected_missing(field: str) -> FieldResult:
     return _result(field, "", "", "", STATUS_REVIEW, 0.0, "Expected application value could not be extracted.")
 
 
 def _downgrade_low_confidence_expected_result(result: FieldResult, fields: ApplicationFields) -> FieldResult:
-    if result.status != STATUS_FAIL:
+    if result.status == STATUS_REVIEW:
         return result
     if fields.raw_sources.get(result.field) != "form-region":
         return result
     source_confidence = fields.raw_confidences.get(result.field, 1.0)
     if source_confidence >= LOW_FORM_OCR_CONFIDENCE_THRESHOLD:
         return result
+    if result.status == STATUS_PASS:
+        return _result(
+            result.field,
+            result.expected,
+            result.found,
+            result.evidence_snippet,
+            STATUS_REVIEW,
+            min(result.confidence, source_confidence),
+            "Expected application value came from low-confidence form OCR; reviewer should confirm it before treating this as verified.",
+        )
     return _result(
         result.field,
         result.expected,

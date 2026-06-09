@@ -40,5 +40,7 @@
 | `APP-036_missing_fanciful_name_review.pdf` | Needs Review | Needs Review | Application supplies a fanciful name, but the label does not clearly show it. |
 | `APP-037_proof_before_value_pass.pdf` | Pass | Pass | Label states proof before the value, which should normalize to ABV. |
 | `APP-038_alcohol_by_volume_order_pass.pdf` | Pass | Pass | Label states alcohol value before by-volume wording, which should normalize as ABV. |
+| `APP-039_brand_only_in_bottler_line_fail.pdf` | Fail | Fail | Expected brand appears only in the bottler line while the primary brand is materially different. |
+| `APP-040_class_type_only_in_brand_review.pdf` | Needs Review | Needs Review | Class/type value appears only inside the brand name and is not clearly stated as class/type. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

@@ -712,6 +712,41 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states alcohol value before by-volume wording, which should normalize as ABV.",
         ),
+        SampleSpec(
+            filename="APP-039_brand_only_in_bottler_line_fail.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-039",
+                "formula": "F-3900",
+                "bottler_producer": "Old Tom Gin",
+            },
+            label_lines=[
+                "MOUNTAIN FORK VODKA",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Old Tom Gin",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Fail",
+            note="Expected brand appears only in the bottler line while the primary brand is materially different.",
+        ),
+        SampleSpec(
+            filename="APP-040_class_type_only_in_brand_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-040", "formula": "F-4000"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Class/type value appears only inside the brand name and is not clearly stated as class/type.",
+        ),
     ]
 
 

@@ -85,5 +85,7 @@
 | `APP-081_republic_ireland_origin_pass.pdf` | Pass | Pass | Imported origin names Republic of Ireland while the application country is Ireland. |
 | `APP-082_finished_alcohol_formula_pass.pdf` | Pass | Pass | Formula support states final ABV as Finished Alcohol Content. |
 | `APP-083_final_product_alcohol_formula_pass.pdf` | Pass | Pass | Formula support states final proof as Final Product Alcohol Content. |
+| `APP-084_distilled_in_origin_pass.pdf` | Pass | Pass | Imported spirits origin is stated as Distilled in Scotland for a United Kingdom application country. |
+| `APP-085_brewed_in_origin_pass.pdf` | Pass | Pass | Imported malt beverage origin is stated as Brewed in Belgium. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

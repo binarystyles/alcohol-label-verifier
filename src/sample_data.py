@@ -1079,6 +1079,29 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Distilled spirits label uses Distilled by as responsible-party wording.",
         ),
+        SampleSpec(
+            filename="APP-059_beer_product_type_first_line_pass.pdf",
+            fields={
+                **malt_fields,
+                "serial_number": "APP-059",
+                "brand_name": "SUNNY FARMS",
+                "fanciful_name": "Crisp Malt",
+                "formula": "MB-5900",
+                "class_type": "Specialty",
+            },
+            label_lines=[
+                "BEER",
+                "SUNNY FARMS",
+                "Crisp Malt",
+                "Class/Type: Specialty",
+                "5.5% Alc./Vol.",
+                "12 fl oz",
+                "Brewed by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Malt beverage label puts BEER before a brand that does not itself contain beer-style product words.",
+        ),
     ]
 
 

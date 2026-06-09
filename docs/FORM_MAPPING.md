@@ -7,7 +7,7 @@ Sources reviewed: the TTB Forms page lists current TTB F 5100.31 as `Application
 | TTB item | Extracted field | Verification use |
 | --- | --- | --- |
 | Item 4 | `serial_number` | Application identifier and result table reference. |
-| Item 5 | `product_type` | Compared to label evidence for Wine, Distilled Spirits, or Malt Beverages. A readable, different product type is a critical mismatch. Explicit `DISTILLED SPIRITS` and `MALT BEVERAGE(S)` phrases are prioritized over incidental descriptors such as `Wine Cask Finish`. |
+| Item 5 | `product_type` | Compared to label evidence for Wine, Distilled Spirits, or Malt Beverages. A readable, different product type is a critical mismatch. Explicit `DISTILLED SPIRITS`, `MALT BEVERAGE(S)`, beer-style terms, and `MALT LIQUOR` phrases are prioritized over incidental descriptors such as `Wine Cask Finish`. |
 | Item 6 | `brand_name` | Required critical check against label brand text. |
 | Item 7 | `fanciful_name` | Optional check when supplied. |
 | Item 8 | `applicant_name_address` | Application context and possible bottler/producer support. |

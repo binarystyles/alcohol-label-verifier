@@ -417,7 +417,7 @@ def _is_explicit_product_type_line(line: str) -> bool:
     normalized = normalize_text(line)
     return bool(
         re.fullmatch(
-            r"(?:PRODUCT\s+TYPE\s*:?\s*)?(?:DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?|WINE|RED\s+WINE|WHITE\s+WINE|ROSE\s+WINE|SPARKLING\s+WINE|TABLE\s+WINE|DESSERT\s+WINE)",
+            r"(?:PRODUCT\s+TYPE\s*:?\s*)?(?:DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?|MALT\s+LIQUOR|BEER|ALE|LAGER|STOUT|PORTER|WINE|RED\s+WINE|WHITE\s+WINE|ROSE\s+WINE|SPARKLING\s+WINE|TABLE\s+WINE|DESSERT\s+WINE)",
             normalized,
         )
     )

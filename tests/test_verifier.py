@@ -210,6 +210,11 @@ def test_product_type_first_label_line_passes_when_explicit() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_malt_product_type_first_label_line_passes_when_explicit() -> None:
+    assert verify_product_type("MALT BEVERAGES", "BEER\nSUNNY FARMS\n5.5% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("MALT BEVERAGES", "MALT LIQUOR\nSUNNY FARMS\n5.5% Alc./Vol.").status == STATUS_PASS
+
+
 def test_wine_brand_with_spirit_word_does_not_fail_product_type() -> None:
     result = verify_product_type("WINE", "SPIRIT HILL WINE\nWINE\nClass/Type: Red Wine\n13% Alc./Vol.")
     assert result.status == STATUS_PASS

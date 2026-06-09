@@ -747,6 +747,44 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Class/type value appears only inside the brand name and is not clearly stated as class/type.",
         ),
+        SampleSpec(
+            filename="APP-041_bottler_only_in_brand_review.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-041",
+                "formula": "F-4100",
+                "brand_name": "EXAMPLE DISTILLING CO.",
+                "fanciful_name": "House Gin",
+                "bottler_producer": "Example Distilling Co.",
+            },
+            label_lines=[
+                "EXAMPLE DISTILLING CO.",
+                "House Gin",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Expected bottler/producer appears as brand text only, with no responsible-party statement.",
+        ),
+        SampleSpec(
+            filename="APP-042_produced_and_bottled_by_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-042", "formula": "F-4200"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Produced and bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Responsible-party statement uses combined produced-and-bottled wording.",
+        ),
     ]
 
 

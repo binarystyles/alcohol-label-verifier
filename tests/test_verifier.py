@@ -6,6 +6,7 @@ from src.verifier import (
     verify_alcohol_content,
     verify_application,
     verify_brand,
+    verify_bottler_producer,
     verify_class_type,
     verify_government_warning,
     verify_formula_alcohol_content,
@@ -27,6 +28,17 @@ def test_brand_in_bottler_line_only_does_not_pass() -> None:
     )
     assert result.status == STATUS_FAIL
     assert "non-brand context" in result.reason
+
+
+def test_bottler_producer_requires_responsible_party_context() -> None:
+    result = verify_bottler_producer("OLD TOM GIN", "OLD TOM GIN\nDISTILLED SPIRITS\n45% Alc./Vol.")
+    assert result.status == STATUS_REVIEW
+    assert "outside responsible-party" in result.reason
+
+
+def test_bottler_producer_accepts_combined_responsible_party_statement() -> None:
+    result = verify_bottler_producer("Example Distilling Co.", "Produced and bottled by Example Distilling Co.")
+    assert result.status == STATUS_PASS
 
 
 def test_government_warning_strict_title_case_behavior() -> None:

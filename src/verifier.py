@@ -124,7 +124,7 @@ def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> li
         verify_formula_alcohol_content(fields.formula, fields.alcohol_content, fields.raw_sources.get("alcohol_content", ""), label_text),
         verify_alcohol_content(fields.alcohol_content, label_text),
         verify_net_contents(fields.net_contents, label_text),
-        verify_optional_fuzzy("bottler_producer", fields.bottler_producer, label_text, missing_status=STATUS_REVIEW),
+        verify_bottler_producer(fields.bottler_producer, label_text),
         verify_country_of_origin(fields.country_of_origin, fields.imported, label_text),
         verify_government_warning(label_text, label.confidence),
         verify_item_15(fields.item_15, label_text),
@@ -160,6 +160,27 @@ def verify_optional_fuzzy(
     if score >= TEXT_FIELD_PASS_THRESHOLD:
         return _result(field, expected, expected, snippet_around(label_text, expected), STATUS_PASS, score / 100, "Expected text appears on the label.")
     return _result(field, expected, "", snippet_around(label_text), missing_status, score / 100, "Expected optional supplied text was not clearly found on the label.")
+
+
+def verify_bottler_producer(expected: str, label_text: str) -> FieldResult:
+    if not expected:
+        return _result("bottler_producer", "", "", "", STATUS_PASS, 1.0, "No expected value supplied; this optional field was not penalized.")
+    party_text = _responsible_party_text(label_text)
+    score = fuzzy_score(expected, party_text)
+    if score >= TEXT_FIELD_PASS_THRESHOLD:
+        return _result("bottler_producer", expected, expected, snippet_around(party_text, expected), STATUS_PASS, score / 100, "Expected bottler/producer appears in responsible-party label text.")
+    full_score = fuzzy_score(expected, label_text)
+    if full_score >= TEXT_FIELD_PASS_THRESHOLD:
+        return _result(
+            "bottler_producer",
+            expected,
+            "",
+            snippet_around(label_text, expected),
+            STATUS_REVIEW,
+            full_score / 100,
+            "Expected bottler/producer appears only outside responsible-party label text.",
+        )
+    return _result("bottler_producer", expected, "", snippet_around(party_text or label_text), STATUS_REVIEW, max(score, full_score) / 100, "Expected bottler/producer was not clearly found in responsible-party label text.")
 
 
 def verify_product_type(expected: str, label_text: str) -> FieldResult:
@@ -354,6 +375,14 @@ def _class_type_candidate_text(label_text: str) -> str:
     return "\n".join(candidates)
 
 
+def _responsible_party_text(label_text: str) -> str:
+    candidates: list[str] = []
+    for line in _label_lines(label_text):
+        if _is_responsible_party_line(line):
+            candidates.append(line)
+    return "\n".join(candidates)
+
+
 def _label_lines(label_text: str) -> list[str]:
     lines: list[str] = []
     for raw_line in re.split(r"[\r\n]+", label_text or ""):
@@ -372,7 +401,7 @@ def _split_flat_label_line(line: str) -> list[str]:
     split_markers = (
         r"\bCLASS\s*/?\s*TYPE\s*:?",
         r"\b(?:DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?)\b",
-        r"\b(?:BOTTLED|PRODUCED|IMPORTED|BREWED|VINTED|CELLARED|PACKAGED|MANUFACTURED|DISTRIBUTED)\s+BY\b",
+        r"\b(?:BOTTLED|PRODUCED|IMPORTED|BREWED|VINTED|CELLARED|PACKAGED|MANUFACTURED|DISTRIBUTED)(?:\s+AND\s+(?:BOTTLED|PRODUCED|IMPORTED|BREWED|VINTED|CELLARED|PACKAGED|MANUFACTURED|DISTRIBUTED))*\s+BY\b",
         r"\bGOVERNMENT\s+WARNING\b",
         r"\b(?:NET\s+CONTENTS?|SERVING\s+SIZE)\b",
         r"\b(?:ALC\.?\s*/?\s*VOL\.?|ALCOHOL\s+\d|PROOF\s*\d|\d{1,3}(?:\.\d+)?\s*(?:%|PERCENT|PROOF))\b",
@@ -399,7 +428,7 @@ def _split_flat_label_line(line: str) -> list[str]:
 
 def _line_before_non_brand_context(line: str) -> str:
     context_pattern = (
-        r"\b(?:BOTTLED|PRODUCED|IMPORTED|BREWED|VINTED|CELLARED|PACKAGED|MANUFACTURED|DISTRIBUTED)\s+BY\b"
+        r"\b(?:BOTTLED|PRODUCED|IMPORTED|BREWED|VINTED|CELLARED|PACKAGED|MANUFACTURED|DISTRIBUTED)(?:\s+AND\s+(?:BOTTLED|PRODUCED|IMPORTED|BREWED|VINTED|CELLARED|PACKAGED|MANUFACTURED|DISTRIBUTED))*\s+BY\b"
         r"|\bGOVERNMENT\s+WARNING\b"
         r"|\bCLASS\s*/?\s*TYPE\s*:?"
         r"|\b(?:DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?)\b"
@@ -416,7 +445,7 @@ def _is_obvious_non_brand_line(line: str) -> bool:
         return True
     return bool(
         re.search(
-            r"\b(CLASS\s*/?\s*TYPE|DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?|GOVERNMENT\s+WARNING|BOTTLED\s+BY|PRODUCED\s+BY|IMPORTED\s+BY|BREWED\s+BY|NET\s+CONTENTS?|SERVING\s+SIZE|ALC|ALCOHOL|PROOF)\b",
+            r"\b(CLASS\s*/?\s*TYPE|DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?|GOVERNMENT\s+WARNING|PRODUCT\s+OF|PRODUCED\s+IN|MADE\s+IN|COUNTRY\s+OF\s+ORIGIN|BOTTLED\s+BY|PRODUCED\s+BY|IMPORTED\s+BY|BREWED\s+BY|NET\s+CONTENTS?|SERVING\s+SIZE|ALC|ALCOHOL|PROOF)\b",
             normalized,
         )
     )
@@ -428,8 +457,17 @@ def _is_obvious_non_class_line(line: str) -> bool:
         return True
     return bool(
         re.search(
-            r"\b(DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?|GOVERNMENT\s+WARNING|BOTTLED\s+BY|PRODUCED\s+BY|IMPORTED\s+BY|BREWED\s+BY|NET\s+CONTENTS?|SERVING\s+SIZE|ALC|ALCOHOL|PROOF)\b",
+            r"\b(DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?|GOVERNMENT\s+WARNING|PRODUCT\s+OF|PRODUCED\s+IN|MADE\s+IN|COUNTRY\s+OF\s+ORIGIN|BOTTLED\s+BY|PRODUCED\s+BY|IMPORTED\s+BY|BREWED\s+BY|NET\s+CONTENTS?|SERVING\s+SIZE|ALC|ALCOHOL|PROOF)\b",
             normalized,
+        )
+    )
+
+
+def _is_responsible_party_line(line: str) -> bool:
+    return bool(
+        re.search(
+            r"\b(?:BOTTLED|PRODUCED|IMPORTED|BREWED|VINTED|CELLARED|PACKAGED|MANUFACTURED|DISTRIBUTED)(?:\s+AND\s+(?:BOTTLED|PRODUCED|IMPORTED|BREWED|VINTED|CELLARED|PACKAGED|MANUFACTURED|DISTRIBUTED))*\s+BY\b",
+            normalize_text(line),
         )
     )
 

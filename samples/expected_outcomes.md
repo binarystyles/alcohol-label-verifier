@@ -42,5 +42,7 @@
 | `APP-038_alcohol_by_volume_order_pass.pdf` | Pass | Pass | Label states alcohol value before by-volume wording, which should normalize as ABV. |
 | `APP-039_brand_only_in_bottler_line_fail.pdf` | Fail | Fail | Expected brand appears only in the bottler line while the primary brand is materially different. |
 | `APP-040_class_type_only_in_brand_review.pdf` | Needs Review | Needs Review | Class/type value appears only inside the brand name and is not clearly stated as class/type. |
+| `APP-041_bottler_only_in_brand_review.pdf` | Needs Review | Needs Review | Expected bottler/producer appears as brand text only, with no responsible-party statement. |
+| `APP-042_produced_and_bottled_by_pass.pdf` | Pass | Pass | Responsible-party statement uses combined produced-and-bottled wording. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

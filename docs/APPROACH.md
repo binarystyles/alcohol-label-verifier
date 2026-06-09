@@ -53,6 +53,7 @@ Needs Review is used for uncertainty:
 - Missing expected application value.
 - Supplied optional application value, such as a fanciful name, is not clearly found on the label.
 - Class/type text appears only in brand, producer, warning, or other non-class context.
+- Bottler/producer text appears only in brand or other non-responsible-party context instead of wording such as `Bottled by`, `Imported by`, or `Produced and bottled by`.
 - Missing matching formula approval content for an Item 9 Formula ID.
 - Matching formula approval/source document found but no final alcohol content is extractable.
 - Formula support document has a similar but nonmatching prefix-sharing Formula ID.

@@ -1287,6 +1287,33 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states net contents with a comma thousands separator, 1,000 mL.",
         ),
+        SampleSpec(
+            filename="APP-071_hard_cider_wine_product_type_pass.pdf",
+            fields={
+                **wine_fields,
+                "serial_number": "APP-071",
+                "brand_name": "ORCHARD RIDGE",
+                "fanciful_name": "Dry Apple",
+                "formula": "NO FORMULA REQUIRED",
+                "class_type": "Hard Cider",
+                "alcohol_content": "6.8% ABV",
+                "net_contents": "355 mL",
+                "bottler_producer": "Orchard Ridge Ciderworks",
+            },
+            label_lines=[
+                "ORCHARD RIDGE",
+                "Dry Apple",
+                "HARD CIDER",
+                "Class/Type: Hard Cider",
+                "6.8% Alc./Vol.",
+                "355 mL",
+                "Bottled by Orchard Ridge Ciderworks",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Wine product type is supported by hard-cider label and class/type wording.",
+            include_formula_approval=False,
+        ),
     ]
 
 

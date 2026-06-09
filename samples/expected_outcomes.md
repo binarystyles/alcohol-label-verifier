@@ -72,5 +72,6 @@
 | `APP-068_imported_by_from_origin_pass.pdf` | Pass | Pass | Imported wine origin is stated as Imported by Example Imports LLC from France. |
 | `APP-069_alcohol_colon_by_volume_pass.pdf` | Pass | Pass | Label states alcohol content with colon wording, Alcohol: 45% by Volume. |
 | `APP-070_comma_thousands_net_contents_pass.pdf` | Pass | Pass | Label states net contents with a comma thousands separator, 1,000 mL. |
+| `APP-071_hard_cider_wine_product_type_pass.pdf` | Pass | Pass | Wine product type is supported by hard-cider label and class/type wording. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

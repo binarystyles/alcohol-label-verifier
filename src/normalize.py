@@ -93,6 +93,8 @@ def extract_product_type(text: str | None) -> str:
         normalized,
     ):
         return "DISTILLED SPIRITS"
+    if re.search(r"\b(?:HARD\s+)?(?:CIDER|PERRY)\b", normalized):
+        return "WINE"
     if "SPIRIT" in normalized or "LIQUOR" in normalized:
         return "DISTILLED SPIRITS"
     if re.search(r"\b(?:BEER|ALE|LAGER|STOUT|PORTER)\b", normalized):

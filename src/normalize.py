@@ -88,7 +88,10 @@ def extract_product_type(text: str | None) -> str:
         return "DISTILLED SPIRITS"
     if "MALT BEVERAGES" in normalized or "MALT BEVERAGE" in normalized or "MALT LIQUOR" in normalized:
         return "MALT BEVERAGES"
-    if re.search(r"\b(?:BEER|ALE|LAGER|STOUT|PORTER)\b", normalized) and not re.search(
+    if re.search(
+        r"\b(?:BEER|ALE|LAGER|STOUT|PORTER|IPA|PILSNER|PILS|SAISON|GOSE|KOLSCH|KOELSCH|BOCK|DOPPELBOCK|WITBIER|HEFEWEIZEN|LAMBIC|CERVEZA)\b",
+        normalized,
+    ) and not re.search(
         r"\b(?:RED|WHITE|ROSE|SPARKLING|TABLE|DESSERT)\s+WINE\b", normalized
     ):
         return "MALT BEVERAGES"
@@ -103,7 +106,10 @@ def extract_product_type(text: str | None) -> str:
         return "WINE"
     if "SPIRIT" in normalized or "LIQUOR" in normalized:
         return "DISTILLED SPIRITS"
-    if re.search(r"\b(?:BEER|ALE|LAGER|STOUT|PORTER)\b", normalized):
+    if re.search(
+        r"\b(?:BEER|ALE|LAGER|STOUT|PORTER|IPA|PILSNER|PILS|SAISON|GOSE|KOLSCH|KOELSCH|BOCK|DOPPELBOCK|WITBIER|HEFEWEIZEN|LAMBIC|CERVEZA)\b",
+        normalized,
+    ):
         return "MALT BEVERAGES"
     return ""
 

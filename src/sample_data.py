@@ -1742,6 +1742,30 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Imported spirits origin is stated as Distilled, matured and bottled in Scotland for a United Kingdom application country.",
         ),
+        SampleSpec(
+            filename="APP-090_ipa_class_type_malt_pass.pdf",
+            fields={
+                **malt_fields,
+                "serial_number": "APP-090",
+                "brand_name": "HARBOR LIGHT",
+                "fanciful_name": "",
+                "formula": "MB-9000",
+                "class_type": "IPA",
+                "alcohol_content": "6.5% ABV",
+                "net_contents": "12 fl oz",
+                "bottler_producer": "Harbor Light Brewing Co.",
+            },
+            label_lines=[
+                "HARBOR LIGHT",
+                "Class/Type: IPA",
+                "6.5% Alc./Vol.",
+                "12 fl oz",
+                "Brewed by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Malt beverage product type is inferred from IPA class/type shorthand.",
+        ),
     ]
 
 

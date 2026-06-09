@@ -409,7 +409,17 @@ def _product_type_candidate_text(label_text: str) -> str:
     return "\n".join(
         line
         for index, line in enumerate(_label_lines(label_text))
-        if index > 0 and not _is_obvious_non_product_type_line(line)
+        if (index > 0 or _is_explicit_product_type_line(line)) and not _is_obvious_non_product_type_line(line)
+    )
+
+
+def _is_explicit_product_type_line(line: str) -> bool:
+    normalized = normalize_text(line)
+    return bool(
+        re.fullmatch(
+            r"(?:PRODUCT\s+TYPE\s*:?\s*)?(?:DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?|WINE|RED\s+WINE|WHITE\s+WINE|ROSE\s+WINE|SPARKLING\s+WINE|TABLE\s+WINE|DESSERT\s+WINE)",
+            normalized,
+        )
     )
 
 

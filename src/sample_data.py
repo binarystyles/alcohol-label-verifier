@@ -911,6 +911,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Product-type word appears only in the brand while explicit wine/class wording is missing.",
         ),
+        SampleSpec(
+            filename="APP-050_product_type_first_line_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-050", "formula": "F-5000"},
+            label_lines=[
+                "DISTILLED SPIRITS",
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Explicit product type appears before the brand and should still verify.",
+        ),
     ]
 
 

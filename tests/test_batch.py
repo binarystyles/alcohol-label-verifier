@@ -44,6 +44,15 @@ def test_export_dataframes_have_expected_rows(sample_bytes: dict[str, bytes]) ->
     assert len(application_fields_dataframe(results)) == 1
 
 
+def test_application_fields_export_is_user_facing(sample_bytes: dict[str, bytes]) -> None:
+    results = process_batch([("APP-001_old_tom_pass.pdf", sample_bytes["APP-001_old_tom_pass.pdf"])], cache={})
+    dataframe = application_fields_dataframe(results)
+    assert "raw_sources" not in dataframe.columns
+    assert "raw_confidences" not in dataframe.columns
+    assert list(dataframe.columns[:4]) == ["filename", "application_id", "serial_number", "product_type"]
+    assert dataframe.loc[0, "brand_name"] == "OLD TOM GIN"
+
+
 def _expected_status(spec) -> str:
     if tesseract_available():
         return spec.expected_status

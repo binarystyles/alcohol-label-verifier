@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import pandas as pd
 import streamlit as st
 
+import src.batch as batch
 import src.constants as constants
 
 
@@ -287,9 +287,9 @@ def _render_results(results: list) -> None:
     cols[4].metric("Unreadable", metrics["unreadable"])
     cols[5].metric("Missing Label Area", metrics["missing_label_area"])
 
-    summary_df = _summary_dataframe(results)
-    detail_df = _field_results_dataframe(results)
-    fields_df = _application_fields_dataframe(results)
+    summary_df = batch.summary_dataframe(results)
+    detail_df = batch.field_results_dataframe(results)
+    fields_df = batch.application_fields_dataframe(results)
 
     status_filter = st.selectbox(
         "Status filter",
@@ -337,9 +337,9 @@ def _render_results(results: list) -> None:
                 ["Extracted application fields", "Field results", "Label OCR text", "Application OCR text"]
             )
             with tab_fields:
-                st.dataframe(pd.DataFrame([result.extracted_application_fields]), width="stretch")
+                st.dataframe(batch.application_fields_dataframe([result]), width="stretch")
             with tab_results:
-                st.dataframe(pd.DataFrame([field.to_dict() for field in result.field_results]), width="stretch")
+                st.dataframe(batch.field_results_dataframe([result]), width="stretch")
             with tab_label:
                 st.text_area(
                     "Label OCR text",
@@ -355,44 +355,8 @@ def _render_results(results: list) -> None:
                     key=f"application_ocr_{result.application_id}_{result.filename}",
                 )
 
-
-def _application_fields_dataframe(results: list) -> pd.DataFrame:
-    rows: list[dict] = []
-    for result in results:
-        row = dict(result.extracted_application_fields)
-        row["filename"] = result.filename
-        row["application_id"] = result.application_id
-        rows.append(row)
-    return pd.DataFrame(rows)
-
-
-def _summary_dataframe(results: list) -> pd.DataFrame:
-    return pd.DataFrame([result.to_summary_dict() for result in results])
-
-
-def _field_results_dataframe(results: list) -> pd.DataFrame:
-    rows: list[dict] = []
-    for result in results:
-        for field in result.field_results:
-            row = field.to_dict()
-            row["filename"] = result.filename
-            row["application_id"] = result.application_id
-            rows.append(row)
-    return pd.DataFrame(rows)
-
-
 def _summary_metrics(results: list) -> dict[str, int]:
-    return {
-        "total": len(results),
-        "pass": sum(result.overall_status == STATUS_PASS for result in results),
-        "needs_review": sum(result.overall_status == STATUS_REVIEW for result in results),
-        "fail": sum(result.overall_status == STATUS_FAIL for result in results),
-        "unreadable": sum(any("unreadable" in warning.lower() for warning in result.warnings) for result in results),
-        "missing_label_area": sum(
-            any("label area" in warning.lower() and "missing" in warning.lower() for warning in result.warnings)
-            for result in results
-        ),
-    }
+    return batch.summary_metrics(results)
 
 
 if __name__ == "__main__":

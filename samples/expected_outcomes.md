@@ -65,5 +65,7 @@
 | `APP-061_bottled_for_responsible_party_pass.pdf` | Pass | Pass | Distilled spirits label uses Bottled for as responsible-party wording. |
 | `APP-062_fractional_pint_net_contents_pass.pdf` | Pass | Pass | Label states net contents as fractional 1/2 Pint, equivalent to the application 8 fl oz value. |
 | `APP-063_written_net_contents_pass.pdf` | Pass | Pass | Label spells out net contents as Seven Hundred Fifty Milliliters, equivalent to the application 750 mL value. |
+| `APP-064_alcohol_by_vol_abbreviation_pass.pdf` | Pass | Pass | Label states alcohol content as Alcohol 45% by Vol., which should normalize as ABV. |
+| `APP-065_degrees_proof_pass.pdf` | Pass | Pass | Label states proof with degrees wording, which should normalize to 45% ABV. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

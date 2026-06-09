@@ -113,12 +113,12 @@ ABV_PATTERNS = (
         re.IGNORECASE,
     ),
     re.compile(
-        r"ALCOHOL\s+(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?\s*BY\s+VOLUME",
+        r"ALCOHOL\s+(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?\s*BY\s+VOL(?:UME)?\.?",
         re.IGNORECASE,
     ),
 )
 PROOF_PATTERNS = (
-    re.compile(r"(?P<num>\d{1,3}(?:\.\d+)?)\s*PROOF", re.IGNORECASE),
+    re.compile(r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:\u00b0|DEGREES?)?\s*PROOF", re.IGNORECASE),
     re.compile(r"PROOF\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)", re.IGNORECASE),
 )
 

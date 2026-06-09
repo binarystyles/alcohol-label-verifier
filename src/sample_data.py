@@ -1166,6 +1166,38 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label spells out net contents as Seven Hundred Fifty Milliliters, equivalent to the application 750 mL value.",
         ),
+        SampleSpec(
+            filename="APP-064_alcohol_by_vol_abbreviation_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-064", "formula": "F-6400"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "Alcohol 45% by Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states alcohol content as Alcohol 45% by Vol., which should normalize as ABV.",
+        ),
+        SampleSpec(
+            filename="APP-065_degrees_proof_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-065", "formula": "F-6500"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "90 degrees proof",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states proof with degrees wording, which should normalize to 45% ABV.",
+        ),
     ]
 
 

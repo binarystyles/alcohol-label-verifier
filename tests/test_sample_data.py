@@ -81,6 +81,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-061_bottled_for_responsible_party_pass.pdf" in specs
     assert "APP-062_fractional_pint_net_contents_pass.pdf" in specs
     assert "APP-063_written_net_contents_pass.pdf" in specs
+    assert "APP-064_alcohol_by_vol_abbreviation_pass.pdf" in specs
+    assert "APP-065_degrees_proof_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
@@ -125,6 +127,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-062_fractional_pint_net_contents_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-063_written_net_contents_pass.pdf"].fields["net_contents"] == "750 mL"
     assert specs["APP-063_written_net_contents_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-064_alcohol_by_vol_abbreviation_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-065_degrees_proof_pass.pdf"].expected_status == STATUS_PASS
 
 
 def test_sample_generator_uses_real_source_form_when_available(sample_paths: list[Path]) -> None:

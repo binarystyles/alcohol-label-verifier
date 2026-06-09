@@ -302,6 +302,12 @@ def test_net_contents_match_passes_with_plain_ounces() -> None:
     assert verify_net_contents("8 fl oz", "Serving size 1/2 Pint").status == STATUS_REVIEW
 
 
+def test_net_contents_match_passes_with_written_number_words() -> None:
+    assert verify_net_contents("750 mL", "Net Contents Seven Hundred Fifty Milliliters").status == STATUS_PASS
+    assert verify_net_contents("1 L", "Net Contents one liter").status == STATUS_PASS
+    assert verify_net_contents("1 L", "Serving size one liter").status == STATUS_REVIEW
+
+
 def test_conflicting_net_contents_need_review() -> None:
     result = verify_net_contents("750 mL", "Net Contents 750 mL Back label says 1 L")
     assert result.status == STATUS_REVIEW

@@ -152,16 +152,28 @@ def _keyword_follows_completed_abv_statement(text: str, start: int) -> bool:
     return bool(re.search(r"\d{1,3}(?:\.\d+)?\s*(?:%|PERCENT)\s*$", prefix, flags=re.IGNORECASE))
 
 
+NET_CONTENTS_UNIT_PATTERN = (
+    r"ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|"
+    r"PT\.?|PINTS?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?"
+)
+NUMBER_WORD_PATTERN = (
+    r"ZERO|ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|TEN|ELEVEN|TWELVE|THIRTEEN|FOURTEEN|FIFTEEN|SIXTEEN|"
+    r"SEVENTEEN|EIGHTEEN|NINETEEN|TWENTY|THIRTY|FORTY|FOURTY|FIFTY|SIXTY|SEVENTY|EIGHTY|NINETY|HUNDRED|THOUSAND|AND"
+)
 NET_CONTENTS_COMPOUND_PATTERN = re.compile(
     r"(?<![A-Z0-9])(?P<pints>\d+(?:\.\d+)?)\s*(?:PT\.?|PINTS?)\s+(?P<ounces>\d+(?:\.\d+)?)\s*(?:FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)\b",
     re.IGNORECASE,
 )
 NET_CONTENTS_FRACTION_PATTERN = re.compile(
-    r"(?<![A-Z0-9])(?P<num>\d+)\s*/\s*(?P<den>\d+)\s*(?P<unit>ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|PT\.?|PINTS?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)\b",
+    rf"(?<![A-Z0-9])(?P<num>\d+)\s*/\s*(?P<den>\d+)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\b",
+    re.IGNORECASE,
+)
+NET_CONTENTS_WORD_PATTERN = re.compile(
+    rf"(?<![A-Z0-9])(?P<words>(?:{NUMBER_WORD_PATTERN})(?:[\s-]+(?:{NUMBER_WORD_PATTERN}))*)\s+(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\b",
     re.IGNORECASE,
 )
 NET_CONTENTS_PATTERN = re.compile(
-    r"(?<![A-Z0-9/])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|PT\.?|PINTS?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)\b",
+    rf"(?<![A-Z0-9/])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\b",
     re.IGNORECASE,
 )
 
@@ -189,6 +201,18 @@ def extract_net_contents_values(text: str | None) -> list[float]:
         if denominator == 0:
             continue
         number = float(match.group("num")) / denominator
+        milliliters = _net_unit_to_milliliters(number, match.group("unit"))
+        if 0 < milliliters < 100000:
+            values.append(round(milliliters, 3))
+            compound_spans.append(match.span())
+    for match in NET_CONTENTS_WORD_PATTERN.finditer(text):
+        if any(start <= match.start() and match.end() <= end for start, end in compound_spans):
+            continue
+        if _is_non_net_contents_volume(text, match.start(), match.end()):
+            continue
+        number = _parse_number_words(match.group("words"))
+        if number is None:
+            continue
         milliliters = _net_unit_to_milliliters(number, match.group("unit"))
         if 0 < milliliters < 100000:
             values.append(round(milliliters, 3))
@@ -271,6 +295,73 @@ def _net_unit_to_milliliters(number: float, unit_text: str) -> float:
     if unit.startswith("M"):
         return number
     return number * 1000
+
+
+def _parse_number_words(text: str) -> float | None:
+    singles = {
+        "ZERO": 0,
+        "ONE": 1,
+        "TWO": 2,
+        "THREE": 3,
+        "FOUR": 4,
+        "FIVE": 5,
+        "SIX": 6,
+        "SEVEN": 7,
+        "EIGHT": 8,
+        "NINE": 9,
+        "TEN": 10,
+        "ELEVEN": 11,
+        "TWELVE": 12,
+        "THIRTEEN": 13,
+        "FOURTEEN": 14,
+        "FIFTEEN": 15,
+        "SIXTEEN": 16,
+        "SEVENTEEN": 17,
+        "EIGHTEEN": 18,
+        "NINETEEN": 19,
+    }
+    tens = {
+        "TWENTY": 20,
+        "THIRTY": 30,
+        "FORTY": 40,
+        "FOURTY": 40,
+        "FIFTY": 50,
+        "SIXTY": 60,
+        "SEVENTY": 70,
+        "EIGHTY": 80,
+        "NINETY": 90,
+    }
+    tokens = re.findall(r"[A-Z]+", normalize_text(text))
+    if not tokens:
+        return None
+    total = 0
+    current = 0
+    saw_value = False
+    for token in tokens:
+        if token == "AND":
+            continue
+        if token in singles:
+            current += singles[token]
+            saw_value = True
+        elif token in tens:
+            current += tens[token]
+            saw_value = True
+        elif token == "HUNDRED":
+            if current == 0:
+                return None
+            current *= 100
+            saw_value = True
+        elif token == "THOUSAND":
+            if current == 0:
+                return None
+            total += current * 1000
+            current = 0
+            saw_value = True
+        else:
+            return None
+    if not saw_value:
+        return None
+    return float(total + current)
 
 
 def _is_non_net_contents_volume(text: str, start: int, end: int) -> bool:

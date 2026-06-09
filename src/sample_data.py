@@ -1150,6 +1150,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states net contents as fractional 1/2 Pint, equivalent to the application 8 fl oz value.",
         ),
+        SampleSpec(
+            filename="APP-063_written_net_contents_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-063", "formula": "F-6300"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "Seven Hundred Fifty Milliliters",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label spells out net contents as Seven Hundred Fifty Milliliters, equivalent to the application 750 mL value.",
+        ),
     ]
 
 

@@ -64,5 +64,6 @@
 | `APP-060_blended_by_responsible_party_pass.pdf` | Pass | Pass | Distilled spirits label uses Blended by as responsible-party wording. |
 | `APP-061_bottled_for_responsible_party_pass.pdf` | Pass | Pass | Distilled spirits label uses Bottled for as responsible-party wording. |
 | `APP-062_fractional_pint_net_contents_pass.pdf` | Pass | Pass | Label states net contents as fractional 1/2 Pint, equivalent to the application 8 fl oz value. |
+| `APP-063_written_net_contents_pass.pdf` | Pass | Pass | Label spells out net contents as Seven Hundred Fifty Milliliters, equivalent to the application 750 mL value. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

@@ -110,11 +110,15 @@ def extract_product_type(text: str | None) -> str:
 
 ABV_PATTERNS = (
     re.compile(
-        r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)",
+        r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)",
         re.IGNORECASE,
     ),
     re.compile(
-        r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)\s*VOL(?:UME)?\.?",
+        r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)\s*BY\s+VOL(?:UME)?\.?",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)\s*VOL(?:UME)?\.?",
         re.IGNORECASE,
     ),
     re.compile(
@@ -122,15 +126,15 @@ ABV_PATTERNS = (
         re.IGNORECASE,
     ),
     re.compile(
-        r"(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?",
+        r"(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)?",
         re.IGNORECASE,
     ),
     re.compile(
-        r"ALC\.?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?\s*(?:BY\s+VOL\.?|BY\s+VOLUME)",
+        r"ALC\.?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)?\s*(?:BY\s+VOL\.?|BY\s+VOLUME)",
         re.IGNORECASE,
     ),
     re.compile(
-        r"ALCOHOL(?:\s+CONTENT)?\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?\s*BY\s+VOL(?:UME)?\.?",
+        r"ALCOHOL(?:\s+CONTENT)?\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)?\s*BY\s+VOL(?:UME)?\.?",
         re.IGNORECASE,
     ),
 )

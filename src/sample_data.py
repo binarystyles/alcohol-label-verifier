@@ -1436,6 +1436,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Brand Saint abbreviation in the label matches Saint in the application as a harmless word variation.",
         ),
+        SampleSpec(
+            filename="APP-077_percent_by_volume_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-077", "formula": "F-7700"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% by volume",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states alcohol content with percent-by-volume shorthand.",
+        ),
     ]
 
 

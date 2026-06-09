@@ -950,6 +950,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Imported origin uses U.S.A. abbreviation for application country United States.",
         ),
+        SampleSpec(
+            filename="APP-052_centiliter_net_contents_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-052", "formula": "F-5200"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "75 cL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states net contents in centiliters, equivalent to the application 750 mL value.",
+        ),
     ]
 
 

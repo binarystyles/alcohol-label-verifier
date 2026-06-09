@@ -53,5 +53,6 @@
 | `APP-049_product_type_brand_word_review.pdf` | Needs Review | Needs Review | Product-type word appears only in the brand while explicit wine/class wording is missing. |
 | `APP-050_product_type_first_line_pass.pdf` | Pass | Pass | Explicit product type appears before the brand and should still verify. |
 | `APP-051_us_origin_abbreviation_pass.pdf` | Pass | Pass | Imported origin uses U.S.A. abbreviation for application country United States. |
+| `APP-052_centiliter_net_contents_pass.pdf` | Pass | Pass | Label states net contents in centiliters, equivalent to the application 750 mL value. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

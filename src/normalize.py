@@ -153,7 +153,7 @@ def _keyword_follows_completed_abv_statement(text: str, start: int) -> bool:
 
 
 NET_CONTENTS_PATTERN = re.compile(
-    r"(?<![A-Z0-9])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>ML|M\.L\.|MILLILITERS?|L|LITERS?|LITRES?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?)\b",
+    r"(?<![A-Z0-9])(?P<num>(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>ML|M\.L\.|MILLILITERS?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?)\b",
     re.IGNORECASE,
 )
 
@@ -169,6 +169,8 @@ def extract_net_contents_values(text: str | None) -> list[float]:
         unit = re.sub(r"[^A-Z]+", "", match.group("unit").upper())
         if "OZ" in unit or "OUNCE" in unit:
             milliliters = number * 29.5735
+        elif unit.startswith("C"):
+            milliliters = number * 10
         elif unit.startswith("M"):
             milliliters = number
         else:

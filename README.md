@@ -103,14 +103,7 @@ Open the app, select PDFs from `samples/applications` or upload `samples/sample_
 
 The sample generator uses the public TTB F 5100.31 template at `docs/source/f510031.pdf` when present, so generated samples resemble the current agency form with completed fields and affixed label artwork. If that template is absent, the generator falls back to a controlled one-page layout for tests.
 
-The generated set includes:
-
-- `APP-001_old_tom_pass.pdf`: passing label.
-- `APP-002_stones_throw_variation.pdf`: harmless brand variation.
-- `APP-003_wrong_abv.pdf`: material ABV mismatch.
-- `APP-004_bad_warning.pdf`: altered/title-case warning.
-- `APP-005_low_quality_rotated.pdf`: OCR quality issue.
-- `APP-006_missing_label_area.pdf`: missing label area.
+The generated set covers passing applications, readable critical mismatches, missing labels, low-quality OCR review cases, Formula ID support, final-alcohol ranges, proof/ABV normalization, net contents normalization, imported-country review, Item 15 review, and color-artwork labels. See `samples/expected_outcomes.md` for the full sample list and expected Pass / Needs Review / Fail outcomes.
 
 ## Application File Intake
 
@@ -137,17 +130,7 @@ The app uses deterministic rules plus fuzzy matching rather than cloud LLM APIs.
 
 ## Tools Used
 
-- Python 3.11
-- Streamlit
-- PyMuPDF
-- pypdf
-- Tesseract and pytesseract
-- Pillow
-- opencv-python-headless
-- rapidfuzz
-- pandas
-- pytest
-- reportlab/PyMuPDF for sample generation
+See `docs/TOOLS_USED.md` for the canonical implementation, OCR, testing, deployment, sample-generation, and reference-input tool inventory.
 
 ## Security And Privacy
 

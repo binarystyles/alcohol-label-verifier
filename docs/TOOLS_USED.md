@@ -1,6 +1,6 @@
 # Tools Used
 
-This project is implemented as a local, deterministic Streamlit application. It does not use cloud AI APIs, remote ML endpoints, or runtime network calls.
+This project is implemented as a local, deterministic Streamlit application. It does not use cloud AI APIs, remote ML endpoints, runtime network calls, or live Formulas Online lookups.
 
 ## Application Runtime
 
@@ -10,6 +10,7 @@ This project is implemented as a local, deterministic Streamlit application. It 
 | Streamlit | Web UI, file upload workflow, result display, and CSV download controls. |
 | pandas | Summary, detailed field-result, and extracted-application CSV exports. |
 | pydantic | Installed structured-data dependency; current result models use Python dataclasses. |
+| Python standard library (`hashlib`, `io`, `zipfile`, `dataclasses`) | In-memory upload handling, ZIP expansion, file hashing, and result models. |
 
 ## PDF And Image Processing
 
@@ -43,7 +44,7 @@ This project is implemented as a local, deterministic Streamlit application. It 
 | Tool | Use |
 | --- | --- |
 | PyMuPDF | Fills the tracked `docs/source/f510031.pdf` form template and writes synthetic completed application PDFs. |
-| Pillow | Builds raster color-artwork labels, low-quality labels, and scanned-image fixtures. |
+| Pillow | Builds raster color-artwork labels, low-quality labels, rotated labels, and scanned-image fixtures. |
 | zipfile | Creates the sample batch ZIP and expands uploaded ZIP files in memory. |
 | openpyxl | Installed spreadsheet dependency available for future workbook export; current app outputs CSV only. |
 | reportlab | Included as a PDF-generation dependency, though current sample generation is handled with PyMuPDF. |
@@ -54,4 +55,4 @@ This project is implemented as a local, deterministic Streamlit application. It 
 | --- | --- |
 | `docs/source/f510031.pdf` | Local copy of the current TTB F 5100.31 template used for deterministic sample generation and form-region mapping. |
 | TTB F 5100.31 instructions | Defines the application fields and Item 9 formula-reference behavior used in `docs/FORM_MAPPING.md`. |
-| TTB formula guidance and example formula pages | Informs local parsing of Formula ID/source documents, especially `Yield Summary` and `Alcohol Content of Finished Product` rows. |
+| TTB formula guidance and example formula pages | Informs local parsing of Formula ID/source documents included inside uploaded application packages, especially `Yield Summary` and `Alcohol Content of Finished Product` rows. |

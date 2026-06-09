@@ -927,6 +927,29 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Explicit product type appears before the brand and should still verify.",
         ),
+        SampleSpec(
+            filename="APP-051_us_origin_abbreviation_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-051",
+                "formula": "F-5100",
+                "imported": True,
+                "country_of_origin": "United States",
+            },
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Product of U.S.A.",
+                "Imported by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported origin uses U.S.A. abbreviation for application country United States.",
+        ),
     ]
 
 

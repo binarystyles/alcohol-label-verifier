@@ -630,17 +630,27 @@ def _country_origin_statement_present(expected: str, label_text: str) -> bool:
     normalized_label = normalize_for_match(label_text)
     if not normalized_country or not normalized_label:
         return False
-    country = re.escape(normalized_country)
-    patterns = (
-        rf"\bPRODUCT\s+(?:OF|FROM)\s+(?:THE\s+)?{country}\b",
-        rf"\bPRODUCED\s+IN\s+(?:THE\s+)?{country}\b",
-        rf"\bMADE\s+IN\s+(?:THE\s+)?{country}\b",
-        rf"\bIMPORTED\s+FROM\s+(?:THE\s+)?{country}\b",
-        rf"\bCOUNTRY\s+OF\s+ORIGIN\s+(?:THE\s+)?{country}\b",
-        rf"\bORIGIN\s+(?:THE\s+)?{country}\b",
-        rf"\b{country}\s+ORIGIN\b",
-    )
+    patterns: list[str] = []
+    for country_name in _country_origin_name_variants(normalized_country):
+        country = re.escape(country_name)
+        patterns.extend(
+            (
+                rf"\bPRODUCT\s+(?:OF|FROM)\s+(?:THE\s+)?{country}\b",
+                rf"\bPRODUCED\s+IN\s+(?:THE\s+)?{country}\b",
+                rf"\bMADE\s+IN\s+(?:THE\s+)?{country}\b",
+                rf"\bIMPORTED\s+FROM\s+(?:THE\s+)?{country}\b",
+                rf"\bCOUNTRY\s+OF\s+ORIGIN\s+(?:THE\s+)?{country}\b",
+                rf"\bORIGIN\s+(?:THE\s+)?{country}\b",
+                rf"\b{country}\s+ORIGIN\b",
+            )
+        )
     return any(re.search(pattern, normalized_label) for pattern in patterns)
+
+
+def _country_origin_name_variants(normalized_country: str) -> tuple[str, ...]:
+    if normalized_country in {"UNITED STATES", "UNITED STATES OF AMERICA", "USA", "U S A", "US", "U S"}:
+        return ("UNITED STATES", "UNITED STATES OF AMERICA", "USA", "U S A", "US", "U S")
+    return (normalized_country,)
 
 
 def _label_unavailable_result(field: str, expected: str, reason: str, optional: bool = False) -> FieldResult:

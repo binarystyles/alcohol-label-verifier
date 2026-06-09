@@ -26,6 +26,11 @@ def test_assignment_brand_case_example_passes() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_brand_ampersand_and_variation_passes() -> None:
+    result = verify_brand("SMITH & SONS", "SMITH AND SONS Bourbon Whiskey")
+    assert result.status == STATUS_PASS
+
+
 def test_brand_word_order_mismatch_fails() -> None:
     result = verify_brand("OLD TOM GIN", "TOM OLD GIN\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL")
     assert result.status == STATUS_FAIL

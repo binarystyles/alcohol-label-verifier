@@ -1358,6 +1358,32 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states alcohol content with compact percent-vol wording.",
         ),
+        SampleSpec(
+            filename="APP-074_ampersand_brand_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-074",
+                "brand_name": "SMITH & SONS",
+                "fanciful_name": "Heritage Reserve",
+                "formula": "F-7400",
+                "class_type": "Bourbon Whiskey",
+                "alcohol_content": "45% ABV",
+                "net_contents": "750 mL",
+                "bottler_producer": "Smith and Sons Distilling Co.",
+            },
+            label_lines=[
+                "SMITH AND SONS",
+                "Heritage Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Bourbon Whiskey",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Smith and Sons Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Brand ampersand in the application matches AND on the label as a harmless text variation.",
+        ),
     ]
 
 

@@ -1063,6 +1063,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states net contents as plain 12 OZ, equivalent to the application 12 fl oz value.",
         ),
+        SampleSpec(
+            filename="APP-058_distilled_by_responsible_party_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-058", "formula": "F-5800"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Distilled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Distilled spirits label uses Distilled by as responsible-party wording.",
+        ),
     ]
 
 

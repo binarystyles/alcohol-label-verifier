@@ -9,6 +9,7 @@ from src.normalize import (
     fuzzy_score,
     government_warning_matches,
     normalize_name,
+    ordered_fuzzy_score,
 )
 
 
@@ -20,6 +21,12 @@ def test_text_normalization_handles_brand_punctuation() -> None:
 def test_brand_fuzzy_matching_allows_harmless_variations() -> None:
     score = fuzzy_score("STONE'S THROW", "STONES THROW Straight Bourbon Whiskey")
     assert score >= 88
+
+
+def test_ordered_fuzzy_score_preserves_brand_word_order() -> None:
+    assert ordered_fuzzy_score("OLD TOM GIN", "OLD TOM GIN Reserve") == 100
+    assert ordered_fuzzy_score("OLD TOM GIN", "TOM OLD GIN") < 74
+    assert ordered_fuzzy_score("OLD TOM GIN", "OLD TOMATO GIN") < 92
 
 
 def test_product_type_matching() -> None:

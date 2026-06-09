@@ -47,5 +47,6 @@
 | `APP-043_ocr_damaged_warning_heading_review.pdf` | Needs Review | Needs Review | Warning statement is close to canonical, but the all-caps heading has OCR-like character damage. |
 | `APP-044_conflicting_abv_values_review.pdf` | Needs Review | Needs Review | Label contains both matching and conflicting alcohol-content values. |
 | `APP-045_conflicting_net_contents_review.pdf` | Needs Review | Needs Review | Label contains both matching and conflicting net-contents values. |
+| `APP-046_brand_word_order_mismatch_fail.pdf` | Fail | Fail | Brand tokens are reordered, which should not pass as a harmless brand variation. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

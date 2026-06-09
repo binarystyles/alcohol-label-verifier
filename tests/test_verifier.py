@@ -21,6 +21,12 @@ def test_brand_variation_passes() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_brand_word_order_mismatch_fails() -> None:
+    result = verify_brand("OLD TOM GIN", "TOM OLD GIN\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL")
+    assert result.status == STATUS_FAIL
+    assert "materially different" in result.reason
+
+
 def test_brand_in_bottler_line_only_does_not_pass() -> None:
     result = verify_brand(
         "OLD TOM GIN",

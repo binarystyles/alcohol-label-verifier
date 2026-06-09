@@ -835,6 +835,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Label contains both matching and conflicting net-contents values.",
         ),
+        SampleSpec(
+            filename="APP-046_brand_word_order_mismatch_fail.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-046", "formula": "F-4600"},
+            label_lines=[
+                "TOM OLD GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Fail",
+            note="Brand tokens are reordered, which should not pass as a harmless brand variation.",
+        ),
     ]
 
 

@@ -53,8 +53,25 @@ def fuzzy_score(expected: str | None, actual: str | None) -> float:
     return float(fuzz.token_set_ratio(expected_norm, actual_norm))
 
 
+def ordered_fuzzy_score(expected: str | None, actual: str | None) -> float:
+    expected_norm = normalize_name(expected)
+    actual_norm = normalize_name(actual)
+    if not expected_norm or not actual_norm:
+        return 0.0
+    if _contains_token_sequence(expected_norm.split(), actual_norm.split()):
+        return 100.0
+    return float(fuzz.ratio(expected_norm, actual_norm))
+
+
 def best_fuzzy_score(expected: str | None, candidates: Iterable[str]) -> float:
     return max((fuzzy_score(expected, candidate) for candidate in candidates), default=0.0)
+
+
+def _contains_token_sequence(expected_tokens: list[str], actual_tokens: list[str]) -> bool:
+    if not expected_tokens or len(expected_tokens) > len(actual_tokens):
+        return False
+    width = len(expected_tokens)
+    return any(actual_tokens[index : index + width] == expected_tokens for index in range(len(actual_tokens) - width + 1))
 
 
 def extract_product_type(text: str | None) -> str:

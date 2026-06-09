@@ -30,6 +30,7 @@ from src.normalize import (
     normalize_for_match,
     normalize_net_contents,
     normalize_text,
+    ordered_fuzzy_score,
     snippet_around,
 )
 
@@ -136,8 +137,8 @@ def verify_brand(expected: str, label_text: str) -> FieldResult:
     if not expected:
         return _expected_missing("brand_name")
     primary_text = _primary_brand_text(label_text)
-    primary_score = fuzzy_score(expected, primary_text)
-    full_score = fuzzy_score(expected, label_text)
+    primary_score = ordered_fuzzy_score(expected, primary_text)
+    full_score = ordered_fuzzy_score(expected, label_text)
     if primary_score >= BRAND_PASS_THRESHOLD:
         return _result("brand_name", expected, expected, snippet_around(primary_text, expected), STATUS_PASS, primary_score / 100, "Brand name matches with harmless formatting variation allowed.")
     if primary_score >= BRAND_REVIEW_THRESHOLD:

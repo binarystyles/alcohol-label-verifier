@@ -38,7 +38,7 @@ The extractor never uses label OCR as the source of expected application values.
 Fail is reserved for critical checks with extractable expected values:
 
 - Government warning missing or materially altered on a readable label.
-- Required brand materially mismatched. Brand matching is limited to primary label text so a brand name appearing only in producer, importer, warning, or other non-brand context does not create a false pass.
+- Required brand materially mismatched. Brand matching is limited to primary label text and preserves word order, so a brand name appearing only in producer, importer, warning, or other non-brand context, or with reordered brand words, does not create a false pass.
 - Product type materially mismatched. Explicit `DISTILLED SPIRITS` and `MALT BEVERAGE(S)` phrases are prioritized over incidental descriptors such as `Wine Cask Finish`.
 - Material ABV mismatch. Proof values from labels and formula support are converted to ABV, including low-proof values such as `40 Proof` = `20% ABV` and label wording such as `Proof 90`. Common label wording such as `Alc. 45% by Vol.` and `Alcohol 45% by Volume` is normalized to ABV. Non-alcohol percentages such as `100% Agave` are ignored for ABV/proof matching and become Needs Review if no actual alcohol statement is found.
 - Material net contents mismatch. Serving-size, recipe, calorie, or per-serving volumes are ignored so they do not create false net-contents mismatches.

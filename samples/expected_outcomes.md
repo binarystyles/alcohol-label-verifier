@@ -56,5 +56,6 @@
 | `APP-052_centiliter_net_contents_pass.pdf` | Pass | Pass | Label states net contents in centiliters, equivalent to the application 750 mL value. |
 | `APP-053_percent_alc_by_vol_pass.pdf` | Pass | Pass | Label states alcohol content with the common percent Alc. by Vol. wording. |
 | `APP-054_stones_throw_case_pass.pdf` | Pass | Pass | Assignment example: application brand Stone's Throw matches label brand STONE'S THROW despite capitalization. |
+| `APP-055_produce_of_origin_pass.pdf` | Pass | Pass | Imported wine uses common Produce of France origin wording. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

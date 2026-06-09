@@ -636,6 +636,7 @@ def _country_origin_statement_present(expected: str, label_text: str) -> bool:
         patterns.extend(
             (
                 rf"\bPRODUCT\s+(?:OF|FROM)\s+(?:THE\s+)?{country}\b",
+                rf"\bPRODUCE\s+(?:OF|FROM)\s+(?:THE\s+)?{country}\b",
                 rf"\bPRODUCED\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bMADE\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bIMPORTED\s+FROM\s+(?:THE\s+)?{country}\b",

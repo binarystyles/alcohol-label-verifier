@@ -1002,6 +1002,32 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Assignment example: application brand Stone's Throw matches label brand STONE'S THROW despite capitalization.",
         ),
+        SampleSpec(
+            filename="APP-055_produce_of_origin_pass.pdf",
+            fields={
+                **wine_fields,
+                "serial_number": "APP-055",
+                "brand_name": "CHATEAU LUMIERE",
+                "fanciful_name": "Red Blend",
+                "formula": "W-5500",
+                "country_of_origin": "France",
+                "imported": True,
+                "bottler_producer": "Example Imports LLC",
+            },
+            label_lines=[
+                "CHATEAU LUMIERE",
+                "Red Blend",
+                "WINE",
+                "Class/Type: Red Wine",
+                "13.5% Alc./Vol.",
+                "750 mL",
+                "Produce of France",
+                "Imported by Example Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported wine uses common Produce of France origin wording.",
+        ),
     ]
 
 

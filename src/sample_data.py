@@ -1102,6 +1102,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Malt beverage label puts BEER before a brand that does not itself contain beer-style product words.",
         ),
+        SampleSpec(
+            filename="APP-060_blended_by_responsible_party_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-060", "formula": "F-6000"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Blended by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Distilled spirits label uses Blended by as responsible-party wording.",
+        ),
     ]
 
 

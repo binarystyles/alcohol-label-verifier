@@ -61,5 +61,6 @@
 | `APP-057_plain_ounce_net_contents_pass.pdf` | Pass | Pass | Label states net contents as plain 12 OZ, equivalent to the application 12 fl oz value. |
 | `APP-058_distilled_by_responsible_party_pass.pdf` | Pass | Pass | Distilled spirits label uses Distilled by as responsible-party wording. |
 | `APP-059_beer_product_type_first_line_pass.pdf` | Pass | Pass | Malt beverage label puts BEER before a brand that does not itself contain beer-style product words. |
+| `APP-060_blended_by_responsible_party_pass.pdf` | Pass | Pass | Distilled spirits label uses Blended by as responsible-party wording. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

@@ -70,6 +70,13 @@ def test_government_warning_ocr_imperfect_canonical_text_needs_review() -> None:
     assert "close to canonical" in result.reason
 
 
+def test_government_warning_damaged_heading_needs_review_when_statement_is_close() -> None:
+    ocr_text = GOVERNMENT_WARNING.replace("GOVERNMENT WARNING", "G0VERNMENT WARNlNG")
+    result = verify_government_warning(ocr_text, 0.88)
+    assert result.status == STATUS_REVIEW
+    assert "heading or OCR text is not exact" in result.reason
+
+
 def test_abv_mismatch_fails() -> None:
     result = verify_alcohol_content("45% ABV", "OLD TOM GIN 40% Alc./Vol.")
     assert result.status == STATUS_FAIL

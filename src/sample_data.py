@@ -785,6 +785,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Responsible-party statement uses combined produced-and-bottled wording.",
         ),
+        SampleSpec(
+            filename="APP-043_ocr_damaged_warning_heading_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-043", "formula": "F-4300"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING.replace("GOVERNMENT WARNING", "G0VERNMENT WARNlNG"),
+            ],
+            expected_status="Needs Review",
+            note="Warning statement is close to canonical, but the all-caps heading has OCR-like character damage.",
+        ),
     ]
 
 
@@ -1067,7 +1083,7 @@ def _draw_text_label(page: fitz.Page, label_lines: list[str]) -> None:
             text_width = fitz.get_text_length(line, fontname="helv", fontsize=17)
             page.insert_text((label_rect.x0 + (label_rect.width - text_width) / 2, y + 18), line, fontsize=17, fontname="helv")
             y += 25
-        elif line.startswith("GOVERNMENT WARNING") or line.startswith("Government Warning"):
+        elif _looks_like_warning_line(line):
             page.insert_textbox(fitz.Rect(label_rect.x0 + 12, label_rect.y1 - 72, label_rect.x1 - 12, label_rect.y1 - 12), line, fontsize=5.8, fontname="helv")
         else:
             page.insert_textbox(fitz.Rect(label_rect.x0 + 20, y, label_rect.x1 - 20, y + 16), line, fontsize=8.8, fontname="helv", align=1)
@@ -1090,11 +1106,11 @@ def _draw_raster_label(page: fitz.Page, label_lines: list[str]) -> None:
     draw.rectangle((8, 8, 812, 352), outline=(120, 120, 120), width=2)
     y = 25
     for index, line in enumerate(label_lines):
-        font = title_font if index == 0 else warning_font if "WARNING" in line else body_font
+        font = title_font if index == 0 else warning_font if _looks_like_warning_line(line) else body_font
         if index == 0:
             draw.text((42, y), line, fill=(75, 75, 72), font=font)
             y += 52
-        elif "WARNING" in line:
+        elif _looks_like_warning_line(line):
             draw.multiline_text((28, 258), _wrap(line, 100), fill=(110, 110, 105), font=font, spacing=2)
         else:
             draw.text((70, y), line, fill=(85, 85, 80), font=font)
@@ -1134,13 +1150,13 @@ def _draw_artwork_label(page: fitz.Page, label_lines: list[str], *, low_quality:
     _draw_centered(draw, title, title_font, width // 2, 78, palette["text"])
     y = 238
     for index, line in enumerate(label_lines[1:]):
-        if "WARNING" in line or line.startswith("Government Warning"):
+        if _looks_like_warning_line(line):
             continue
         font = subtitle_font if index == 0 else body_font
         _draw_centered(draw, line, font, width // 2, y, palette["text"])
         y += 70 if index == 0 else 56
 
-    warning = next((line for line in label_lines if "WARNING" in line or line.startswith("Government Warning")), "")
+    warning = next((line for line in label_lines if _looks_like_warning_line(line)), "")
     if warning:
         warning_box = (118, height - 282, width - 118, height - 44)
         draw.rectangle(warning_box, fill=palette["warning_panel"])
@@ -1243,3 +1259,8 @@ def _wrap(text: str, width: int) -> str:
     if current:
         lines.append(" ".join(current))
     return "\n".join(lines)
+
+
+def _looks_like_warning_line(line: str) -> bool:
+    normalized = line.upper().replace("0", "O").replace("1", "I").replace("L", "I")
+    return "GOVERNMENT WARNING" in normalized or "GOVERNMENT WARN" in normalized

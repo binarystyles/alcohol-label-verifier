@@ -323,8 +323,8 @@ def verify_government_warning(label_text: str, label_confidence: float) -> Field
         return _result("government_warning", GOVERNMENT_WARNING, "Government Warning", snippet_around(label_text, "Government Warning"), STATUS_FAIL, 0.95, "Government warning heading is not all caps.")
     if government_warning_matches(label_text):
         return _result("government_warning", GOVERNMENT_WARNING, GOVERNMENT_WARNING, snippet_around(label_text, "GOVERNMENT WARNING"), STATUS_PASS, min(0.98, max(label_confidence, 0.9)), "Government warning text and all-caps heading match the canonical statement.")
+    similarity = government_warning_similarity(label_text)
     if "GOVERNMENT WARNING" in normalize_text(label_text):
-        similarity = government_warning_similarity(label_text)
         if similarity >= WARNING_OCR_REVIEW_THRESHOLD:
             return _result(
                 "government_warning",
@@ -336,6 +336,16 @@ def verify_government_warning(label_text: str, label_confidence: float) -> Field
                 "Government warning heading is present and the statement is close to canonical, but OCR/text is not exact; reviewer should confirm the warning.",
             )
         return _result("government_warning", GOVERNMENT_WARNING, "", snippet_around(label_text, "GOVERNMENT WARNING"), STATUS_FAIL, 0.9, "Government warning appears reworded, truncated, or materially altered.")
+    if similarity >= WARNING_OCR_REVIEW_THRESHOLD:
+        return _result(
+            "government_warning",
+            GOVERNMENT_WARNING,
+            "",
+            snippet_around(label_text),
+            STATUS_REVIEW,
+            min(0.85, max(label_confidence, 0.6)),
+            "Government warning text is close to canonical, but the heading or OCR text is not exact; reviewer should confirm the warning.",
+        )
     return _result("government_warning", GOVERNMENT_WARNING, "", snippet_around(label_text), STATUS_FAIL, 0.9, "Government warning is missing.")
 
 

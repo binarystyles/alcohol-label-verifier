@@ -58,7 +58,7 @@ Needs Review is used for uncertainty:
 - Matching formula approval/source document found but no final alcohol content is extractable.
 - Formula support document has a similar but nonmatching prefix-sharing Formula ID.
 - Imported country of origin is missing or the country name appears only in unrelated text, such as an importer company name, rather than in origin wording like `Product of`.
-- Government warning heading present with text close to canonical, but OCR/text is not exact enough for a strict pass.
+- Government warning text is close to canonical, but the heading or OCR text is not exact enough for a strict pass.
 - Optional supplied value not clearly found.
 - Item 15 supplied but not clearly found.
 

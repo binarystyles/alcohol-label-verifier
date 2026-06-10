@@ -3591,6 +3591,80 @@ def sample_specs() -> list[SampleSpec]:
             note="Formula support states final alcohol as Alcohol Content as Bottled and should verify against the label.",
             formula_approval_alcohol_label="Alcohol Content as Bottled",
         ),
+        SampleSpec(
+            filename="APP-184_ornate_artwork_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-184", "formula": "F-18400"},
+            label_lines=good_label,
+            expected_status="Pass",
+            expected_status_without_ocr="Needs Review",
+            note="Readable decorative color artwork with overprint-like ornamentation should still verify when OCR is available.",
+            artwork_label=True,
+            artwork_style="ornate",
+        ),
+        SampleSpec(
+            filename="APP-185_tiny_warning_artwork_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-185", "formula": "F-18500"},
+            label_lines=good_label,
+            expected_status="Needs Review",
+            note="Color artwork with tiny low-quality warning text should require human review for OCR/legibility instead of being treated as a confirmed missing warning.",
+            raster_label=True,
+            artwork_label=True,
+            artwork_style="micro-warning",
+        ),
+        SampleSpec(
+            filename="APP-186_champagne_of_france_origin_pass.pdf",
+            fields={
+                **wine_fields,
+                "serial_number": "APP-186",
+                "brand_name": "MAISON LUMIERE",
+                "fanciful_name": "Brut Reserve",
+                "formula": "W-18600",
+                "class_type": "Champagne",
+                "alcohol_content": "12.5% ABV",
+                "bottler_producer": "Maison Lumiere",
+                "country_of_origin": "France",
+                "imported": True,
+            },
+            label_lines=[
+                "MAISON LUMIERE",
+                "Brut Reserve",
+                "Champagne",
+                "12.5% Alc./Vol.",
+                "750 mL",
+                "Bottled by Maison Lumiere",
+                "Champagne of France",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported origin stated as a recognized wine class term plus country should pass, matching the existing Wine of France pattern.",
+        ),
+        SampleSpec(
+            filename="APP-187_mezcal_of_mexico_origin_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-187",
+                "brand_name": "CASA NOCHE MEZCAL",
+                "fanciful_name": "",
+                "formula": "F-18700",
+                "class_type": "Mezcal",
+                "alcohol_content": "45% ABV",
+                "bottler_producer": "Casa Noche Spirits",
+                "country_of_origin": "Mexico",
+                "imported": True,
+            },
+            label_lines=[
+                "CASA NOCHE MEZCAL",
+                "DISTILLED SPIRITS",
+                "Class/Type: Mezcal",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Casa Noche Spirits",
+                "Mezcal of Mexico",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported origin stated as a recognized distilled-spirits class term plus country should pass.",
+        ),
     ]
 
 
@@ -4006,7 +4080,7 @@ def _draw_artwork_label(page: fitz.Page, label_lines: list[str], *, low_quality:
     title_font = _load_font(96)
     subtitle_font = _load_font(54)
     body_font = _load_font(44)
-    warning_font = _load_font(34)
+    warning_font = _load_font(18 if style == "micro-warning" else 34)
 
     _draw_artwork_background(draw, width, height, palette, style)
 
@@ -4021,11 +4095,15 @@ def _draw_artwork_label(page: fitz.Page, label_lines: list[str], *, low_quality:
 
     warning = next((line for line in label_lines if _looks_like_warning_line(line)), "")
     if warning:
-        warning_box = (118, height - 282, width - 118, height - 44)
+        warning_box = (
+            (118, height - 158, width - 118, height - 44)
+            if style == "micro-warning"
+            else (118, height - 282, width - 118, height - 44)
+        )
         draw.rectangle(warning_box, fill=palette["warning_panel"])
         draw.multiline_text(
             (warning_box[0] + 26, warning_box[1] + 16),
-            _wrap(warning, 76),
+            _wrap(warning, 118 if style == "micro-warning" else 76),
             fill=palette.get("warning_text", palette["text"]),
             font=warning_font,
             spacing=6,
@@ -4092,6 +4170,17 @@ def _draw_artwork_background(
             draw.line((index, 122, index + height, height - 20), fill=palette["accent"], width=4)
         for index in range(0, width, 120):
             draw.rectangle((index, height - 154, index + 56, height - 24), fill=palette["accent2"])
+    elif style == "ornate":
+        for index in range(16):
+            x0 = 70 + index * 134
+            draw.arc((x0, 150, x0 + 270, 500), 185, 355, fill=palette["accent"], width=6)
+            draw.arc((x0 - 30, 320, x0 + 210, 725), 8, 180, fill=palette["accent2"], width=5)
+        for index in range(10):
+            center_x = 170 + index * 210
+            draw.ellipse((center_x - 42, 260, center_x + 42, 344), outline=palette["accent3"], width=5)
+            draw.line((center_x, 344, center_x, 650), fill=palette["accent3"], width=4)
+            draw.ellipse((center_x - 80, 420, center_x - 8, 486), outline=palette["accent"], width=4)
+            draw.ellipse((center_x + 8, 482, center_x + 80, 548), outline=palette["accent2"], width=4)
     elif style in {"photo", "photo-low-contrast"}:
         sky = palette["accent"]
         ground = palette["accent2"]
@@ -4223,6 +4312,32 @@ def _artwork_palette(seed: str, *, style: str = "geometric") -> dict[str, tuple[
             "text": (111, 116, 106),
             "warning_panel": (223, 225, 219),
             "warning_text": (111, 116, 106),
+        }
+    if style == "ornate":
+        return {
+            "background": (238, 242, 232),
+            "band": (76, 46, 88),
+            "band_text": (255, 252, 246),
+            "panel": (255, 253, 244),
+            "accent": (206, 169, 84),
+            "accent2": (107, 151, 119),
+            "accent3": (141, 88, 112),
+            "border": (74, 53, 78),
+            "text": (30, 26, 36),
+            "warning_panel": (255, 253, 244),
+        }
+    if style == "micro-warning":
+        return {
+            "background": (229, 236, 242),
+            "band": (32, 74, 104),
+            "band_text": (255, 255, 255),
+            "panel": (249, 250, 247),
+            "accent": (196, 215, 224),
+            "accent2": (226, 192, 118),
+            "border": (42, 60, 78),
+            "text": (20, 30, 43),
+            "warning_panel": (247, 248, 244),
+            "warning_text": (112, 119, 126),
         }
     palettes = [
         {

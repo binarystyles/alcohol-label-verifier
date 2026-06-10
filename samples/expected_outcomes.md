@@ -185,5 +185,9 @@
 | `APP-181_oneline_bottled_for_brand_owner_review.pdf` | Needs Review | Needs Review | One-line Bottled for ... by ... wording should need review when the application identifies the brand owner but a different actual bottler appears. |
 | `APP-182_formula_final_abv_heading_pass.pdf` | Pass | Pass | Formula support states final alcohol with Final ABV shorthand and should verify against the label. |
 | `APP-183_formula_as_bottled_heading_pass.pdf` | Pass | Pass | Formula support states final alcohol as Alcohol Content as Bottled and should verify against the label. |
+| `APP-184_ornate_artwork_pass.pdf` | Pass | Needs Review | Readable decorative color artwork with overprint-like ornamentation should still verify when OCR is available. |
+| `APP-185_tiny_warning_artwork_review.pdf` | Needs Review | Needs Review | Color artwork with tiny low-quality warning text should require human review for OCR/legibility instead of being treated as a confirmed missing warning. |
+| `APP-186_champagne_of_france_origin_pass.pdf` | Pass | Pass | Imported origin stated as a recognized wine class term plus country should pass, matching the existing Wine of France pattern. |
+| `APP-187_mezcal_of_mexico_origin_pass.pdf` | Pass | Pass | Imported origin stated as a recognized distilled-spirits class term plus country should pass. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

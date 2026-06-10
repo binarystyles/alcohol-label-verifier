@@ -49,6 +49,8 @@ def test_sample_corpus_includes_color_artwork_ocr_cases() -> None:
         "texture",
         "photo",
         "photo-low-contrast",
+        "ornate",
+        "micro-warning",
     } <= artwork_styles
 
 
@@ -193,6 +195,10 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-181_oneline_bottled_for_brand_owner_review.pdf" in specs
     assert "APP-182_formula_final_abv_heading_pass.pdf" in specs
     assert "APP-183_formula_as_bottled_heading_pass.pdf" in specs
+    assert "APP-184_ornate_artwork_pass.pdf" in specs
+    assert "APP-185_tiny_warning_artwork_review.pdf" in specs
+    assert "APP-186_champagne_of_france_origin_pass.pdf" in specs
+    assert "APP-187_mezcal_of_mexico_origin_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -502,6 +508,16 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "A B V 50%" in specs["APP-130_spaced_abv_dark_artwork_pass.pdf"].label_lines
     assert specs["APP-133_photo_artwork_pass.pdf"].artwork_style == "photo"
     assert specs["APP-134_photo_low_contrast_artwork_review.pdf"].artwork_style == "photo-low-contrast"
+    assert specs["APP-184_ornate_artwork_pass.pdf"].artwork_style == "ornate"
+    assert specs["APP-184_ornate_artwork_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-185_tiny_warning_artwork_review.pdf"].artwork_style == "micro-warning"
+    assert specs["APP-185_tiny_warning_artwork_review.pdf"].expected_status == STATUS_REVIEW
+    assert specs["APP-186_champagne_of_france_origin_pass.pdf"].fields["country_of_origin"] == "France"
+    assert "Champagne of France" in specs["APP-186_champagne_of_france_origin_pass.pdf"].label_lines
+    assert specs["APP-186_champagne_of_france_origin_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-187_mezcal_of_mexico_origin_pass.pdf"].fields["country_of_origin"] == "Mexico"
+    assert "Mezcal of Mexico" in specs["APP-187_mezcal_of_mexico_origin_pass.pdf"].label_lines
+    assert specs["APP-187_mezcal_of_mexico_origin_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-115_sake_wine_class_pass.pdf"].fields["class_type"] == "Sake"
     assert specs["APP-115_sake_wine_class_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-116_vermouth_wine_class_pass.pdf"].fields["class_type"] == "Vermouth"

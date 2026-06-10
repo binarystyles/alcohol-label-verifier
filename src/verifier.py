@@ -1043,7 +1043,7 @@ def _country_origin_statement_present(expected: str, label_text: str) -> bool:
             (
                 rf"\bPRODUCT\s+(?:OF|FROM)\s+(?:THE\s+)?{country}\b",
                 rf"\bPRODUCE\s+(?:OF|FROM)\s+(?:THE\s+)?{country}\b",
-                rf"\b(?:WINE|BEER|ALE|LAGER|STOUT|PORTER|CIDER|PERRY|WHISKY|WHISKEY|VODKA|GIN|RUM|TEQUILA|BRANDY|LIQUEUR)\s+OF\s+(?:THE\s+)?{country}\b",
+                rf"\b(?:{COUNTRY_ORIGIN_PRODUCT_TERMS_PATTERN})\s+OF\s+(?:THE\s+)?{country}\b",
                 rf"\bPRODUCED\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bPRODUCED\s+AND\s+BOTTLED\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bPRODUCED(?:\s+AND)?\s+(?:BOTTLED|CANNED|PACKAGED|PACKED)(?:\s+AND\s+(?:BOTTLED|CANNED|PACKAGED|PACKED))*\s+IN\s+(?:THE\s+)?{country}\b",
@@ -1073,6 +1073,15 @@ def _country_origin_statement_present(expected: str, label_text: str) -> bool:
         elif country_name == "CANADA":
             patterns.append(r"\bCANADIAN\s+WHISK(?:Y|EY)\b")
     return any(re.search(pattern, normalized_label) for pattern in patterns)
+
+
+COUNTRY_ORIGIN_PRODUCT_TERMS_PATTERN = (
+    r"WINE|BEER|ALE|LAGER|STOUT|PORTER|CIDER|PERRY|HARD\s+CIDER|HARD\s+SELTZER|"
+    r"MALT\s+BEVERAGES?|FLAVORED\s+MALT\s+BEVERAGE|MALT\s+LIQUOR|"
+    r"WHISKY|WHISKEY|BOURBON|SCOTCH|VODKA|GIN|RUM|TEQUILA|MEZCAL|BRANDY|COGNAC|"
+    r"LIQUEUR|CORDIAL|SCHNAPPS|AQUAVIT|SAKE|VERMOUTH|SHERRY|PORT|CHAMPAGNE|"
+    r"MEAD|SANGRIA"
+)
 
 
 COUNTRY_ORIGIN_CANONICAL_ALIASES: dict[str, tuple[str, ...]] = {
@@ -1214,9 +1223,24 @@ def _short_summary(status: str, results: list[FieldResult], warnings: list[str],
     if status == STATUS_FAIL:
         return "Failed critical checks: " + ", ".join(failed[:4])
     if status == STATUS_REVIEW:
+        warning_summary = _review_warning_summary(warnings)
+        if warning_summary:
+            return f"Needs review: {warning_summary}"
         reasons = review[:4] or warnings[:2] or ["review recommended"]
         return "Needs review: " + ", ".join(reasons)
     return "All required checks passed with adequate confidence."
+
+
+def _review_warning_summary(warnings: list[str]) -> str:
+    for warning in warnings:
+        normalized = warning.lower()
+        if "label image appears rotated" in normalized or "label text is unreadable" in normalized:
+            return "label OCR quality"
+        if "label artwork was present" in normalized:
+            return "label artwork text unreadable"
+        if "no readable affixed label area" in normalized or "label area is missing" in normalized:
+            return "missing or blank label area"
+    return ""
 
 
 def _dedupe(values: list[str]) -> list[str]:

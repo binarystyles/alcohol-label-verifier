@@ -858,6 +858,18 @@ def test_imported_country_origin_aliases_do_not_create_false_conflict() -> None:
     assert verify_country_of_origin("The Netherlands", True, "Product of Netherlands").status == STATUS_PASS
 
 
+def test_imported_country_of_origin_allows_recognized_product_of_wording() -> None:
+    assert verify_country_of_origin("France", True, "Champagne of France").status == STATUS_PASS
+    assert verify_country_of_origin("Japan", True, "Sake of Japan").status == STATUS_PASS
+    assert verify_country_of_origin("Mexico", True, "Mezcal of Mexico").status == STATUS_PASS
+    assert verify_country_of_origin("Portugal", True, "Port of Portugal").status == STATUS_PASS
+    assert verify_country_of_origin("Spain", True, "Sangria of Spain").status == STATUS_PASS
+    assert verify_country_of_origin("France", True, "Cognac of France").status == STATUS_PASS
+    conflict = verify_country_of_origin("France", True, "Champagne of France\nMezcal of Mexico")
+    assert conflict.status == STATUS_REVIEW
+    assert conflict.found == "Mexico"
+
+
 def test_imported_country_of_origin_needs_review_when_missing_from_label() -> None:
     result = verify_country_of_origin("Mexico", True, "CASA VERDE TEQUILA Imported by Borderland Imports LLC")
     assert result.status == STATUS_REVIEW
@@ -1068,6 +1080,7 @@ def test_low_confidence_label_text_does_not_fail_government_warning() -> None:
     )
     warning = next(field for field in result.field_results if field.field == "government_warning")
     assert result.overall_status == STATUS_REVIEW
+    assert result.short_summary == "Needs review: label OCR quality"
     assert warning.status == STATUS_REVIEW
     assert "rotated, blurry, or unreadable" in warning.reason
 

@@ -1818,6 +1818,15 @@ def sample_specs() -> list[SampleSpec]:
             blank_label=True,
             instruction_pages_before_supplemental_label=3,
         ),
+        SampleSpec(
+            filename="APP-094_long_attachment_before_label_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-094", "formula": "F-9400"},
+            label_lines=good_label,
+            expected_status="Pass",
+            note="Supplemental label appears after more than twelve attached instruction pages and still verifies.",
+            blank_label=True,
+            instruction_pages_before_supplemental_label=13,
+        ),
     ]
 
 

@@ -6,7 +6,7 @@ import fitz
 
 from src.form_mapping import FORM_REGIONS
 
-MAX_LABEL_SCAN_PAGES = 12
+MAX_LABEL_SCAN_PAGES = 30
 
 
 def page_one_label_rect(page: fitz.Page) -> fitz.Rect:

@@ -136,3 +136,5 @@ APP-134_photo_low_contrast_artwork_review.pdf,APP-134,APP-134,OLD TOM GIN,DISTIL
 APP-135_ambiguous_product_type_checkboxes_review.pdf,APP-135,APP-135,OLD TOM GIN,,Needs Review,0.0,0.111,Needs review: product_type,Item 5 product-type checkboxes contain multiple selected values.,
 APP-136_ambiguous_import_checkboxes_review.pdf,APP-136,APP-136,CASA VERDE TEQUILA,DISTILLED SPIRITS,Needs Review,0.95,0.114,Needs review: Item 3 Domestic/Imported checkboxes contain multiple selected values.,Item 3 Domestic/Imported checkboxes contain multiple selected values.,
 APP-137_formula_of_the_finished_product_pass.pdf,APP-137,APP-137,OLD TOM GIN,DISTILLED SPIRITS,Pass,0.95,0.096,All required checks passed with adequate confidence.,,
+APP-138_flavoring_percent_with_abv_pass.pdf,APP-138,APP-138,OLD TOM GIN,DISTILLED SPIRITS,Pass,0.95,0.113,All required checks passed with adequate confidence.,,
+APP-139_flavoring_percent_missing_abv_review.pdf,APP-139,APP-139,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.45,0.098,"Needs review: formula, alcohol_content",,

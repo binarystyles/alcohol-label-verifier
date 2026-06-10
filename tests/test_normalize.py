@@ -107,6 +107,9 @@ def test_abv_and_proof_extraction_normalize_to_abv() -> None:
     assert extract_abv_values("45 pct alc/vol") == [45.0]
     assert extract_abv_values("100% Agave") == []
     assert extract_abv_values("100% Agave 40% Alc./Vol.") == [40.0]
+    assert extract_abv_values("Natural flavoring 49% by volume") == []
+    assert extract_abv_values("Natural flavoring 49% by volume\n45% Alc./Vol.") == [45.0]
+    assert extract_abv_values("Naturally flavored vodka 45% by volume") == [45.0]
     assert extract_abv_values("40% Alc./Vol. 1000 mL") == [40.0]
     assert extract_abv_values("5.5% Alc./Vol. 12 fl oz") == [5.5]
 

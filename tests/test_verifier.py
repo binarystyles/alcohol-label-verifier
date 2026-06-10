@@ -252,6 +252,20 @@ def test_non_alcohol_percentage_does_not_create_abv_mismatch() -> None:
     assert "not clearly found" in result.reason
 
 
+def test_non_alcohol_percent_by_volume_does_not_create_abv_mismatch() -> None:
+    result = verify_alcohol_content("45% ABV", "OLD TOM GIN Natural flavoring 49% by volume")
+    assert result.status == STATUS_REVIEW
+    assert "not clearly found" in result.reason
+
+
+def test_non_alcohol_percent_by_volume_does_not_conflict_with_real_abv() -> None:
+    result = verify_alcohol_content(
+        "45% ABV",
+        "OLD TOM GIN Natural flavoring 49% by volume\n45% Alc./Vol.",
+    )
+    assert result.status == STATUS_PASS
+
+
 def test_formula_alcohol_content_matches_label() -> None:
     result = verify_formula_alcohol_content("F-1001", "45% ABV", "formula-approval", "OLD TOM GIN 45% Alc./Vol.")
     assert result.status == STATUS_PASS

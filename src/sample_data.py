@@ -2718,6 +2718,39 @@ def sample_specs() -> list[SampleSpec]:
             note="Formula support states final alcohol with the official-style Alcohol Content of the Finished Product wording.",
             formula_approval_alcohol_label="Alcohol Content of the Finished Product",
         ),
+        SampleSpec(
+            filename="APP-138_flavoring_percent_with_abv_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-138", "formula": "F-13800"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "Natural flavoring 49% by volume",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Non-alcohol flavoring percent-by-volume text must not conflict with the real label ABV statement.",
+        ),
+        SampleSpec(
+            filename="APP-139_flavoring_percent_missing_abv_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-139", "formula": "F-13900"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "Natural flavoring 49% by volume",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Non-alcohol flavoring percent-by-volume text alone should not be treated as an ABV mismatch; missing actual ABV requires review.",
+        ),
     ]
 
 

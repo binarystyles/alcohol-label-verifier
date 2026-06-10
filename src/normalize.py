@@ -184,6 +184,8 @@ def extract_abv_values(text: str | None) -> list[float]:
         for match in pattern.finditer(text):
             if _keyword_follows_completed_abv_statement(text, match.start()):
                 continue
+            if _is_non_alcohol_percent_by_volume_context(text, match.start(), match.end()):
+                continue
             value = _parse_decimal_number(match.group("num"))
             if 0 < value <= 100:
                 values.append(round(value, 3))
@@ -207,6 +209,26 @@ def normalize_abv(text: str | None) -> float | None:
 def _keyword_follows_completed_abv_statement(text: str, start: int) -> bool:
     prefix = text[max(0, start - 16) : start]
     return bool(re.search(rf"{ALCOHOL_NUMBER_PATTERN}\s*(?:%|PERCENT)\s*$", prefix, flags=re.IGNORECASE))
+
+
+def _is_non_alcohol_percent_by_volume_context(text: str, start: int, end: int) -> bool:
+    line_start = text.rfind("\n", 0, start) + 1
+    line_end = text.find("\n", end)
+    if line_end < 0:
+        line_end = len(text)
+    line = normalize_text(text[line_start:line_end])
+    match_text = normalize_text(text[start:end])
+    if re.search(r"\b(?:ALC|ALCOHOL|ABV|PROOF)\b", match_text):
+        return False
+    prefix = normalize_text(text[max(line_start, start - 48) : start])
+    if re.search(r"\b(?:ALC|ALCOHOL|ABV|PROOF)\b", prefix):
+        return False
+    return bool(
+        re.search(
+            r"\b(?:FLAVOR|FLAVOUR|FLAVORING|FLAVOURING|JUICE|EXTRACT|ESSENCE|COLOR|COLOUR|CARAMEL|SUGAR|SWEETENER|VANILLIN|INGREDIENT|NONBEVERAGE)\b",
+            line,
+        )
+    )
 
 
 NET_CONTENTS_UNIT_PATTERN = (

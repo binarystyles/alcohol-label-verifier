@@ -200,6 +200,10 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-136_ambiguous_import_checkboxes_review.pdf"].expected_status == STATUS_REVIEW
     assert specs["APP-137_formula_of_the_finished_product_pass.pdf"].formula_approval_alcohol_label == "Alcohol Content of the Finished Product"
     assert specs["APP-137_formula_of_the_finished_product_pass.pdf"].expected_status == STATUS_PASS
+    assert "Natural flavoring 49% by volume" in specs["APP-138_flavoring_percent_with_abv_pass.pdf"].label_lines
+    assert specs["APP-138_flavoring_percent_with_abv_pass.pdf"].expected_status == STATUS_PASS
+    assert "45% Alc./Vol." not in specs["APP-139_flavoring_percent_missing_abv_review.pdf"].label_lines
+    assert specs["APP-139_flavoring_percent_missing_abv_review.pdf"].expected_status == STATUS_REVIEW
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

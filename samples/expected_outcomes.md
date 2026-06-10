@@ -139,5 +139,7 @@
 | `APP-135_ambiguous_product_type_checkboxes_review.pdf` | Needs Review | Needs Review | Application has multiple Item 5 product-type checkboxes selected, so expected product type is ambiguous and must not be guessed from the label. |
 | `APP-136_ambiguous_import_checkboxes_review.pdf` | Needs Review | Needs Review | Application has both Domestic and Imported Item 3 checkboxes selected, so source of product is ambiguous even though country evidence is present. |
 | `APP-137_formula_of_the_finished_product_pass.pdf` | Pass | Pass | Formula support states final alcohol with the official-style Alcohol Content of the Finished Product wording. |
+| `APP-138_flavoring_percent_with_abv_pass.pdf` | Pass | Pass | Non-alcohol flavoring percent-by-volume text must not conflict with the real label ABV statement. |
+| `APP-139_flavoring_percent_missing_abv_review.pdf` | Needs Review | Needs Review | Non-alcohol flavoring percent-by-volume text alone should not be treated as an ABV mismatch; missing actual ABV requires review. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

@@ -77,6 +77,24 @@ def test_bottler_producer_accepts_combined_responsible_party_statement() -> None
     assert result.status == STATUS_PASS
 
 
+def test_bottler_producer_conflicting_same_role_needs_review() -> None:
+    result = verify_bottler_producer(
+        "Example Distilling Co.",
+        "Bottled by Example Distilling Co.\nBottled by Canyon Creek Spirits",
+    )
+    assert result.status == STATUS_REVIEW
+    assert result.found == "Canyon Creek Spirits"
+    assert "conflicting responsible-party" in result.reason
+
+
+def test_bottler_producer_separate_importer_role_does_not_conflict() -> None:
+    result = verify_bottler_producer(
+        "Highland Forge Distilling Co.",
+        "Bottled by Highland Forge Distilling Co.\nImported by Example Imports LLC",
+    )
+    assert result.status == STATUS_PASS
+
+
 def test_bottler_producer_company_abbreviation_passes() -> None:
     assert verify_bottler_producer("Acme Distilling Co.", "Bottled by Acme Distilling Company").status == STATUS_PASS
     assert verify_bottler_producer("Acme Distilling Company", "Bottled by Acme Distilling Co.").status == STATUS_PASS

@@ -2453,6 +2453,23 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Label contains expected and conflicting Class/Type statements, so class/type requires review.",
         ),
+        SampleSpec(
+            filename="APP-124_bottler_conflict_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-124", "formula": "F-12400"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                "Bottled by Canyon Creek Spirits",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Label contains expected and conflicting Bottled by statements, so responsible-party text requires review.",
+        ),
     ]
 
 

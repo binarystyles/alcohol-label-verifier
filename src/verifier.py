@@ -166,6 +166,17 @@ def verify_optional_fuzzy(
 def verify_bottler_producer(expected: str, label_text: str) -> FieldResult:
     if not expected:
         return _result("bottler_producer", "", "", "", STATUS_PASS, 1.0, "No expected value supplied; this optional field was not penalized.")
+    conflicting_parties = _conflicting_responsible_party_values(expected, label_text)
+    if conflicting_parties:
+        return _result(
+            "bottler_producer",
+            expected,
+            "; ".join(conflicting_parties),
+            snippet_around(label_text),
+            STATUS_REVIEW,
+            0.75,
+            "Label contains conflicting responsible-party statements; reviewer should confirm the intended bottler/producer/importer.",
+        )
     party_text = _responsible_party_text(label_text)
     score = fuzzy_score(expected, party_text)
     if score >= TEXT_FIELD_PASS_THRESHOLD:
@@ -566,6 +577,43 @@ def _responsible_party_text(label_text: str) -> str:
         if _is_responsible_party_line(line):
             candidates.append(line)
     return "\n".join(candidates)
+
+
+RESPONSIBLE_PARTY_ACTION_PATTERN = (
+    r"BOTTLED|PRODUCED|DISTILLED|BLENDED|IMPORTED|BREWED|VINTED|CELLARED|CANNED|PACKED|PACKAGED|MANUFACTURED|DISTRIBUTED"
+)
+RESPONSIBLE_PARTY_VALUE_PATTERN = re.compile(
+    rf"\b(?P<actions>(?:{RESPONSIBLE_PARTY_ACTION_PATTERN})(?:\s+AND\s+(?:{RESPONSIBLE_PARTY_ACTION_PATTERN}))*)\s+(?:BY|FOR)\s+(?P<party>.+)",
+    re.IGNORECASE,
+)
+
+
+def _responsible_party_entries(label_text: str) -> list[tuple[frozenset[str], str]]:
+    entries: list[tuple[frozenset[str], str]] = []
+    for line in _label_lines(label_text):
+        match = RESPONSIBLE_PARTY_VALUE_PATTERN.search(line)
+        if not match:
+            continue
+        actions = frozenset(re.findall(RESPONSIBLE_PARTY_ACTION_PATTERN, normalize_text(match.group("actions"))))
+        party = match.group("party").strip(" .:-")
+        if actions and party:
+            entries.append((actions, party))
+    return entries
+
+
+def _conflicting_responsible_party_values(expected: str, label_text: str) -> list[str]:
+    entries = _responsible_party_entries(label_text)
+    matching_actions = [actions for actions, party in entries if fuzzy_score(expected, party) >= TEXT_FIELD_PASS_THRESHOLD]
+    if not matching_actions:
+        return []
+
+    conflicts: list[str] = []
+    for actions, party in entries:
+        if fuzzy_score(expected, party) >= TEXT_FIELD_PASS_THRESHOLD:
+            continue
+        if any(actions.intersection(matched_actions) for matched_actions in matching_actions):
+            conflicts.append(party)
+    return conflicts
 
 
 def _label_lines(label_text: str) -> list[str]:

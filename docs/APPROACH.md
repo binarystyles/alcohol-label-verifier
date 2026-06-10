@@ -25,7 +25,7 @@ See `docs/TOOLS_USED.md` for the implementation, OCR, test, and deployment toolc
 4. Try `pypdf` AcroForm extraction for PDFs.
 5. If expected values remain missing, render/extract defined page-one form regions.
 6. Parse an explicit `APPLICATION DATA SUMMARY` block when present in the package.
-7. Use Item 9 as a Formula ID/reference and look for an exact normalized matching formula approval/source document inside the same uploaded package.
+7. Use Item 9 as a Formula ID/reference and look for an exact normalized matching formula approval/source document inside the same uploaded package, ignoring unrelated formula approvals that may also be attached.
 8. Derive expected alcohol content from the matched formula approval document when available.
 9. Extract label text only from the lower page-one label area and likely supplemental label pages in the first 30 pages, skipping attached instruction pages and formula approval/source documents.
 10. Compare expected application values to label evidence.

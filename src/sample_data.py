@@ -35,6 +35,7 @@ class SampleSpec:
     formula_approval_unit: str = "% by Volume"
     formula_approval_identifier_label: str = "TTB Formula ID"
     formula_approval_alcohol_label: str = "Alcohol Content of Finished Product"
+    extra_formula_approvals_before: tuple[dict[str, str | bool], ...] = ()
     expected_status_without_ocr: str | None = None
     instruction_pages_before_supplemental_label: int = 0
 
@@ -1857,6 +1858,21 @@ def sample_specs() -> list[SampleSpec]:
             note="Imported wine states origin as Wine of France, a product-style country-of-origin statement.",
             include_formula_approval=False,
         ),
+        SampleSpec(
+            filename="APP-096_multiple_formula_documents_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-096", "formula": "F-9600"},
+            label_lines=good_label,
+            expected_status="Pass",
+            note="Package includes an unrelated approved formula before the matching Formula ID; only the matching formula document is used.",
+            extra_formula_approvals_before=(
+                {
+                    "formula": "F-4000",
+                    "brand_name": "UNRELATED VODKA",
+                    "class_type": "Vodka",
+                    "alcohol_content": "40% ABV",
+                },
+            ),
+        ),
     ]
 
 
@@ -1895,6 +1911,8 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
         _append_instruction_pages(document, spec.instruction_pages_before_supplemental_label)
         _append_supplemental_label_page(document, spec.label_lines)
     if spec.include_formula_approval:
+        for approval_fields in spec.extra_formula_approvals_before:
+            _append_formula_approval_page(document, {**spec.fields, **approval_fields})
         _append_formula_approval_page(
             document,
             spec.fields,

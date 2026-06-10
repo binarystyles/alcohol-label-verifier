@@ -312,9 +312,7 @@ def parse_formula_approval_fields(text: str, formula_id: str) -> dict[str, str]:
     windows: list[str] = []
     for index, line in enumerate(lines):
         if _line_matches_formula_id(line, normalized_id):
-            start = max(0, index - 18)
-            end = min(len(lines), index + 40)
-            windows.append("\n".join(lines[start:end]))
+            windows.append(_formula_approval_window(lines, index, normalized_id))
 
     matched_formula_document = False
     matched_class_type = ""
@@ -364,6 +362,42 @@ def _extract_labeled_formula_identifier(text: str) -> str:
 def _line_matches_formula_id(line: str, normalized_id: str) -> bool:
     candidate = _extract_labeled_formula_identifier(line)
     return bool(candidate and _normalize_formula_id(candidate) == normalized_id)
+
+
+def _formula_approval_window(lines: list[str], index: int, normalized_id: str) -> str:
+    start = index
+    for candidate_index in range(index - 1, max(-1, index - 18), -1):
+        line = lines[candidate_index]
+        candidate_id = _extract_labeled_formula_identifier(line)
+        if candidate_id and _normalize_formula_id(candidate_id) != normalized_id:
+            break
+
+        normalized_line = normalize_text(line)
+        if _is_formula_final_alcohol_line(normalized_line):
+            break
+
+        start = candidate_index
+        if _is_formula_document_boundary(normalized_line):
+            break
+
+    end = len(lines)
+    for candidate_index in range(index + 1, len(lines)):
+        line = lines[candidate_index]
+        candidate_id = _extract_labeled_formula_identifier(line)
+        if candidate_id and _normalize_formula_id(candidate_id) != normalized_id:
+            end = candidate_index
+            break
+
+        normalized_line = normalize_text(line)
+        if candidate_index > index + 3 and _is_formula_document_boundary(normalized_line):
+            end = candidate_index
+            break
+
+        if candidate_index - index >= 80:
+            end = candidate_index
+            break
+
+    return "\n".join(lines[start:end])
 
 
 def clean_region_value(field_name: str, text: str) -> str:
@@ -491,6 +525,15 @@ def _looks_like_formula_approval_text(normalized_text: str) -> bool:
             "METHOD OF MANUFACTURE",
         )
     )
+
+
+def _is_formula_document_boundary(normalized_line: str) -> bool:
+    return normalized_line in {
+        "FORMULAS ONLINE APPROVAL DETERMINATION",
+        "FORMULAS ONLINE ENTRY",
+        "FORMULA APPROVAL",
+        "APPROVED FORMULA",
+    }
 
 
 def _extract_formula_final_alcohol_content(text: str) -> str:

@@ -247,6 +247,37 @@ def test_formula_approval_parser_does_not_match_prefix_formula_id() -> None:
     assert fields == {}
 
 
+def test_formula_approval_parser_uses_matching_document_only() -> None:
+    text = """
+    FORMULAS ONLINE APPROVAL DETERMINATION
+    TTB Formula ID: F-4000
+    Status: Approved
+    Class/Type: Vodka
+    Alcohol Content of Finished Product: Low 40 High 40 Unit % by Volume
+
+    FORMULAS ONLINE APPROVAL DETERMINATION
+    TTB Formula ID: F-9600
+    Status: Approved
+    Class/Type: Gin
+    Alcohol Content of Finished Product: Low 45 High 45 Unit % by Volume
+
+    FORMULAS ONLINE APPROVAL DETERMINATION
+    TTB Formula ID: F-5000
+    Status: Approved
+    Class/Type: Rum
+    Alcohol Content of Finished Product: Low 50 High 50 Unit % by Volume
+    """
+
+    target_fields = parse_formula_approval_fields(text, "F-9600")
+    preceding_fields = parse_formula_approval_fields(text, "F-4000")
+    following_fields = parse_formula_approval_fields(text, "F-5000")
+
+    assert target_fields["alcohol_content"] == "45% ABV"
+    assert target_fields["class_type"] == "Gin"
+    assert preceding_fields["alcohol_content"] == "40% ABV"
+    assert following_fields["alcohol_content"] == "50% ABV"
+
+
 def test_application_derives_alcohol_content_from_matching_formula_approval() -> None:
     document = fitz.open()
     page = document.new_page(width=612, height=1008)

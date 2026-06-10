@@ -9,6 +9,7 @@ from src.extractors import (
     extract_acroform_fields,
     extract_application,
     extract_formula_identifier,
+    extract_imported_status_from_widgets,
     extract_label,
     extract_product_type_from_widgets,
     parse_application_summary,
@@ -405,6 +406,48 @@ def test_product_type_checkbox_widget_extraction(sample_bytes: dict[str, bytes])
             document.close()
 
 
+def test_imported_checkbox_widget_extraction(sample_bytes: dict[str, bytes]) -> None:
+    document = fitz.open(stream=sample_bytes["APP-024_import_country_artwork_pass.pdf"], filetype="pdf")
+    try:
+        assert extract_imported_status_from_widgets(document[0]) is True
+    finally:
+        document.close()
+
+    domestic_document = fitz.open(stream=sample_bytes["APP-001_old_tom_pass.pdf"], filetype="pdf")
+    try:
+        assert extract_imported_status_from_widgets(domestic_document[0]) is False
+    finally:
+        domestic_document.close()
+
+
+def test_checkbox_mark_extraction_from_flattened_source_form() -> None:
+    source = Path("docs/source/f510031.pdf")
+    assert source.exists()
+    document = fitz.open(source)
+    page = document[0]
+    for widget in page.widgets() or []:
+        if widget.field_type_string != "CheckBox":
+            continue
+        states = widget.button_states() or {}
+        option_text = " ".join(value for values in states.values() if values for value in values)
+        if "Import" in option_text or "Spirits" in option_text:
+            widget.field_value = next(value for values in states.values() if values for value in values if value != "Off")
+        else:
+            widget.field_value = "Off"
+        widget.update()
+
+    pixmap = page.get_pixmap(matrix=fitz.Matrix(2, 2), alpha=False)
+    flattened = fitz.open()
+    flattened_page = flattened.new_page(width=page.rect.width, height=page.rect.height)
+    flattened_page.insert_image(flattened_page.rect, pixmap=pixmap)
+    try:
+        assert extract_product_type_from_widgets(flattened_page) == "DISTILLED SPIRITS"
+        assert extract_imported_status_from_widgets(flattened_page) is True
+    finally:
+        document.close()
+        flattened.close()
+
+
 def test_generated_pdf_application_fields_do_not_keep_form_boilerplate(sample_bytes: dict[str, bytes]) -> None:
     extraction = extract_application(sample_bytes["APP-001_old_tom_pass.pdf"])
     assert extraction.fields.mailing_address == ""
@@ -414,6 +457,7 @@ def test_generated_pdf_application_fields_do_not_keep_form_boilerplate(sample_by
     assert extraction.fields.email == "labels@example.test"
     assert extraction.fields.application_type == "Certificate of Label Approval"
     assert extraction.fields.item_15 == ""
+    assert extraction.fields.raw_sources["imported"] == "application-summary"
     assert "TYPE OF A" not in extraction.fields.to_dict().get("grape_varietals", "")
 
 

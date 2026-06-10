@@ -31,7 +31,7 @@ There is no manual-entry mode and no separate single-application page. Batch mod
 - One-button verification workflow.
 - Top-page light/dark mode toggle.
 - Session-only PDF hash caching.
-- Best-effort AcroForm extraction with region and summary fallback.
+- Best-effort AcroForm extraction with checkbox, region, and summary fallback.
 - Separate application extraction and label evidence extraction.
 - Local Tesseract OCR fallback for raster label areas.
 - Ordered brand matching for harmless case, punctuation, apostrophe, ampersand, legal suffix variants such as `Co.`/`Company`, `Inc.`/`Incorporated`, `Corp.`/`Corporation`, `Ltd.`/`Limited`, and `L.L.C.`/`LLC`, and common `St.`/`Saint` or `Mt.`/`Mount` variations such as `STONE'S THROW`, `Stone's Throw`, `STONES THROW`, `SMITH & SONS` / `SMITH AND SONS`, `ACME DISTILLING CO.` / `ACME DISTILLING COMPANY`, and `SAINT GEORGE` / `ST. GEORGE`, without treating reordered brand words or distinct legal suffixes as equivalent.
@@ -44,7 +44,7 @@ There is no manual-entry mode and no separate single-application page. Batch mod
 The pipeline is implemented in small modules under `src/`:
 
 - `pdf_intake.py`: file hashing, ZIP expansion, scanned image normalization, and PDF processing.
-- `extractors.py`: AcroForm, form-region, summary, and label extraction.
+- `extractors.py`: AcroForm, source-form checkbox, form-region, summary, and label extraction.
 - `form_mapping.py`: normalized TTB F 5100.31 coordinate heuristics.
 - `ocr.py` and `preprocess.py`: local OCR and image cleanup.
 - `normalize.py`: deterministic value parsing and fuzzy normalization.
@@ -113,10 +113,11 @@ For each completed application file, the app:
 2. Computes SHA-256 for session caching.
 3. Converts scanned image files to an in-memory single-application PDF representation.
 4. Tries `pypdf` AcroForm extraction for PDFs.
-5. Extracts mapped form regions from page one when needed.
-6. Parses an explicit application-data summary block when present.
-7. Extracts label evidence from the lower page-one affixed label area and likely supplemental label pages.
-8. Compares application values to label evidence.
+5. Reads source-form checkbox widgets and visible checkbox marks for Item 3 Domestic/Imported and Item 5 product type when available.
+6. Extracts mapped form regions from page one when needed.
+7. Parses an explicit application-data summary block when present.
+8. Extracts label evidence from the lower page-one affixed label area and likely supplemental label pages.
+9. Compares application values to label evidence.
 
 Label OCR text is never used to invent expected application values.
 

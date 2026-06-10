@@ -94,6 +94,17 @@ FORMULA_ID_PATTERNS = (
     re.compile(rf"LAB\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
 )
 LOW_LABEL_SHARPNESS_THRESHOLD = 250.0
+SOURCE_FORM_WIDTH = 612.0
+CHECKBOX_MARK_THRESHOLD = 0.08
+SOURCE_PRODUCT_CHECKBOXES: tuple[tuple[str, tuple[float, float, float, float]], ...] = (
+    ("WINE", (146.6, 169.7, 157.2, 179.6)),
+    ("DISTILLED SPIRITS", (147.0, 180.9, 156.6, 190.7)),
+    ("MALT BEVERAGES", (147.0, 191.8, 156.2, 201.9)),
+)
+SOURCE_IMPORT_CHECKBOXES: tuple[tuple[bool, tuple[float, float, float, float]], ...] = (
+    (False, (140.4, 127.9, 149.9, 136.8)),
+    (True, (198.4, 127.9, 208.0, 136.8)),
+)
 
 FIELD_LABEL_PATTERNS: dict[str, tuple[re.Pattern[str], ...]] = {
     "serial_number": (re.compile(r"^\s*4\.?\s*SERIAL\s+NUMBER\s*[:\-]?\s*", re.IGNORECASE),),
@@ -177,8 +188,14 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
             product_type = extract_product_type_from_widgets(page)
             if product_type:
                 fields.product_type = product_type
-                fields.raw_sources["product_type"] = "acroform-checkbox"
+                fields.raw_sources["product_type"] = "source-checkbox"
                 fields.raw_confidences["product_type"] = 1.0
+        if "imported" not in fields.raw_sources:
+            imported_status = extract_imported_status_from_widgets(page)
+            if imported_status is not None:
+                fields.imported = imported_status
+                fields.raw_sources["imported"] = "source-checkbox"
+                fields.raw_confidences["imported"] = 1.0
         for field_name in APPLICATION_FORM_FIELDS:
             if getattr(fields, field_name):
                 continue
@@ -205,6 +222,8 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
 
     if not any((fields.serial_number, fields.brand_name, fields.product_type)):
         warnings.append("Application fields could not be extracted with enough certainty.")
+    if "imported" not in fields.raw_sources:
+        warnings.append("Source of product Domestic/Imported checkbox could not be extracted with enough certainty.")
 
     return ApplicationExtraction(
         fields=fields,
@@ -292,16 +311,70 @@ def extract_product_type_from_widgets(page: fitz.Page) -> str:
     for widget in page.widgets() or []:
         if widget.field_type_string != "CheckBox":
             continue
-        value = normalize_text(str(widget.field_value or ""))
-        if not value or value == "OFF":
+        if not _checkbox_is_checked(widget):
             continue
-        if "SPIRITS" in value:
+        checkbox_text = _checkbox_option_text(widget)
+        if "SPIRITS" in checkbox_text:
             return "DISTILLED SPIRITS"
-        if "WINE" in value:
+        if "WINE" in checkbox_text:
             return "WINE"
-        if "MALT" in value:
+        if "MALT" in checkbox_text:
             return "MALT BEVERAGES"
-    return ""
+    return _checked_option_from_marks(page, SOURCE_PRODUCT_CHECKBOXES) or ""
+
+
+def extract_imported_status_from_widgets(page: fitz.Page) -> bool | None:
+    for widget in page.widgets() or []:
+        if widget.field_type_string != "CheckBox" or not _checkbox_is_checked(widget):
+            continue
+        checkbox_text = _checkbox_option_text(widget)
+        if "IMPORT" in checkbox_text:
+            return True
+        if "DOMES" in checkbox_text or "DOMESTIC" in checkbox_text:
+            return False
+    return _checked_option_from_marks(page, SOURCE_IMPORT_CHECKBOXES)
+
+
+def _checkbox_is_checked(widget: fitz.Widget) -> bool:
+    value = normalize_text(str(widget.field_value or ""))
+    return bool(value and value not in {"OFF", "NO", "FALSE", "0"})
+
+
+def _checkbox_option_text(widget: fitz.Widget) -> str:
+    parts = [str(widget.field_name or ""), str(widget.field_value or "")]
+    try:
+        states = widget.button_states() or {}
+    except Exception:
+        states = {}
+    for values in states.values():
+        if not values:
+            continue
+        parts.extend(str(value) for value in values)
+    return normalize_text(" ".join(parts))
+
+
+def _checked_option_from_marks(page: fitz.Page, options: tuple[tuple[Any, tuple[float, float, float, float]], ...]) -> Any | None:
+    scored = [(option, _checkbox_mark_score(page, rect)) for option, rect in options]
+    checked = [(option, score) for option, score in scored if score >= CHECKBOX_MARK_THRESHOLD]
+    if len(checked) != 1:
+        return None
+    return checked[0][0]
+
+
+def _checkbox_mark_score(page: fitz.Page, source_rect: tuple[float, float, float, float]) -> float:
+    scale = page.rect.width / SOURCE_FORM_WIDTH
+    rect = fitz.Rect(*(coordinate * scale for coordinate in source_rect))
+    pad_x = rect.width * 0.2
+    pad_y = rect.height * 0.2
+    inner_rect = fitz.Rect(rect.x0 + pad_x, rect.y0 + pad_y, rect.x1 - pad_x, rect.y1 - pad_y)
+    try:
+        pixmap = page.get_pixmap(matrix=fitz.Matrix(8, 8), clip=inner_rect, colorspace=fitz.csGRAY, alpha=False)
+    except Exception:
+        return 0.0
+    if not pixmap.samples:
+        return 0.0
+    dark_pixels = sum(pixel < 150 for pixel in pixmap.samples)
+    return dark_pixels / len(pixmap.samples)
 
 
 def parse_application_summary(text: str) -> dict[str, Any]:
@@ -480,10 +553,9 @@ def _merge_fields(fields: ApplicationFields, values: dict[str, Any], source: str
         if not hasattr(fields, key):
             continue
         if key == "imported":
-            if value:
-                fields.imported = bool(value)
-                fields.raw_sources[key] = source
-                fields.raw_confidences[key] = 1.0
+            fields.imported = bool(value)
+            fields.raw_sources[key] = source
+            fields.raw_confidences[key] = 1.0
             continue
         value = str(value).strip()
         existing_source = fields.raw_sources.get(key, "")

@@ -18,6 +18,7 @@ This project is implemented as a local, deterministic Streamlit application. It 
 | --- | --- |
 | PyMuPDF (`pymupdf`, imported as `fitz`) | Opens PDFs, renders page regions, reads text layers, fills/generates sample PDFs, and converts scanned image inputs into in-memory PDF pages. |
 | pypdf | Reads PDF AcroForm field values from completed applications. |
+| PyMuPDF checkbox rendering | Reads visible checkbox marks for current source-form Item 3 Domestic/Imported and Item 5 product type when widgets are flattened or scanned. |
 | Pillow | Image loading, scanned-image conversion, sample label artwork generation, and raster label manipulation. |
 | OpenCV headless | OCR image preprocessing variants, Otsu/adaptive thresholding, and sharpness scoring for low-quality/rotated label detection. |
 | NumPy | Image-array operations for preprocessing, nonwhite-pixel ratio, and sharpness calculations. |

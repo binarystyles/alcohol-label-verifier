@@ -7,7 +7,7 @@ The app is a standalone Streamlit workflow that treats each completed applicatio
 The main modules are:
 
 - `src/pdf_intake.py`: PDF/image/ZIP expansion, hashing, per-file processing, and cache entry points.
-- `src/extractors.py`: AcroForm extraction, page-one region extraction, application summary parsing, and label-area extraction.
+- `src/extractors.py`: AcroForm extraction, source-form checkbox extraction, page-one region extraction, application summary parsing, and label-area extraction.
 - `src/form_mapping.py`: normalized prototype coordinates for TTB F 5100.31 page-one fields.
 - `src/ocr.py` and `src/preprocess.py`: PDF crop rendering, multiple local image-preprocessing variants, and local Tesseract OCR fallback.
 - `src/normalize.py`: text, brand, ABV/proof, net contents, product type, and warning normalization.
@@ -23,13 +23,14 @@ See `docs/TOOLS_USED.md` for the implementation, OCR, test, and deployment toolc
 2. Compute a SHA-256 hash for Streamlit session caching.
 3. Convert scanned images to an in-memory PDF page so the same region pipeline applies.
 4. Try `pypdf` AcroForm extraction for PDFs.
-5. If expected values remain missing, render/extract defined page-one form regions.
-6. Parse an explicit `APPLICATION DATA SUMMARY` block when present in the package.
-7. Use Item 9 as a Formula ID/reference and look for an exact normalized matching formula approval/source document inside the same uploaded package, ignoring unrelated formula approvals that may also be attached.
-8. Derive expected alcohol content from the matched formula approval document when available.
-9. Extract label text only from the lower page-one label area and likely supplemental label pages in the first 30 pages, skipping attached instruction pages and formula approval/source documents.
-10. Compare expected application values to label evidence.
-11. Return one application result plus field-level results.
+5. Read current source-form checkbox widgets, or visible checkbox marks on flattened/scanned source-form pages, for Item 3 Domestic/Imported and Item 5 product type.
+6. If expected values remain missing, render/extract defined page-one form regions.
+7. Parse an explicit `APPLICATION DATA SUMMARY` block when present in the package.
+8. Use Item 9 as a Formula ID/reference and look for an exact normalized matching formula approval/source document inside the same uploaded package, ignoring unrelated formula approvals that may also be attached.
+9. Derive expected alcohol content from the matched formula approval document when available.
+10. Extract label text only from the lower page-one label area and likely supplemental label pages in the first 30 pages, skipping attached instruction pages and formula approval/source documents.
+11. Compare expected application values to label evidence.
+12. Return one application result plus field-level results.
 
 The extractor never uses label OCR as the source of expected application values. If an expected value cannot be extracted from application fields, form regions, AcroForm values, an explicit application-data summary, or a matched formula approval document, that field becomes Needs Review.
 
@@ -51,6 +52,7 @@ Needs Review is used for uncertainty:
 - Low-confidence form OCR for an expected application value.
 - Unreadable PDF.
 - Missing expected application value.
+- Source of product Domestic/Imported checkbox cannot be extracted with enough certainty.
 - Supplied optional application value, such as a fanciful name, is not clearly found on the label.
 - Expected text appears only as a fragment inside a larger word, such as `Gin` inside `Ginger`.
 - Product-type words appear only in primary brand text, with no clear product/class label statement.
@@ -77,6 +79,7 @@ The app avoids full-document OCR unless necessary:
 
 - Embedded PDF text is used first.
 - AcroForms are checked before region OCR.
+- Current source-form checkbox widgets and visible checkbox marks are checked before OCR is trusted for checkbox-only values.
 - Only mapped page-one regions and candidate label areas are rendered.
 - Label OCR tries conservative adaptive-threshold, grayscale, contrast, and Otsu-preprocessed variants, then keeps the strongest local Tesseract result. This improves colored artwork, dark/reversed text, and colored warning panels without making network calls.
 - Results are cached by PDF hash during the Streamlit session.

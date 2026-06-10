@@ -51,6 +51,18 @@ def test_brand_number_symbol_variations_pass() -> None:
     assert verify_brand("OLD TOM NUMBER 5", "OLD TOM 5\nDISTILLED SPIRITS").status == STATUS_PASS
 
 
+def test_brand_ocr_character_confusion_needs_review_not_fail() -> None:
+    result = verify_brand("OLD TOM GIN", "0LD T0M GIN Botanical Reserve\nDISTILLED SPIRITS\n45% Alc./Vol.")
+    assert result.status == STATUS_REVIEW
+    assert "OCR-like character substitutions" in result.reason
+
+
+def test_brand_ocr_review_fallback_does_not_pass_materially_different_brand() -> None:
+    result = verify_brand("OLD TOM GIN", "0LD T0M V0DKA\nDISTILLED SPIRITS\n45% Alc./Vol.")
+    assert result.status == STATUS_FAIL
+    assert "materially different" in result.reason
+
+
 def test_brand_containing_proof_word_is_not_treated_as_alcohol_statement() -> None:
     result = verify_brand("PROOF RANGE BOURBON", "PROOF RANGE BOURBON\nDISTILLED SPIRITS\n90 Proof")
     assert result.status == STATUS_PASS

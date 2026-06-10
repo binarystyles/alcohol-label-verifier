@@ -400,6 +400,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-118_champagne_wine_class_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-119_port_wine_class_pass.pdf"].fields["class_type"] == "Port"
     assert specs["APP-119_port_wine_class_pass.pdf"].expected_status == STATUS_PASS
+    assert "0LD T0M GIN" in specs["APP-153_ocr_character_confusion_brand_review.pdf"].label_lines
+    assert specs["APP-153_ocr_character_confusion_brand_review.pdf"].expected_status == STATUS_REVIEW
 
 
 def test_sample_generator_uses_real_source_form_when_available(sample_paths: list[Path]) -> None:

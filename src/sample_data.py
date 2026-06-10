@@ -2985,6 +2985,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Explicit Class/Type values may contain product-type words such as Distilled Spirits Specialty and should still verify.",
         ),
+        SampleSpec(
+            filename="APP-153_ocr_character_confusion_brand_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-153", "formula": "F-15300"},
+            label_lines=[
+                "0LD T0M GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="OCR-style zero/letter substitutions in required brand text should be treated as a similar-but-not-certain Needs Review case.",
+        ),
     ]
 
 

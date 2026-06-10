@@ -28,6 +28,7 @@ from src.normalize import (
     government_warning_similarity,
     normalize_abv,
     normalize_for_match,
+    normalize_name,
     normalize_net_contents,
     normalize_text,
     ordered_fuzzy_score,
@@ -140,10 +141,21 @@ def verify_brand(expected: str, label_text: str) -> FieldResult:
     primary_text = _primary_brand_text(label_text)
     primary_score = ordered_fuzzy_score(expected, primary_text)
     full_score = ordered_fuzzy_score(expected, label_text)
+    ocr_confusion_score = _ocr_confusion_review_score(expected, primary_text or label_text)
     if primary_score >= BRAND_PASS_THRESHOLD:
         return _result("brand_name", expected, expected, snippet_around(primary_text, expected), STATUS_PASS, primary_score / 100, "Brand name matches with harmless formatting variation allowed.")
     if primary_score >= BRAND_REVIEW_THRESHOLD:
         return _result("brand_name", expected, "", snippet_around(primary_text), STATUS_REVIEW, primary_score / 100, "Brand name is similar but should be checked by a reviewer.")
+    if ocr_confusion_score >= BRAND_PASS_THRESHOLD:
+        return _result(
+            "brand_name",
+            expected,
+            "",
+            snippet_around(primary_text or label_text),
+            STATUS_REVIEW,
+            min(0.85, ocr_confusion_score / 100),
+            "Brand name appears to match except for OCR-like character substitutions; reviewer should confirm the label text.",
+        )
     if full_score >= BRAND_PASS_THRESHOLD and primary_text:
         return _result("brand_name", expected, "", snippet_around(label_text, expected), STATUS_FAIL, full_score / 100, "Expected brand appears only in producer, importer, warning, or other non-brand context.")
     return _result("brand_name", expected, "", snippet_around(primary_text or label_text), STATUS_FAIL, max(primary_score, full_score) / 100, "Required brand name appears materially different or missing.")
@@ -667,6 +679,28 @@ def _label_lines(label_text: str) -> list[str]:
     if len(lines) == 1:
         return _split_flat_label_line(lines[0])
     return lines
+
+
+OCR_CONFUSION_TRANSLATION = str.maketrans({"0": "O", "1": "I", "5": "S"})
+
+
+def _ocr_confusion_review_score(expected: str, actual: str) -> float:
+    expected_tokens = _normalize_ocr_confusions(expected).split()
+    actual_tokens = _normalize_ocr_confusions(actual).split()
+    if _contains_ordered_token_sequence(expected_tokens, actual_tokens):
+        return 100.0
+    return ordered_fuzzy_score(_normalize_ocr_confusions(expected), _normalize_ocr_confusions(actual))
+
+
+def _normalize_ocr_confusions(value: str) -> str:
+    return normalize_name(normalize_text(value).translate(OCR_CONFUSION_TRANSLATION))
+
+
+def _contains_ordered_token_sequence(expected_tokens: list[str], actual_tokens: list[str]) -> bool:
+    if not expected_tokens or len(expected_tokens) > len(actual_tokens):
+        return False
+    width = len(expected_tokens)
+    return any(actual_tokens[index : index + width] == expected_tokens for index in range(len(actual_tokens) - width + 1))
 
 
 def _split_flat_label_line(line: str) -> list[str]:

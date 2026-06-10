@@ -122,6 +122,20 @@ def test_government_warning_strict_title_case_behavior() -> None:
     assert "all caps" in result.reason
 
 
+def test_government_warning_mixed_or_lowercase_heading_fails_even_with_exact_statement() -> None:
+    for heading in ("GOVERNMENT Warning", "Government WARNING", "government warning"):
+        text = GOVERNMENT_WARNING.replace("GOVERNMENT WARNING", heading)
+        result = verify_government_warning(text, 0.95)
+        assert result.status == STATUS_FAIL
+        assert "all caps" in result.reason
+
+
+def test_government_warning_all_caps_heading_can_span_whitespace() -> None:
+    text = GOVERNMENT_WARNING.replace("GOVERNMENT WARNING", "GOVERNMENT\nWARNING")
+    result = verify_government_warning(text, 0.95)
+    assert result.status == STATUS_PASS
+
+
 def test_government_warning_missing_fails_when_label_is_readable() -> None:
     result = verify_government_warning("OLD TOM GIN 45% Alc./Vol. 750 mL", 0.95)
     assert result.status == STATUS_FAIL

@@ -109,5 +109,6 @@
 | `APP-105_formula_symbol_label_pass.pdf` | Pass | Pass | Formula support identifies the approval as Formula # instead of Formula ID. |
 | `APP-106_estimated_net_contents_mark_pass.pdf` | Pass | Pass | Label prefixes net contents with a compact estimated quantity mark, e750 mL. |
 | `APP-107_dotted_net_contents_unit_pass.pdf` | Pass | Pass | Label states net contents with dotted metric unit styling, 750 M.L. |
+| `APP-108_mixed_case_warning_heading_fail.pdf` | Fail | Fail | Government warning statement is exact, but the heading is mixed case instead of all caps. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

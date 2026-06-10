@@ -2131,6 +2131,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states net contents with dotted metric unit styling, 750 M.L.",
         ),
+        SampleSpec(
+            filename="APP-108_mixed_case_warning_heading_fail.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-108", "formula": "F-10800"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING.replace("GOVERNMENT WARNING", "GOVERNMENT Warning"),
+            ],
+            expected_status="Fail",
+            note="Government warning statement is exact, but the heading is mixed case instead of all caps.",
+        ),
     ]
 
 

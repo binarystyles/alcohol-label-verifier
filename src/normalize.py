@@ -327,7 +327,14 @@ def government_warning_similarity(text: str | None) -> float:
 def contains_title_case_warning(text: str | None) -> bool:
     if not text:
         return False
-    return bool(re.search(r"\bGovernment Warning\b", text)) and "GOVERNMENT WARNING" not in text
+    return has_non_uppercase_warning_heading(text)
+
+
+def has_non_uppercase_warning_heading(text: str | None) -> bool:
+    if not text:
+        return False
+    headings = re.findall(r"\bgovernment\s+warning\b", text, flags=re.IGNORECASE)
+    return bool(headings) and not any(re.sub(r"\s+", " ", heading).strip() == "GOVERNMENT WARNING" for heading in headings)
 
 
 def snippet_around(text: str | None, target: str | None = None, width: int = 220) -> str:

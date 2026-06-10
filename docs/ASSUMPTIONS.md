@@ -15,5 +15,5 @@
 - Net contents and imported country checks are context-aware. Serving-size volumes are not treated as net contents, and a country name must appear in origin wording rather than only in unrelated importer or brand text.
 - If an expected application value cannot be extracted, the field is marked Needs Review instead of being inferred from the label.
 - If an expected application value comes only from low-confidence form OCR, mismatches are marked Needs Review instead of Fail because the source value itself may be wrong.
-- OCR can be unreliable for low-resolution, rotated, distorted, or low-contrast labels. A government warning must match strictly to Pass, but OCR-imperfect warning text that is close to the canonical statement is routed to Needs Review rather than treated as a confirmed material alteration.
+- OCR can be unreliable for low-resolution, rotated, distorted, or low-contrast labels. A government warning must match strictly to Pass, including a readable all-caps `GOVERNMENT WARNING` heading, but OCR-imperfect warning text that is close to the canonical statement is routed to Needs Review rather than treated as a confirmed material alteration.
 - Reliable visual detection of bold type, exact type size, characters per inch, and contrasting background is documented as a limitation unless implemented separately.

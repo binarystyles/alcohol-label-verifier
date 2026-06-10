@@ -135,3 +135,7 @@ def test_government_warning_validation_exact_statement() -> None:
 
 def test_title_case_warning_is_detected() -> None:
     assert contains_title_case_warning("Government Warning: do not drink during pregnancy")
+    assert contains_title_case_warning("GOVERNMENT Warning: do not drink during pregnancy")
+    assert contains_title_case_warning("government warning: do not drink during pregnancy")
+    assert not contains_title_case_warning("GOVERNMENT WARNING: do not drink during pregnancy")
+    assert not contains_title_case_warning("GOVERNMENT\nWARNING: do not drink during pregnancy")

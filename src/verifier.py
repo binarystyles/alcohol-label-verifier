@@ -717,13 +717,13 @@ RESPONSIBLE_PARTY_CONTEXT_PATTERN = (
     rf"\b{RESPONSIBLE_PARTY_ACTION_LIST_PATTERN}\s+{RESPONSIBLE_PARTY_MODIFIER_PATTERN}(?:BY|FOR)\b"
 )
 RESPONSIBLE_PARTY_VALUE_PATTERN = re.compile(
-    rf"\b(?P<actions>{RESPONSIBLE_PARTY_ACTION_LIST_PATTERN})\s+{RESPONSIBLE_PARTY_MODIFIER_PATTERN}(?:BY|FOR)\s*(?::|-|\.)?\s+(?P<party>.+)",
+    rf"\b(?P<actions>{RESPONSIBLE_PARTY_ACTION_LIST_PATTERN})\s+{RESPONSIBLE_PARTY_MODIFIER_PATTERN}(?P<role>BY|FOR)\s*(?::|-|\.)?\s+(?P<party>.+)",
     re.IGNORECASE,
 )
 
 
-def _responsible_party_entries(label_text: str) -> list[tuple[frozenset[str], str]]:
-    entries: list[tuple[frozenset[str], str]] = []
+def _responsible_party_entries(label_text: str) -> list[tuple[frozenset[str], str, str]]:
+    entries: list[tuple[frozenset[str], str, str]] = []
     for line in _label_lines(label_text):
         match = RESPONSIBLE_PARTY_VALUE_PATTERN.search(line)
         if not match:
@@ -732,25 +732,46 @@ def _responsible_party_entries(label_text: str) -> list[tuple[frozenset[str], st
             RESPONSIBLE_PARTY_ACTION_ALIASES.get(action.rstrip("."), action.rstrip("."))
             for action in re.findall(RESPONSIBLE_PARTY_ACTION_PATTERN, normalize_text(match.group("actions")))
         )
+        role = normalize_text(match.group("role"))
         party = match.group("party").strip(" .:-")
         if actions.intersection(RESPONSIBLE_PARTY_REQUIRED_ACTIONS) and party:
-            entries.append((actions, party))
+            entries.append((actions, role, party))
     return entries
 
 
 def _conflicting_responsible_party_values(expected: str, label_text: str) -> list[str]:
     entries = _responsible_party_entries(label_text)
-    matching_actions = [actions for actions, party in entries if fuzzy_score(expected, party) >= TEXT_FIELD_PASS_THRESHOLD]
-    if not matching_actions:
+    matching_entries = [
+        (actions, role)
+        for actions, role, party in entries
+        if fuzzy_score(expected, party) >= TEXT_FIELD_PASS_THRESHOLD
+    ]
+    if not matching_entries:
         return []
 
     conflicts: list[str] = []
-    for actions, party in entries:
+    for actions, role, party in entries:
         if fuzzy_score(expected, party) >= TEXT_FIELD_PASS_THRESHOLD:
             continue
-        if any(actions.intersection(matched_actions) for matched_actions in matching_actions):
+        if any(
+            _responsible_party_entries_conflict(actions, role, matched_actions, matched_role)
+            for matched_actions, matched_role in matching_entries
+        ):
             conflicts.append(party)
     return conflicts
+
+
+def _responsible_party_entries_conflict(
+    actions: frozenset[str],
+    role: str,
+    matched_actions: frozenset[str],
+    matched_role: str,
+) -> bool:
+    if not actions.intersection(matched_actions):
+        return False
+    if role == matched_role:
+        return True
+    return matched_role == "FOR" and role == "BY"
 
 
 def _label_lines(label_text: str) -> list[str]:

@@ -3521,6 +3521,23 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Authority wording names an entity but does not provide a clear Bottled by/for responsible-party statement.",
         ),
+        SampleSpec(
+            filename="APP-179_bottled_for_by_actual_bottler_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-179", "formula": "F-17900"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled for Old Tom Brands",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Separate Bottled for and Bottled by statements should pass when the application identifies the actual Bottled by entity.",
+        ),
     ]
 
 

@@ -180,5 +180,6 @@
 | `APP-176_first_line_straight_rye_whiskey_pass.pdf` | Pass | Pass | A first-line distilled-spirits class phrase should satisfy distilled-spirits product type and class/type checks. |
 | `APP-177_imported_into_from_origin_pass.pdf` | Pass | Pass | Imported origin can be stated as Imported into the United States from France. |
 | `APP-178_under_authority_responsible_party_review.pdf` | Needs Review | Needs Review | Authority wording names an entity but does not provide a clear Bottled by/for responsible-party statement. |
+| `APP-179_bottled_for_by_actual_bottler_pass.pdf` | Pass | Pass | Separate Bottled for and Bottled by statements should pass when the application identifies the actual Bottled by entity. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

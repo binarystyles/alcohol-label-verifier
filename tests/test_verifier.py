@@ -183,6 +183,24 @@ def test_bottler_producer_separate_importer_role_does_not_conflict() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_bottler_producer_bottled_for_does_not_block_expected_bottled_by() -> None:
+    result = verify_bottler_producer(
+        "Example Distilling Co.",
+        "Bottled for Old Tom Brands\nBottled by Example Distilling Co.",
+    )
+    assert result.status == STATUS_PASS
+
+
+def test_bottler_producer_bottled_for_still_reviews_different_bottled_by() -> None:
+    result = verify_bottler_producer(
+        "Old Tom Brands",
+        "Bottled for Old Tom Brands\nBottled by Example Distilling Co.",
+    )
+    assert result.status == STATUS_REVIEW
+    assert result.found == "Example Distilling Co"
+    assert "conflicting responsible-party" in result.reason
+
+
 def test_bottler_producer_company_abbreviation_passes() -> None:
     assert verify_bottler_producer("Acme Distilling Co.", "Bottled by Acme Distilling Company").status == STATUS_PASS
     assert verify_bottler_producer("Acme Distilling Company", "Bottled by Acme Distilling Co.").status == STATUS_PASS

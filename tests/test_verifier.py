@@ -356,6 +356,13 @@ def test_product_type_mismatch_fails() -> None:
     assert "different product type" in result.reason
 
 
+def test_conflicting_explicit_product_type_statements_need_review() -> None:
+    result = verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nMALT BEVERAGES\nWINE\n5.5% Alc./Vol.")
+    assert result.status == STATUS_REVIEW
+    assert result.found == "WINE"
+    assert "conflicting product-type" in result.reason
+
+
 def test_product_type_descriptor_does_not_override_explicit_product_type() -> None:
     result = verify_product_type("DISTILLED SPIRITS", "CELLAR CASK WHISKEY Wine Cask Finish DISTILLED SPIRITS")
     assert result.status == STATUS_PASS
@@ -443,6 +450,13 @@ def test_class_type_in_brand_line_only_needs_review() -> None:
     result = verify_class_type("Gin", "OLD TOM GIN\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL")
     assert result.status == STATUS_REVIEW
     assert "non-class context" in result.reason
+
+
+def test_conflicting_class_type_statements_need_review() -> None:
+    result = verify_class_type("Gin", "OLD TOM GIN\nClass/Type: Gin\nClass/Type: Vodka\n45% Alc./Vol.")
+    assert result.status == STATUS_REVIEW
+    assert result.found == "Vodka"
+    assert "conflicting class/type" in result.reason
 
 
 def test_class_type_does_not_match_inside_larger_word() -> None:

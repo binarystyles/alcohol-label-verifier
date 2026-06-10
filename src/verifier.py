@@ -188,6 +188,18 @@ def verify_product_type(expected: str, label_text: str) -> FieldResult:
     expected_type = extract_product_type(expected)
     if not expected_type:
         return _expected_missing("product_type")
+    explicit_types = _explicit_product_type_statements(label_text)
+    conflicting_types = sorted({product_type for product_type in explicit_types if product_type != expected_type})
+    if expected_type in explicit_types and conflicting_types:
+        return _result(
+            "product_type",
+            expected_type,
+            ", ".join(conflicting_types),
+            snippet_around(label_text),
+            STATUS_REVIEW,
+            0.75,
+            "Label contains conflicting product-type statements; reviewer should confirm the intended product type.",
+        )
     candidate_text = _product_type_candidate_text(label_text)
     found = extract_product_type(candidate_text)
     if found == expected_type:
@@ -215,6 +227,21 @@ def verify_product_type(expected: str, label_text: str) -> FieldResult:
 def verify_class_type(expected: str, label_text: str) -> FieldResult:
     if not expected:
         return _expected_missing("class_type")
+    class_values = _explicit_class_type_values(label_text)
+    matching_class_values = [value for value in class_values if fuzzy_score(expected, value) >= CLASS_TYPE_PASS_THRESHOLD]
+    conflicting_class_values = [
+        value for value in class_values if fuzzy_score(expected, value) < CLASS_TYPE_REVIEW_THRESHOLD
+    ]
+    if matching_class_values and conflicting_class_values:
+        return _result(
+            "class_type",
+            expected,
+            "; ".join(conflicting_class_values),
+            snippet_around(label_text),
+            STATUS_REVIEW,
+            0.75,
+            "Label contains conflicting class/type statements; reviewer should confirm the intended class/type.",
+        )
     class_text = _class_type_candidate_text(label_text)
     score = fuzzy_score(expected, class_text)
     if score >= CLASS_TYPE_PASS_THRESHOLD:
@@ -477,6 +504,17 @@ def _explicit_product_type_statement_present(label_text: str, product_type: str)
     return any(_is_explicit_product_type_line(line) and extract_product_type(line) == product_type for line in _label_lines(label_text))
 
 
+def _explicit_product_type_statements(label_text: str) -> list[str]:
+    product_types: list[str] = []
+    for line in _label_lines(label_text):
+        if not _is_explicit_product_type_line(line):
+            continue
+        product_type = extract_product_type(line)
+        if product_type:
+            product_types.append(product_type)
+    return product_types
+
+
 def _distilled_spirits_class_statement_present(label_text: str) -> bool:
     for line in _label_lines(label_text):
         normalized = normalize_text(line)
@@ -508,6 +546,18 @@ def _class_type_candidate_text(label_text: str) -> str:
             continue
         candidates.append(line)
     return "\n".join(candidates)
+
+
+def _explicit_class_type_values(label_text: str) -> list[str]:
+    values: list[str] = []
+    for line in _label_lines(label_text):
+        normalized_line = normalize_text(line)
+        if "CLASS/TYPE" not in normalized_line and "CLASS TYPE" not in normalized_line:
+            continue
+        value = re.split(r"CLASS\s*/?\s*TYPE\s*:?", line, maxsplit=1, flags=re.IGNORECASE)[-1].strip(" :-")
+        if value:
+            values.append(value)
+    return values
 
 
 def _responsible_party_text(label_text: str) -> str:

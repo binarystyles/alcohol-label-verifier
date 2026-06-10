@@ -55,8 +55,8 @@ Needs Review is used for uncertainty:
 - Source of product Domestic/Imported checkbox cannot be extracted with enough certainty.
 - Supplied optional application value, such as a fanciful name, is not clearly found on the label.
 - Expected text appears only as a fragment inside a larger word, such as `Gin` inside `Ginger`.
-- Product-type words appear only in primary brand text, with no clear product/class label statement.
-- Class/type text appears only in brand, producer, warning, or other non-class context.
+- Product-type words appear only in primary brand text, with no clear product/class label statement, or the label contains conflicting explicit product-type statements.
+- Class/type text appears only in brand, producer, warning, or other non-class context, or the label contains conflicting explicit class/type statements.
 - Bottler/producer text appears only in brand or other non-responsible-party context instead of wording such as `Bottled by`, `Bottled for`, `Distilled by`, `Blended by`, `Imported by`, `Canned by`, `Packed by`, or `Produced and bottled by`. Harmless legal suffix variants pass, but distinct suffixes such as `LLC` versus `Limited` are not treated as the same entity.
 - Label contains both matching and conflicting alcohol-content or net-contents values.
 - Missing matching formula approval content for an Item 9 Formula ID.

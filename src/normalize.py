@@ -280,6 +280,20 @@ NET_CONTENTS_PATTERN = re.compile(
     rf"(?<![A-Z0-9/])(?P<num>(?:\d{{1,3}}(?:,\d{{3}})+(?:\.\d+)?)|(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN}){NET_CONTENTS_UNIT_BOUNDARY}",
     re.IGNORECASE,
 )
+NET_CONTENTS_MULTIPACK_PATTERNS = (
+    re.compile(
+        rf"(?<![A-Z0-9])(?P<count>\d{{1,3}})\s*(?:X|x|\u00d7)\s*(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN}){NET_CONTENTS_UNIT_BOUNDARY}",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        rf"(?<![A-Z0-9])(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\s*(?:X|x|\u00d7)\s*(?P<count>\d{{1,3}})(?=$|[^A-Z0-9])",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        rf"(?<![A-Z0-9])(?P<count>\d{{1,3}})\s*(?:BOTTLES?|CANS?|CONTAINERS?|PACK|PACKS|PK)\s+(?:OF\s+)?(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})(?:\s+EACH)?{NET_CONTENTS_UNIT_BOUNDARY}",
+        re.IGNORECASE,
+    ),
+)
 
 
 def extract_net_contents_values(text: str | None) -> list[float]:
@@ -288,6 +302,16 @@ def extract_net_contents_values(text: str | None) -> list[float]:
     text = _strip_estimated_net_quantity_mark(text)
     values: list[float] = []
     compound_spans: list[tuple[int, int]] = []
+    for pattern in NET_CONTENTS_MULTIPACK_PATTERNS:
+        for match in pattern.finditer(text):
+            if _is_non_net_contents_volume(text, match.start(), match.end()):
+                continue
+            count = float(match.group("count"))
+            number = _parse_net_contents_number(match.group("num"))
+            milliliters = _net_unit_to_milliliters(number, match.group("unit")) * count
+            if 0 < milliliters < 100000:
+                values.append(round(milliliters, 3))
+                compound_spans.append(match.span())
     for match in NET_CONTENTS_COMPOUND_PATTERN.finditer(text):
         if _is_non_net_contents_volume(text, match.start(), match.end()):
             continue
@@ -347,6 +371,14 @@ def extract_net_contents_values(text: str | None) -> list[float]:
 def normalize_net_contents(text: str | None) -> float | None:
     values = extract_net_contents_values(text)
     return values[0] if values else None
+
+
+def _parse_net_contents_number(value: str) -> float:
+    if "," in value and "." not in value:
+        if re.fullmatch(r"\d{1,3}(?:,\d{3})+", value):
+            return float(value.replace(",", ""))
+        return float(value.replace(",", "."))
+    return float(value.replace(",", ""))
 
 
 def _strip_estimated_net_quantity_mark(text: str) -> str:

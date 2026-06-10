@@ -3082,6 +3082,27 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Fail",
             note="Readable labels with hyphenated government-warning headings should fail strict canonical-heading validation.",
         ),
+        SampleSpec(
+            filename="APP-158_multipack_net_contents_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-158",
+                "formula": "F-15800",
+                "net_contents": "200 mL",
+            },
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "Net Contents 4 x 50 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Multipack net-contents wording such as 4 x 50 mL should normalize to the total package volume.",
+        ),
     ]
 
 

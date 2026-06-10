@@ -822,6 +822,12 @@ def test_net_contents_match_passes_with_rounded_dual_unit_equivalents() -> None:
     assert verify_net_contents("750 mL", "Net Contents 750 mL / 24 FL OZ").status == STATUS_REVIEW
 
 
+def test_net_contents_match_passes_with_multipack_statement() -> None:
+    assert verify_net_contents("200 mL", "Net Contents 4 x 50 mL").status == STATUS_PASS
+    assert verify_net_contents("200 mL", "Net Contents 50 mL x 4").status == STATUS_PASS
+    assert verify_net_contents("200 mL", "Net Contents 200 mL (4 x 50 mL)").status == STATUS_PASS
+
+
 def test_net_contents_match_passes_with_written_number_words() -> None:
     assert verify_net_contents("750 mL", "Net Contents Seven Hundred Fifty Milliliters").status == STATUS_PASS
     assert verify_net_contents("750 mL", "Net Contents 750 millilitres").status == STATUS_PASS

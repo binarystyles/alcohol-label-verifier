@@ -159,5 +159,6 @@
 | `APP-155_vodka_cocktail_class_product_type_pass.pdf` | Pass | Pass | Distilled spirits specialty/cocktail class-type text can satisfy product type without a separate DISTILLED SPIRITS line. |
 | `APP-156_bottled_in_origin_review.pdf` | Needs Review | Needs Review | Imported country of origin should need review when the label has only bottling-location wording, not clear origin wording. |
 | `APP-157_hyphenated_warning_heading_fail.pdf` | Fail | Fail | Readable labels with hyphenated government-warning headings should fail strict canonical-heading validation. |
+| `APP-158_multipack_net_contents_pass.pdf` | Pass | Pass | Multipack net-contents wording such as 4 x 50 mL should normalize to the total package volume. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

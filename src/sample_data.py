@@ -3120,6 +3120,31 @@ def sample_specs() -> list[SampleSpec]:
             note="Formula support states final alcohol with Target ABV shorthand and should verify against the label.",
             formula_approval_alcohol_label="Target ABV",
         ),
+        SampleSpec(
+            filename="APP-160_mfg_made_bottled_origin_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-160",
+                "formula": "F-16000",
+                "brand_name": "LAGO VERDE AMARO",
+                "fanciful_name": "",
+                "class_type": "Liqueur",
+                "imported": True,
+                "country_of_origin": "Italy",
+            },
+            label_lines=[
+                "LAGO VERDE AMARO",
+                "DISTILLED SPIRITS",
+                "Class/Type: Liqueur",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Made and bottled in Italy",
+                "Mfg. by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported origin can be stated as Made and bottled in Italy, and abbreviated Mfg. by wording should satisfy responsible-party evidence.",
+        ),
     ]
 
 

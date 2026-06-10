@@ -169,6 +169,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-157_hyphenated_warning_heading_fail.pdf" in specs
     assert "APP-158_multipack_net_contents_pass.pdf" in specs
     assert "APP-159_formula_target_abv_pass.pdf" in specs
+    assert "APP-160_mfg_made_bottled_origin_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -257,6 +258,10 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-158_multipack_net_contents_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-159_formula_target_abv_pass.pdf"].formula_approval_alcohol_label == "Target ABV"
     assert specs["APP-159_formula_target_abv_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-160_mfg_made_bottled_origin_pass.pdf"].fields["country_of_origin"] == "Italy"
+    assert "Made and bottled in Italy" in specs["APP-160_mfg_made_bottled_origin_pass.pdf"].label_lines
+    assert "Mfg. by Example Distilling Co." in specs["APP-160_mfg_made_bottled_origin_pass.pdf"].label_lines
+    assert specs["APP-160_mfg_made_bottled_origin_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

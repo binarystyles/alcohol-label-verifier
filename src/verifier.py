@@ -634,8 +634,9 @@ def _responsible_party_text(label_text: str) -> str:
 
 
 RESPONSIBLE_PARTY_ACTION_PATTERN = (
-    r"(?:BOTTLED|PRODUCED|DISTILLED|BLENDED|IMPORTED|BREWED|VINTED|CELLARED|CANNED|PACKED|PACKAGED|FILLED|MADE|PREPARED|MANUFACTURED)"
+    r"(?:BOTTLED|PRODUCED|DISTILLED|BLENDED|IMPORTED|BREWED|VINTED|CELLARED|CANNED|PACKED|PACKAGED|FILLED|MADE|PREPARED|MANUFACTURED|MFG\.?|MFR\.?)"
 )
+RESPONSIBLE_PARTY_ACTION_ALIASES = {"MFG": "MANUFACTURED", "MFR": "MANUFACTURED"}
 RESPONSIBLE_PARTY_ACTION_LIST_PATTERN = (
     rf"{RESPONSIBLE_PARTY_ACTION_PATTERN}"
     rf"(?:(?:\s*(?:,|/|&)\s*|\s+AND\s+){RESPONSIBLE_PARTY_ACTION_PATTERN})*"
@@ -656,7 +657,10 @@ def _responsible_party_entries(label_text: str) -> list[tuple[frozenset[str], st
         match = RESPONSIBLE_PARTY_VALUE_PATTERN.search(line)
         if not match:
             continue
-        actions = frozenset(re.findall(RESPONSIBLE_PARTY_ACTION_PATTERN, normalize_text(match.group("actions"))))
+        actions = frozenset(
+            RESPONSIBLE_PARTY_ACTION_ALIASES.get(action.rstrip("."), action.rstrip("."))
+            for action in re.findall(RESPONSIBLE_PARTY_ACTION_PATTERN, normalize_text(match.group("actions")))
+        )
         party = match.group("party").strip(" .:-")
         if actions and party:
             entries.append((actions, party))
@@ -940,6 +944,7 @@ def _country_origin_statement_present(expected: str, label_text: str) -> bool:
                 rf"\bBREWED\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bBREWED\s+AND\s+BOTTLED\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bMADE\s+IN\s+(?:THE\s+)?{country}\b",
+                rf"\bMADE\s+AND\s+BOTTLED\s+IN\s+(?:THE\s+)?{country}\b",
                 rf"\bIMPORTED\s+FROM\s+(?:THE\s+)?{country}\b",
                 rf"\bIMPORTED\s+BY\b(?:\s+[A-Z0-9]+){{0,12}}\s+FROM\s+(?:THE\s+)?{country}\b",
                 rf"\bCOUNTRY\s+OF\s+ORIGIN\s+(?:THE\s+)?{country}\b",

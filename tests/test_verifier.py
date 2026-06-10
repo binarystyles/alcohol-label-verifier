@@ -110,6 +110,9 @@ def test_bottler_producer_accepts_additional_valid_function_words() -> None:
         "Filled by Example Distilling Co.",
         "Made by Example Distilling Co.",
         "Prepared by Example Distilling Co.",
+        "Manufactured by Example Distilling Co.",
+        "Mfg. by Example Distilling Co.",
+        "Mfr. by Example Distilling Co.",
         "Brewed, filled and packaged by Example Distilling Co.",
     ):
         assert verify_bottler_producer("Example Distilling Co.", text).status == STATUS_PASS
@@ -681,6 +684,7 @@ def test_imported_country_of_origin_allows_distilled_and_brewed_in_wording() -> 
     assert verify_country_of_origin("United Kingdom", True, "Blended, matured and bottled in Scotland").status == STATUS_PASS
     assert verify_country_of_origin("Belgium", True, "Brewed in Belgium").status == STATUS_PASS
     assert verify_country_of_origin("Belgium", True, "Brewed and bottled in Belgium").status == STATUS_PASS
+    assert verify_country_of_origin("Italy", True, "Made and bottled in Italy").status == STATUS_PASS
 
 
 def test_imported_country_of_origin_allows_produced_and_bottled_in_wording() -> None:

@@ -127,5 +127,6 @@
 | `APP-123_class_type_conflict_review.pdf` | Needs Review | Needs Review | Label contains expected and conflicting Class/Type statements, so class/type requires review. |
 | `APP-124_bottler_conflict_review.pdf` | Needs Review | Needs Review | Label contains expected and conflicting Bottled by statements, so responsible-party text requires review. |
 | `APP-125_comma_responsible_party_pass.pdf` | Pass | Pass | Label uses comma-separated responsible-party actions before By and should still match the application entity. |
+| `APP-126_pre_import_approval_pass.pdf` | Pass | Pass | Item 9 references a pre-import approval letter in the same PDF package, and the approved alcohol content matches the label. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

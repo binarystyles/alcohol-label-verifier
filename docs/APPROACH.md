@@ -26,8 +26,8 @@ See `docs/TOOLS_USED.md` for the implementation, OCR, test, and deployment toolc
 5. Read current source-form checkbox widgets, or visible checkbox marks on flattened/scanned source-form pages, for Item 3 Domestic/Imported and Item 5 product type.
 6. If expected values remain missing, render/extract defined page-one form regions.
 7. Parse an explicit `APPLICATION DATA SUMMARY` block when present in the package.
-8. Use Item 9 as a Formula ID/reference and look for an exact normalized matching formula approval/source document inside the same uploaded package, ignoring unrelated formula approvals that may also be attached.
-9. Derive expected alcohol content from the matched formula approval document when available.
+8. Use Item 9 as a Formula ID/reference and look for an exact normalized matching formula approval/source document or pre-import approval letter inside the same uploaded package, ignoring unrelated approvals that may also be attached.
+9. Derive expected alcohol content from the matched approval/source document when available.
 10. Extract label text only from the lower page-one label area and likely supplemental label pages in the first 30 pages, skipping attached instruction pages and formula approval/source documents.
 11. Compare expected application values to label evidence.
 12. Return one application result plus field-level results.
@@ -59,8 +59,8 @@ Needs Review is used for uncertainty:
 - Class/type text appears only in brand, producer, warning, or other non-class context, or the label contains conflicting explicit class/type statements.
 - Bottler/producer text appears only in brand or other non-responsible-party context instead of wording such as `Bottled by`, `Bottled for`, `Distilled by`, `Blended by`, `Imported by`, `Canned by`, `Packed by`, `Produced and bottled by`, or comma/slash-separated action lists such as `Distilled, bottled and packaged by` and `Produced/Bottled by`, or the label contains conflicting same-role responsible-party statements. Harmless legal suffix variants pass, but distinct suffixes such as `LLC` versus `Limited` are not treated as the same entity.
 - Label contains both matching and conflicting alcohol-content or net-contents values.
-- Missing matching formula approval content for an Item 9 Formula ID.
-- Matching formula approval/source document found but no final alcohol content is extractable.
+- Missing matching formula approval or pre-import approval content for an Item 9 reference.
+- Matching formula approval/source document or pre-import approval letter found but no final alcohol content is extractable.
 - Formula support document has a similar but nonmatching prefix-sharing Formula ID.
 - Imported country of origin is missing, conflicts with another origin-style country statement, or appears only in unrelated text such as an importer company name rather than in origin wording like `Product of`, `Produce of`, `Distilled in`, `Distilled and bottled in`, `Distilled, matured and bottled in`, `Blended in`, `Blended and bottled in`, `Brewed in`, `Brewed and bottled in`, `Made in`, `Imported from`, or `Imported by ... from`. United States and United Kingdom origins can match common label abbreviations such as `USA`, `U.S.A.`, `U.S.`, `UK`, or `U.K.`; United Kingdom can also match constituent-origin wording such as `Product of Scotland`, `Distilled in Scotland`, `Distilled and bottled in Scotland`, `Distilled, matured and bottled in Scotland`, or `Blended in Scotland`; Ireland can match `Republic of Ireland`; and Netherlands can match `The Netherlands`.
 - Government warning text is close to canonical, but the heading or OCR text is not exact enough for a strict pass.

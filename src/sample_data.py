@@ -34,6 +34,7 @@ class SampleSpec:
     include_formula_approval: bool = True
     formula_approval_id: str | None = None
     formula_approval_unit: str = "% by Volume"
+    formula_approval_header: str = "FORMULAS ONLINE APPROVAL DETERMINATION"
     formula_approval_identifier_label: str = "TTB Formula ID"
     formula_approval_alcohol_label: str = "Alcohol Content of Finished Product"
     extra_formula_approvals_before: tuple[dict[str, str | bool], ...] = ()
@@ -2486,6 +2487,24 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label uses comma-separated responsible-party actions before By and should still match the application entity.",
         ),
+        SampleSpec(
+            filename="APP-126_pre_import_approval_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-126", "formula": "PIA-12600"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Item 9 references a pre-import approval letter in the same PDF package, and the approved alcohol content matches the label.",
+            formula_approval_header="PRE-IMPORT APPROVAL LETTER",
+            formula_approval_identifier_label="Pre-import Approval No.",
+        ),
     ]
 
 
@@ -2531,6 +2550,7 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
             spec.fields,
             formula_id_override=spec.formula_approval_id,
             formula_unit=spec.formula_approval_unit,
+            formula_header=spec.formula_approval_header,
             formula_identifier_label=spec.formula_approval_identifier_label,
             formula_alcohol_label=spec.formula_approval_alcohol_label,
         )
@@ -2691,6 +2711,7 @@ def _append_formula_approval_page(
     *,
     formula_id_override: str | None = None,
     formula_unit: str = "% by Volume",
+    formula_header: str = "FORMULAS ONLINE APPROVAL DETERMINATION",
     formula_identifier_label: str = "TTB Formula ID",
     formula_alcohol_label: str = "Alcohol Content of Finished Product",
 ) -> None:
@@ -2698,7 +2719,7 @@ def _append_formula_approval_page(
     formula_id = formula_id_override or str(fields.get("formula", "") or "")
     low_alcohol, high_alcohol = _low_high_values(fields.get("alcohol_content", ""))
     lines = [
-        "FORMULAS ONLINE APPROVAL DETERMINATION",
+        formula_header,
         "",
         f"{formula_identifier_label}: {formula_id}",
         "Status: Approved",

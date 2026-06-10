@@ -89,6 +89,10 @@ FORMULA_ID_PATTERNS = (
         rf"(?:APPROVED\s+)?(?:TTB\s+)?FORMULA\s+ID\s*(?:(?:NO\.?|NUMBER|#)\s*)?[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})",
         re.IGNORECASE,
     ),
+    re.compile(
+        rf"PRE[-\s]*IMPORT\s+APPROVAL\s*(?:(?:REFERENCE|LETTER|ID|NO\.?|NUMBER)\s*)?[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})",
+        re.IGNORECASE,
+    ),
     re.compile(rf"TTB\s+ID\s*(?:NO\.?|NUMBER)?\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
     re.compile(rf"(?:APPROVED\s+)?(?:TTB\s+)?FORMULA\s*(?:NO\.?|NUMBER|#)\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
     re.compile(rf"LAB\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
@@ -623,6 +627,9 @@ def _looks_like_formula_approval_text(normalized_text: str) -> bool:
             "FORMULAS ONLINE",
             "TTB FORMULA ID",
             "FORMULA ID",
+            "PRE-IMPORT APPROVAL",
+            "PRE IMPORT APPROVAL",
+            "PREIMPORT APPROVAL",
             "FINAL ALCOHOL CONTENT",
             "ALCOHOL CONTENT OF FINISHED PRODUCT",
             "YIELD SUMMARY",
@@ -639,6 +646,9 @@ def _is_formula_document_boundary(normalized_line: str) -> bool:
         "FORMULAS ONLINE ENTRY",
         "FORMULA APPROVAL",
         "APPROVED FORMULA",
+        "PRE-IMPORT APPROVAL LETTER",
+        "PRE IMPORT APPROVAL LETTER",
+        "PREIMPORT APPROVAL LETTER",
     }
 
 

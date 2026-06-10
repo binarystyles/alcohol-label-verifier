@@ -51,6 +51,8 @@ def test_formula_identifier_extraction() -> None:
     assert extract_formula_identifier("TTB Formula ID: 123456") == "123456"
     assert extract_formula_identifier("Formula Number: 24-001") == "24-001"
     assert extract_formula_identifier("Lab Number: 12345") == "12345"
+    assert extract_formula_identifier("Pre-import Approval No.: PIA-1001") == "PIA-1001"
+    assert extract_formula_identifier("Pre-import approval reference: PIA 1001") == "PIA 1001"
     assert extract_formula_identifier("123456") == "123456"
     assert extract_formula_identifier("45% ABV") == ""
 
@@ -91,6 +93,23 @@ def test_formula_approval_parser_matches_formula_symbol_and_id_number_labels() -
         fields = parse_formula_approval_fields(text, "F-10500")
         assert fields["alcohol_content"] == "45% ABV"
         assert fields["class_type"] == "Gin"
+
+
+def test_formula_approval_parser_matches_pre_import_approval_reference() -> None:
+    text = """
+    PRE-IMPORT APPROVAL LETTER
+
+    Pre-import Approval No.: PIA-1001
+    Status: Approved
+    Brand Name: OLD TOM GIN
+    Class/Type: Gin
+
+    Yield Summary
+    Alcohol Content of Finished Product: 45% ABV
+    """
+    fields = parse_formula_approval_fields(text, "PIA-1001")
+    assert fields["alcohol_content"] == "45% ABV"
+    assert fields["class_type"] == "Gin"
 
 
 def test_formula_approval_parser_matches_numeric_formula_identifiers() -> None:

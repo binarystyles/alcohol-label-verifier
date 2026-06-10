@@ -171,5 +171,6 @@
 | `APP-167_colon_bottled_by_pass.pdf` | Pass | Pass | Colon punctuation after Bottled by should still satisfy responsible-party evidence. |
 | `APP-168_percent_alcohol_volume_pass.pdf` | Pass | Pass | Percent Alcohol Vol. wording should normalize as ABV. |
 | `APP-169_slash_alcohol_volume_pass.pdf` | Pass | Pass | Slash-separated Alcohol/Vol. wording should normalize as ABV. |
+| `APP-170_brewed_canned_origin_pass.pdf` | Pass | Pass | Imported malt beverage origin can be stated as Brewed and canned in Belgium. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

@@ -3319,6 +3319,33 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Slash-separated Alcohol/Vol. wording should normalize as ABV.",
         ),
+        SampleSpec(
+            filename="APP-170_brewed_canned_origin_pass.pdf",
+            fields={
+                **malt_fields,
+                "serial_number": "APP-170",
+                "brand_name": "LOWLAND ABBEY ALE",
+                "fanciful_name": "",
+                "formula": "MB-17000",
+                "class_type": "Ale",
+                "bottler_producer": "Lowland Abbey Brewing Co.",
+                "country_of_origin": "Belgium",
+                "imported": True,
+            },
+            label_lines=[
+                "LOWLAND ABBEY ALE",
+                "MALT BEVERAGE",
+                "Class/Type: Ale",
+                "5.5% Alc./Vol.",
+                "12 fl oz",
+                "Brewed and canned in Belgium",
+                "Brewed and canned by Lowland Abbey Brewing Co.",
+                "Imported by Example Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported malt beverage origin can be stated as Brewed and canned in Belgium.",
+        ),
     ]
 
 

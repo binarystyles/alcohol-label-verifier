@@ -714,12 +714,15 @@ def test_imported_country_of_origin_allows_distilled_and_brewed_in_wording() -> 
     assert verify_country_of_origin("United Kingdom", True, "Blended, matured and bottled in Scotland").status == STATUS_PASS
     assert verify_country_of_origin("Belgium", True, "Brewed in Belgium").status == STATUS_PASS
     assert verify_country_of_origin("Belgium", True, "Brewed and bottled in Belgium").status == STATUS_PASS
+    assert verify_country_of_origin("Belgium", True, "Brewed and canned in Belgium").status == STATUS_PASS
+    assert verify_country_of_origin("Belgium", True, "Brewed, bottled and canned in Belgium").status == STATUS_PASS
     assert verify_country_of_origin("Italy", True, "Made and bottled in Italy").status == STATUS_PASS
 
 
 def test_imported_country_of_origin_allows_produced_and_bottled_in_wording() -> None:
     result = verify_country_of_origin("France", True, "Produced and bottled in France")
     assert result.status == STATUS_PASS
+    assert verify_country_of_origin("France", True, "Produced, bottled and packaged in France").status == STATUS_PASS
 
 
 def test_imported_country_of_origin_allows_us_abbreviations() -> None:

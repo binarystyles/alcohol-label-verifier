@@ -179,6 +179,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-167_colon_bottled_by_pass.pdf" in specs
     assert "APP-168_percent_alcohol_volume_pass.pdf" in specs
     assert "APP-169_slash_alcohol_volume_pass.pdf" in specs
+    assert "APP-170_brewed_canned_origin_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -294,6 +295,9 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-168_percent_alcohol_volume_pass.pdf"].expected_status == STATUS_PASS
     assert "45% Alcohol/Vol." in specs["APP-169_slash_alcohol_volume_pass.pdf"].label_lines
     assert specs["APP-169_slash_alcohol_volume_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-170_brewed_canned_origin_pass.pdf"].fields["country_of_origin"] == "Belgium"
+    assert "Brewed and canned in Belgium" in specs["APP-170_brewed_canned_origin_pass.pdf"].label_lines
+    assert specs["APP-170_brewed_canned_origin_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

@@ -3189,6 +3189,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Dash-separated multipack net-contents wording such as 4-50 mL should normalize to the total package volume.",
         ),
+        SampleSpec(
+            filename="APP-163_colon_warning_heading_fail.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-163", "formula": "F-16300"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING.replace("GOVERNMENT WARNING", "GOVERNMENT: WARNING"),
+            ],
+            expected_status="Fail",
+            note="Readable government warning heading with colon punctuation between GOVERNMENT and WARNING should fail strict canonical-heading validation.",
+        ),
     ]
 
 

@@ -170,5 +170,7 @@ def test_title_case_warning_is_detected() -> None:
 def test_noncanonical_warning_heading_punctuation_is_detected() -> None:
     assert contains_noncanonical_warning_heading_punctuation("GOVERNMENT-WARNING: do not drink during pregnancy")
     assert contains_noncanonical_warning_heading_punctuation("GOVERNMENT / WARNING: do not drink during pregnancy")
+    assert contains_noncanonical_warning_heading_punctuation("GOVERNMENT: WARNING: do not drink during pregnancy")
+    assert contains_noncanonical_warning_heading_punctuation("GOVERNMENT.WARNING: do not drink during pregnancy")
     assert not contains_noncanonical_warning_heading_punctuation("GOVERNMENT WARNING: do not drink during pregnancy")
     assert not contains_noncanonical_warning_heading_punctuation("GOVERNMENT\nWARNING: do not drink during pregnancy")

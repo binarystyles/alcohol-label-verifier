@@ -3505,6 +3505,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Imported origin can be stated as Imported into the United States from France.",
         ),
+        SampleSpec(
+            filename="APP-178_under_authority_responsible_party_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-178", "formula": "F-17800"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled under the authority of Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Authority wording names an entity but does not provide a clear Bottled by/for responsible-party statement.",
+        ),
     ]
 
 

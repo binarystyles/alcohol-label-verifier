@@ -126,6 +126,15 @@ def test_bottler_producer_distributed_by_alone_needs_review() -> None:
     assert "outside responsible-party" in result.reason
 
 
+def test_bottler_under_authority_wording_needs_review_without_bottled_by() -> None:
+    result = verify_bottler_producer(
+        "Example Distilling Co.",
+        "Bottled under the authority of Example Distilling Co.",
+    )
+    assert result.status == STATUS_REVIEW
+    assert "outside responsible-party" in result.reason
+
+
 def test_bottler_producer_accepts_distribution_inside_valid_action_list() -> None:
     result = verify_bottler_producer(
         "Example Imports LLC",

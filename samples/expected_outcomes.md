@@ -147,5 +147,6 @@
 | `APP-143_dual_proof_abv_statement_pass.pdf` | Pass | Pass | Label states proof immediately before ABV; the parser must not reread the ABV number as Proof 45. |
 | `APP-144_lager_beer_first_line_pass.pdf` | Pass | Pass | Malt beverage label states LAGER BEER before the brand; this should be treated as an explicit product-type statement. |
 | `APP-145_brand_number_symbol_pass.pdf` | Pass | Pass | Brand number marker in the application uses No. while the label uses #; this should pass as harmless formatting variation. |
+| `APP-146_finished_product_proof_formula_pass.pdf` | Pass | Pass | Matching formula support states Finished Product Proof rather than Alcohol Content of Finished Product; proof must convert to ABV for label comparison. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

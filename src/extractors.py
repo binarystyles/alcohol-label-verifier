@@ -80,11 +80,13 @@ EMAIL_PATTERN = re.compile(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.IGNORECA
 FORMULA_FINAL_ALCOHOL_PATTERN = re.compile(
     r"(?:"
     r"(?<!OVERALL\s)ALCOHOL\s+CONTENT\s+(?:OF\s+(?:THE\s+)?)?FINISHED\s+PRODUCT"
+    r"|ALCOHOL\s+BY\s+VOLUME\s+(?:OF\s+(?:THE\s+)?)?FINISHED\s+PRODUCT"
     r"|FINAL\s+ALCOHOL\s+CONTENT"
+    r"|FINAL\s+ALCOHOL\s+BY\s+VOLUME"
     r"|FINISHED\s+ALCOHOL\s+CONTENT"
-    r"|FINISHED\s+PRODUCT\s+(?:ALCOHOL\s+CONTENT|ALC\.?\s*/?\s*VOL\.?|ABV)"
-    r"|FINAL\s+PRODUCT\s+ALCOHOL\s+CONTENT"
-    r"|TARGET\s+ALCOHOL\s+CONTENT"
+    r"|FINISHED\s+PRODUCT\s+(?:ALCOHOL(?:\s+CONTENT)?|PROOF|ALC\.?\s*/?\s*VOL\.?|ABV)"
+    r"|FINAL\s+PRODUCT\s+(?:ALCOHOL(?:\s+CONTENT)?|PROOF)"
+    r"|TARGET\s+(?:ALCOHOL\s+CONTENT|PROOF)"
     r")",
     flags=re.IGNORECASE,
 )

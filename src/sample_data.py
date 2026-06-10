@@ -2849,6 +2849,24 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Brand number marker in the application uses No. while the label uses #; this should pass as harmless formatting variation.",
         ),
+        SampleSpec(
+            filename="APP-146_finished_product_proof_formula_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-146", "formula": "F-14600", "alcohol_content": "90 Proof"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "90 Proof",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Matching formula support states Finished Product Proof rather than Alcohol Content of Finished Product; proof must convert to ABV for label comparison.",
+            formula_approval_unit="Proof",
+            formula_approval_alcohol_label="Finished Product Proof",
+        ),
     ]
 
 

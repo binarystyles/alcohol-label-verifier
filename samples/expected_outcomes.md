@@ -178,5 +178,6 @@
 | `APP-174_first_line_sparkling_hard_seltzer_pass.pdf` | Pass | Pass | A first-line modified hard-seltzer class phrase should satisfy malt-beverage product type and class/type checks. |
 | `APP-175_first_line_imperial_stout_pass.pdf` | Pass | Pass | A first-line modified beer style should satisfy malt-beverage product type and class/type checks. |
 | `APP-176_first_line_straight_rye_whiskey_pass.pdf` | Pass | Pass | A first-line distilled-spirits class phrase should satisfy distilled-spirits product type and class/type checks. |
+| `APP-177_imported_into_from_origin_pass.pdf` | Pass | Pass | Imported origin can be stated as Imported into the United States from France. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

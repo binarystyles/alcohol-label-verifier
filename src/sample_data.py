@@ -3481,6 +3481,30 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="A first-line distilled-spirits class phrase should satisfy distilled-spirits product type and class/type checks.",
         ),
+        SampleSpec(
+            filename="APP-177_imported_into_from_origin_pass.pdf",
+            fields={
+                **wine_fields,
+                "serial_number": "APP-177",
+                "brand_name": "SUNSET HOLLOW",
+                "formula": "W-17700",
+                "country_of_origin": "France",
+                "imported": True,
+            },
+            label_lines=[
+                "SUNSET HOLLOW",
+                "Red Blend",
+                "WINE",
+                "Class/Type: Red Wine",
+                "13.5% Alc./Vol.",
+                "750 mL",
+                "Bottled by Sunset Hollow Winery",
+                "Imported into the United States from France by Example Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported origin can be stated as Imported into the United States from France.",
+        ),
     ]
 
 

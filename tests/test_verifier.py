@@ -739,6 +739,8 @@ def test_imported_country_of_origin_allows_produce_of_wording() -> None:
 def test_imported_country_of_origin_allows_imported_by_from_wording() -> None:
     result = verify_country_of_origin("France", True, "Imported by Example Imports LLC from France")
     assert result.status == STATUS_PASS
+    assert verify_country_of_origin("France", True, "Imported into the United States from France by Example Imports LLC").status == STATUS_PASS
+    assert verify_country_of_origin("France", True, "Imported to USA from France").status == STATUS_PASS
 
 
 def test_imported_country_of_origin_allows_distilled_and_brewed_in_wording() -> None:

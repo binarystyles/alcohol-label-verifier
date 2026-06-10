@@ -2802,6 +2802,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Application is domestic/no imported origin, but the label contains imported-from origin wording and should require review.",
         ),
+        SampleSpec(
+            filename="APP-143_dual_proof_abv_statement_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-143"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "90 Proof 45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states proof immediately before ABV; the parser must not reread the ABV number as Proof 45.",
+        ),
     ]
 
 

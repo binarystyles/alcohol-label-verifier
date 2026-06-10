@@ -189,8 +189,10 @@ def extract_abv_values(text: str | None) -> list[float]:
             value = _parse_decimal_number(match.group("num"))
             if 0 < value <= 100:
                 values.append(round(value, 3))
-    for pattern in PROOF_PATTERNS:
+    for index, pattern in enumerate(PROOF_PATTERNS):
         for match in pattern.finditer(text):
+            if index == 1 and _keyword_follows_completed_proof_statement(text, match.start()):
+                continue
             proof = _parse_decimal_number(match.group("num"))
             if 0 < proof <= 200:
                 values.append(round(proof / 2.0, 3))
@@ -209,6 +211,13 @@ def normalize_abv(text: str | None) -> float | None:
 def _keyword_follows_completed_abv_statement(text: str, start: int) -> bool:
     prefix = text[max(0, start - 16) : start]
     return bool(re.search(rf"{ALCOHOL_NUMBER_PATTERN}\s*(?:%|PERCENT)\s*$", prefix, flags=re.IGNORECASE))
+
+
+def _keyword_follows_completed_proof_statement(text: str, start: int) -> bool:
+    prefix = text[max(0, start - 16) : start]
+    return bool(
+        re.search(rf"{ALCOHOL_NUMBER_PATTERN}\s*(?:\u00b0|DEGREES?)?\s*$", prefix, flags=re.IGNORECASE)
+    )
 
 
 def _is_non_alcohol_percent_by_volume_context(text: str, start: int, end: int) -> bool:

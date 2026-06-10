@@ -144,5 +144,6 @@
 | `APP-140_formula_row_number_pass.pdf` | Pass | Pass | Formula support has an OCR-style row number before the low/high final-alcohol values and should still verify. |
 | `APP-141_domestic_foreign_origin_review.pdf` | Needs Review | Needs Review | Application is domestic/no imported origin, but the label contains foreign origin wording and should require review. |
 | `APP-142_domestic_imported_from_origin_review.pdf` | Needs Review | Needs Review | Application is domestic/no imported origin, but the label contains imported-from origin wording and should require review. |
+| `APP-143_dual_proof_abv_statement_pass.pdf` | Pass | Pass | Label states proof immediately before ABV; the parser must not reread the ABV number as Proof 45. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

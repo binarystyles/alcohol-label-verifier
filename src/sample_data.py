@@ -2915,6 +2915,14 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Malt application states FLAVORED MALT BEVERAGE before the brand; this should be treated as explicit product-type evidence.",
         ),
+        SampleSpec(
+            filename="APP-149_superseded_formula_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-149", "formula": "F-14900"},
+            label_lines=good_label,
+            expected_status="Needs Review",
+            note="Matching formula support says Status: Approved - Superseded, so it should not be used as current approved expected evidence.",
+            formula_approval_status="Approved - Superseded",
+        ),
     ]
 
 

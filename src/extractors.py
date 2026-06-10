@@ -752,7 +752,10 @@ def _formula_status_is_approved(status: str) -> bool:
     normalized = normalize_text(status)
     if not normalized:
         return False
-    if "NOT APPROVED" in normalized or "DISAPPROVED" in normalized:
+    if re.search(
+        r"\b(?:NOT\s+APPROVED|DISAPPROVED|REJECTED|SUPERSEDED|WITHDRAWN|EXPIRED|REVOKED|CANCELED|CANCELLED)\b",
+        normalized,
+    ):
         return False
     return "APPROVED" in normalized
 

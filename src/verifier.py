@@ -306,7 +306,7 @@ def verify_formula_alcohol_content(formula: str, approved_alcohol_content: str, 
             "",
             STATUS_REVIEW,
             0.0,
-            "The matching formula/pre-import approval document is not approved, so its final alcohol content cannot be used as expected label evidence.",
+            "The matching formula/pre-import approval document is not approved or is not current, so its final alcohol content cannot be used as expected label evidence.",
         )
     if alcohol_source != "formula-approval":
         return _result(

@@ -150,5 +150,6 @@
 | `APP-146_finished_product_proof_formula_pass.pdf` | Pass | Pass | Matching formula support states Finished Product Proof rather than Alcohol Content of Finished Product; proof must convert to ABV for label comparison. |
 | `APP-147_mead_wine_class_pass.pdf` | Pass | Pass | Wine application uses Mead as the label class/type rather than the word WINE; this should still satisfy product type. |
 | `APP-148_flavored_malt_beverage_first_line_pass.pdf` | Pass | Pass | Malt application states FLAVORED MALT BEVERAGE before the brand; this should be treated as explicit product-type evidence. |
+| `APP-149_superseded_formula_review.pdf` | Needs Review | Needs Review | Matching formula support says Status: Approved - Superseded, so it should not be used as current approved expected evidence. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

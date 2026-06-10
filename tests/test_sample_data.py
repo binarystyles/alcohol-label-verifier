@@ -222,6 +222,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-147_mead_wine_class_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-148_flavored_malt_beverage_first_line_pass.pdf"].label_lines[0] == "FLAVORED MALT BEVERAGE"
     assert specs["APP-148_flavored_malt_beverage_first_line_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-149_superseded_formula_review.pdf"].formula_approval_status == "Approved - Superseded"
+    assert specs["APP-149_superseded_formula_review.pdf"].expected_status == STATUS_REVIEW
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

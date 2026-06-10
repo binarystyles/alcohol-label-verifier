@@ -146,6 +146,19 @@ def test_formula_approval_parser_rejects_nonapproved_status() -> None:
     assert fields == {"alcohol_content": "", "_formula_approval_status": "REJECTED"}
 
 
+def test_formula_approval_parser_rejects_superseded_approved_status() -> None:
+    text = """
+    FORMULAS ONLINE APPROVAL DETERMINATION
+    TTB Formula ID: F-14900
+    Status: Approved - Superseded
+    Class/Type: Gin
+    Yield Summary
+    Alcohol Content of Finished Product: 45% ABV
+    """
+    fields = parse_formula_approval_fields(text, "F-14900")
+    assert fields == {"alcohol_content": "", "_formula_approval_status": "APPROVED - SUPERSEDED"}
+
+
 def test_formula_approval_parser_matches_numeric_formula_identifiers() -> None:
     for label, expected in (
         ("TTB Formula ID: 123456", "123456"),

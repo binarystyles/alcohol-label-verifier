@@ -369,6 +369,17 @@ def verify_country_of_origin(expected: str, imported: bool, label_text: str) -> 
     if not expected:
         return _expected_missing("country_of_origin")
     if _country_origin_statement_present(expected, label_text):
+        conflicting_countries = _conflicting_country_origin_statements(expected, label_text)
+        if conflicting_countries:
+            return _result(
+                "country_of_origin",
+                expected,
+                ", ".join(conflicting_countries),
+                snippet_around(label_text),
+                STATUS_REVIEW,
+                0.75,
+                "Label contains conflicting country-of-origin statements; reviewer should confirm the intended origin.",
+            )
         return _result("country_of_origin", expected, expected, snippet_around(label_text, expected), STATUS_PASS, 0.95, "Country of origin appears on the label.")
     return _result("country_of_origin", expected, "", snippet_around(label_text), STATUS_REVIEW, 0.6, "Country of origin was expected but not clearly found.")
 
@@ -751,6 +762,72 @@ def _country_origin_statement_present(expected: str, label_text: str) -> bool:
             )
         )
     return any(re.search(pattern, normalized_label) for pattern in patterns)
+
+
+COUNTRY_ORIGIN_CANONICAL_ALIASES: dict[str, tuple[str, ...]] = {
+    "ARGENTINA": ("ARGENTINA",),
+    "AUSTRALIA": ("AUSTRALIA",),
+    "AUSTRIA": ("AUSTRIA",),
+    "BARBADOS": ("BARBADOS",),
+    "BELGIUM": ("BELGIUM",),
+    "BRAZIL": ("BRAZIL",),
+    "CANADA": ("CANADA",),
+    "CHILE": ("CHILE",),
+    "CHINA": ("CHINA",),
+    "COLOMBIA": ("COLOMBIA",),
+    "DENMARK": ("DENMARK",),
+    "DOMINICAN REPUBLIC": ("DOMINICAN REPUBLIC",),
+    "FRANCE": ("FRANCE",),
+    "GERMANY": ("GERMANY",),
+    "GREECE": ("GREECE",),
+    "GUATEMALA": ("GUATEMALA",),
+    "HUNGARY": ("HUNGARY",),
+    "IRELAND": ("IRELAND", "REPUBLIC OF IRELAND"),
+    "ITALY": ("ITALY",),
+    "JAMAICA": ("JAMAICA",),
+    "JAPAN": ("JAPAN",),
+    "MEXICO": ("MEXICO",),
+    "NETHERLANDS": ("NETHERLANDS", "THE NETHERLANDS"),
+    "NEW ZEALAND": ("NEW ZEALAND",),
+    "PERU": ("PERU",),
+    "PORTUGAL": ("PORTUGAL",),
+    "SOUTH AFRICA": ("SOUTH AFRICA",),
+    "SPAIN": ("SPAIN",),
+    "SWITZERLAND": ("SWITZERLAND",),
+    "TRINIDAD AND TOBAGO": ("TRINIDAD AND TOBAGO",),
+    "UNITED KINGDOM": (
+        "UNITED KINGDOM",
+        "UNITED KINGDOM OF GREAT BRITAIN AND NORTHERN IRELAND",
+        "GREAT BRITAIN",
+        "BRITAIN",
+        "UK",
+        "U K",
+        "ENGLAND",
+        "SCOTLAND",
+        "WALES",
+        "NORTHERN IRELAND",
+    ),
+    "UNITED STATES": ("UNITED STATES", "UNITED STATES OF AMERICA", "USA", "U S A", "US", "U S"),
+}
+
+
+def _conflicting_country_origin_statements(expected: str, label_text: str) -> list[str]:
+    expected_canonical = _canonical_country_origin(expected)
+    conflicts: list[str] = []
+    for country, aliases in COUNTRY_ORIGIN_CANONICAL_ALIASES.items():
+        if country == expected_canonical:
+            continue
+        if any(_country_origin_statement_present(alias, label_text) for alias in aliases):
+            conflicts.append(country.title())
+    return conflicts
+
+
+def _canonical_country_origin(country: str) -> str:
+    normalized_country = normalize_for_match(country)
+    for canonical, aliases in COUNTRY_ORIGIN_CANONICAL_ALIASES.items():
+        if normalized_country in {normalize_for_match(alias) for alias in aliases}:
+            return canonical
+    return normalized_country
 
 
 def _country_origin_name_variants(normalized_country: str) -> tuple[str, ...]:

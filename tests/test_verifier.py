@@ -513,6 +513,22 @@ def test_imported_country_of_origin_allows_republic_of_ireland_variants() -> Non
     assert verify_country_of_origin("Republic of Ireland", True, "Product of Ireland").status == STATUS_PASS
 
 
+def test_imported_country_of_origin_conflict_needs_review() -> None:
+    result = verify_country_of_origin("Mexico", True, "Product of Mexico\nImported from France")
+    assert result.status == STATUS_REVIEW
+    assert result.found == "France"
+    assert "conflicting country-of-origin" in result.reason
+
+
+def test_imported_country_origin_aliases_do_not_create_false_conflict() -> None:
+    assert (
+        verify_country_of_origin("United Kingdom", True, "Product of Scotland\nImported from UK").status
+        == STATUS_PASS
+    )
+    assert verify_country_of_origin("Ireland", True, "Product of Republic of Ireland").status == STATUS_PASS
+    assert verify_country_of_origin("The Netherlands", True, "Product of Netherlands").status == STATUS_PASS
+
+
 def test_imported_country_of_origin_needs_review_when_missing_from_label() -> None:
     result = verify_country_of_origin("Mexico", True, "CASA VERDE TEQUILA Imported by Borderland Imports LLC")
     assert result.status == STATUS_REVIEW

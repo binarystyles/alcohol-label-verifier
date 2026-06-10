@@ -122,5 +122,6 @@
 | `APP-118_champagne_wine_class_pass.pdf` | Pass | Pass | Champagne is a sparkling grape wine type under 27 CFR 4.21 and should satisfy wine product-type verification. |
 | `APP-119_port_wine_class_pass.pdf` | Pass | Pass | Port is a dessert wine type under 27 CFR 4.21 and should satisfy wine product-type verification without confusing Porter malt-beverage labels. |
 | `APP-120_formula_not_required_pass.pdf` | Pass | Pass | Item 9 uses FORMULA NOT REQUIRED wording rather than NO FORMULA REQUIRED; no formula approval page should be required. |
+| `APP-121_import_country_conflict_review.pdf` | Needs Review | Needs Review | Imported label contains both the expected country and a conflicting origin statement, so country of origin requires review. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

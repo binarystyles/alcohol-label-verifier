@@ -135,10 +135,12 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-113_colored_warning_panel_pass.pdf" in specs
     assert "APP-114_busy_low_contrast_artwork_review.pdf" in specs
     assert "APP-120_formula_not_required_pass.pdf" in specs
+    assert "APP-121_import_country_conflict_review.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
     assert specs["APP-120_formula_not_required_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-121_import_country_conflict_review.pdf"].expected_status == STATUS_REVIEW
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

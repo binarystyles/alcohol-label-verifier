@@ -2381,6 +2381,35 @@ def sample_specs() -> list[SampleSpec]:
             note="Item 9 uses FORMULA NOT REQUIRED wording rather than NO FORMULA REQUIRED; no formula approval page should be required.",
             include_formula_approval=False,
         ),
+        SampleSpec(
+            filename="APP-121_import_country_conflict_review.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-121",
+                "brand_name": "CASA VERDE TEQUILA",
+                "fanciful_name": "Blanco",
+                "formula": "F-12100",
+                "class_type": "Tequila",
+                "alcohol_content": "40% ABV",
+                "bottler_producer": "Borderland Imports LLC",
+                "country_of_origin": "Mexico",
+                "imported": True,
+            },
+            label_lines=[
+                "CASA VERDE TEQUILA",
+                "Blanco",
+                "DISTILLED SPIRITS",
+                "Class/Type: Tequila",
+                "40% Alc./Vol.",
+                "750 mL",
+                "Product of Mexico",
+                "Imported from France",
+                "Imported by Borderland Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Imported label contains both the expected country and a conflicting origin statement, so country of origin requires review.",
+        ),
     ]
 
 

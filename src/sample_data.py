@@ -2785,6 +2785,23 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Application is domestic/no imported origin, but the label contains foreign origin wording and should require review.",
         ),
+        SampleSpec(
+            filename="APP-142_domestic_imported_from_origin_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-142", "country_of_origin": "", "imported": False},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Imported from France",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Application is domestic/no imported origin, but the label contains imported-from origin wording and should require review.",
+        ),
     ]
 
 

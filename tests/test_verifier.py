@@ -625,6 +625,18 @@ def test_domestic_application_with_foreign_origin_statement_needs_review() -> No
     assert "marked domestic" in result.reason
 
 
+def test_domestic_application_with_imported_from_statement_needs_review() -> None:
+    result = verify_country_of_origin("", False, "OLD TOM GIN Imported from France")
+    assert result.status == STATUS_REVIEW
+    assert result.found == "France"
+
+
+def test_domestic_application_with_protected_foreign_origin_term_needs_review() -> None:
+    result = verify_country_of_origin("", False, "HIGHLAND FORGE Scotch Whisky")
+    assert result.status == STATUS_REVIEW
+    assert result.found == "United Kingdom"
+
+
 def test_domestic_application_with_us_origin_statement_still_passes() -> None:
     result = verify_country_of_origin("", False, "OLD TOM GIN Product of USA")
     assert result.status == STATUS_PASS

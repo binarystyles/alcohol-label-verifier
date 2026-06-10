@@ -135,6 +135,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-052_centiliter_net_contents_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-053_percent_alc_by_vol_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-054_stones_throw_case_pass.pdf"].fields["brand_name"] == "Stone's Throw"
+    assert specs["APP-054_stones_throw_case_pass.pdf"].label_lines[0] == "STONE'S THROW"
     assert specs["APP-054_stones_throw_case_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-055_produce_of_origin_pass.pdf"].fields["country_of_origin"] == "France"
     assert specs["APP-055_produce_of_origin_pass.pdf"].expected_status == STATUS_PASS

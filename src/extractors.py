@@ -190,27 +190,27 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
     if document.page_count:
         page = document[0]
         product_type_checkbox_ambiguous = product_type_checkbox_is_ambiguous(page)
-        if not fields.product_type:
-            product_type = "" if product_type_checkbox_ambiguous else extract_product_type_from_widgets(page)
+        if product_type_checkbox_ambiguous:
+            fields.raw_sources["product_type"] = "ambiguous-source-checkbox"
+            fields.raw_confidences["product_type"] = 0.0
+            warnings.append("Item 5 product-type checkboxes contain multiple selected values.")
+        elif not fields.product_type:
+            product_type = extract_product_type_from_widgets(page)
             if product_type:
                 fields.product_type = product_type
                 fields.raw_sources["product_type"] = "source-checkbox"
                 fields.raw_confidences["product_type"] = 1.0
-            elif product_type_checkbox_ambiguous:
-                fields.raw_sources["product_type"] = "ambiguous-source-checkbox"
-                fields.raw_confidences["product_type"] = 0.0
-                warnings.append("Item 5 product-type checkboxes contain multiple selected values.")
-        if "imported" not in fields.raw_sources:
-            imported_checkbox_ambiguous = imported_checkbox_is_ambiguous(page)
-            imported_status = None if imported_checkbox_ambiguous else extract_imported_status_from_widgets(page)
+        imported_checkbox_ambiguous = imported_checkbox_is_ambiguous(page)
+        if imported_checkbox_ambiguous:
+            fields.raw_sources["imported"] = "ambiguous-source-checkbox"
+            fields.raw_confidences["imported"] = 0.0
+            warnings.append("Item 3 Domestic/Imported checkboxes contain multiple selected values.")
+        elif "imported" not in fields.raw_sources:
+            imported_status = extract_imported_status_from_widgets(page)
             if imported_status is not None:
                 fields.imported = imported_status
                 fields.raw_sources["imported"] = "source-checkbox"
                 fields.raw_confidences["imported"] = 1.0
-            elif imported_checkbox_ambiguous:
-                fields.raw_sources["imported"] = "ambiguous-source-checkbox"
-                fields.raw_confidences["imported"] = 0.0
-                warnings.append("Item 3 Domestic/Imported checkboxes contain multiple selected values.")
         for field_name in APPLICATION_FORM_FIELDS:
             if getattr(fields, field_name):
                 continue

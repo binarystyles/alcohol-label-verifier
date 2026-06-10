@@ -137,5 +137,6 @@
 | `APP-133_photo_artwork_pass.pdf` | Pass | Needs Review | Photo-like color artwork with scenic background and readable panels should still verify. |
 | `APP-134_photo_low_contrast_artwork_review.pdf` | Needs Review | Needs Review | Photo-like low-contrast artwork should require review for OCR quality instead of failing as missing text. |
 | `APP-135_ambiguous_product_type_checkboxes_review.pdf` | Needs Review | Needs Review | Application has multiple Item 5 product-type checkboxes selected, so expected product type is ambiguous and must not be guessed from the label. |
+| `APP-136_ambiguous_import_checkboxes_review.pdf` | Needs Review | Needs Review | Application has both Domestic and Imported Item 3 checkboxes selected, so source of product is ambiguous even though country evidence is present. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

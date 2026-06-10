@@ -43,6 +43,7 @@ class SampleSpec:
     instruction_pages_before_supplemental_label: int = 0
     artwork_style: str = "geometric"
     source_product_type_checks: tuple[str, ...] = ()
+    source_import_checks: tuple[bool, ...] = ()
 
 
 BASE_FIELDS: dict[str, str | bool] = {
@@ -2671,6 +2672,35 @@ def sample_specs() -> list[SampleSpec]:
             note="Application has multiple Item 5 product-type checkboxes selected, so expected product type is ambiguous and must not be guessed from the label.",
             source_product_type_checks=("WINE", "DISTILLED SPIRITS"),
         ),
+        SampleSpec(
+            filename="APP-136_ambiguous_import_checkboxes_review.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-136",
+                "formula": "F-13600",
+                "brand_name": "CASA VERDE TEQUILA",
+                "fanciful_name": "Blanco",
+                "class_type": "Tequila",
+                "alcohol_content": "40% ABV",
+                "bottler_producer": "Casa Verde Distilling Co.",
+                "country_of_origin": "Mexico",
+                "imported": False,
+            },
+            label_lines=[
+                "CASA VERDE TEQUILA",
+                "Blanco",
+                "DISTILLED SPIRITS",
+                "Class/Type: Tequila",
+                "40% Alc./Vol.",
+                "750 mL",
+                "Bottled by Casa Verde Distilling Co.",
+                "Product of Mexico",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Application has both Domestic and Imported Item 3 checkboxes selected, so source of product is ambiguous even though country evidence is present.",
+            source_import_checks=(False, True),
+        ),
     ]
 
 
@@ -2690,7 +2720,12 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
     document = _new_document()
     page = document[0]
     if SOURCE_FORM.exists():
-        _fill_source_form_widgets(page, spec.fields, product_type_checks=spec.source_product_type_checks)
+        _fill_source_form_widgets(
+            page,
+            spec.fields,
+            product_type_checks=spec.source_product_type_checks,
+            import_checks=spec.source_import_checks,
+        )
         _draw_hidden_summary_block(page, spec.fields)
         _prepare_source_label_area(page)
     else:
@@ -2781,6 +2816,7 @@ def _fill_source_form_widgets(
     fields: dict[str, str | bool],
     *,
     product_type_checks: tuple[str, ...] = (),
+    import_checks: tuple[bool, ...] = (),
 ) -> None:
     serial_digits = "".join(ch for ch in str(fields.get("serial_number", "")) if ch.isdigit())[-4:].zfill(4)
     field_values = {
@@ -2810,7 +2846,7 @@ def _fill_source_form_widgets(
             widget.field_value = field_values[widget.field_name]
             widget.update()
         elif widget.field_type_string == "CheckBox":
-            _set_source_checkbox(widget, fields, product_type_checks=product_type_checks)
+            _set_source_checkbox(widget, fields, product_type_checks=product_type_checks, import_checks=import_checks)
 
 
 def _set_source_checkbox(
@@ -2818,16 +2854,22 @@ def _set_source_checkbox(
     fields: dict[str, str | bool],
     *,
     product_type_checks: tuple[str, ...] = (),
+    import_checks: tuple[bool, ...] = (),
 ) -> None:
     states = (widget.button_states() or {}).get("normal", [])
     state_names = {str(state).lower(): str(state) for state in states}
     value = "Off"
     rect = widget.rect
     selected_product_types = set(product_type_checks)
+    selected_import_values = set(import_checks)
 
-    if "domes" in state_names and not fields.get("imported"):
+    if "domes" in state_names and (
+        False in selected_import_values or (not selected_import_values and not fields.get("imported"))
+    ):
         value = state_names["domes"]
-    elif "import" in state_names and fields.get("imported"):
+    elif "import" in state_names and (
+        True in selected_import_values or (not selected_import_values and fields.get("imported"))
+    ):
         value = state_names["import"]
     elif "spirits" in state_names and (
         fields.get("product_type") == "DISTILLED SPIRITS" or "DISTILLED SPIRITS" in selected_product_types

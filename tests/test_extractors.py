@@ -473,6 +473,16 @@ def test_ambiguous_product_type_checkboxes_do_not_fall_back_to_label_or_boilerpl
     assert "Item 5 product-type checkboxes contain multiple selected values." in extraction.warnings
 
 
+def test_ambiguous_import_checkboxes_do_not_default_to_domestic(
+    sample_bytes: dict[str, bytes],
+) -> None:
+    extraction = extract_application(sample_bytes["APP-136_ambiguous_import_checkboxes_review.pdf"])
+
+    assert extraction.fields.imported is False
+    assert extraction.fields.raw_sources["imported"] == "ambiguous-source-checkbox"
+    assert "Item 3 Domestic/Imported checkboxes contain multiple selected values." in extraction.warnings
+
+
 def test_product_type_checkbox_widget_extraction(sample_bytes: dict[str, bytes]) -> None:
     cases = {
         "APP-001_old_tom_pass.pdf": "DISTILLED SPIRITS",

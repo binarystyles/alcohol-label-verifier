@@ -113,40 +113,41 @@ def extract_product_type(text: str | None) -> str:
         return "MALT BEVERAGES"
     return ""
 
+ALCOHOL_NUMBER_PATTERN = r"\d{1,3}(?:[.,]\d{1,2})?"
 
 ABV_PATTERNS = (
     re.compile(
-        r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)",
+        rf"(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)",
         re.IGNORECASE,
     ),
     re.compile(
-        r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)\s*BY\s+VOL(?:UME)?\.?",
+        rf"(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)\s*BY\s+VOL(?:UME)?\.?",
         re.IGNORECASE,
     ),
     re.compile(
-        r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)\s*VOL(?:UME)?\.?",
+        rf"(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)\s*VOL(?:UME)?\.?",
         re.IGNORECASE,
     ),
     re.compile(
-        r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV)",
+        rf"(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV)",
         re.IGNORECASE,
     ),
     re.compile(
-        r"(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)?",
+        rf"(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)\s*:?\s*(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)?",
         re.IGNORECASE,
     ),
     re.compile(
-        r"ALC\.?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)?\s*(?:BY\s+VOL\.?|BY\s+VOLUME)",
+        rf"ALC\.?\s*(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)?\s*(?:BY\s+VOL\.?|BY\s+VOLUME)",
         re.IGNORECASE,
     ),
     re.compile(
-        r"ALCOHOL(?:\s+CONTENT)?\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT|PCT\.?)?\s*BY\s+VOL(?:UME)?\.?",
+        rf"ALCOHOL(?:\s+CONTENT)?\s*:?\s*(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)?\s*BY\s+VOL(?:UME)?\.?",
         re.IGNORECASE,
     ),
 )
 PROOF_PATTERNS = (
-    re.compile(r"(?P<num>\d{1,3}(?:\.\d+)?)\s*(?:\u00b0|DEGREES?)?\s*PROOF", re.IGNORECASE),
-    re.compile(r"PROOF\s*:?\s*(?P<num>\d{1,3}(?:\.\d+)?)", re.IGNORECASE),
+    re.compile(rf"(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:\u00b0|DEGREES?)?\s*PROOF", re.IGNORECASE),
+    re.compile(rf"PROOF\s*:?\s*(?P<num>{ALCOHOL_NUMBER_PATTERN})", re.IGNORECASE),
 )
 
 
@@ -158,15 +159,19 @@ def extract_abv_values(text: str | None) -> list[float]:
         for match in pattern.finditer(text):
             if _keyword_follows_completed_abv_statement(text, match.start()):
                 continue
-            value = float(match.group("num"))
+            value = _parse_decimal_number(match.group("num"))
             if 0 < value <= 100:
                 values.append(round(value, 3))
     for pattern in PROOF_PATTERNS:
         for match in pattern.finditer(text):
-            proof = float(match.group("num"))
+            proof = _parse_decimal_number(match.group("num"))
             if 0 < proof <= 200:
                 values.append(round(proof / 2.0, 3))
     return _dedupe_floats(values)
+
+
+def _parse_decimal_number(value: str) -> float:
+    return float(value.replace(",", "."))
 
 
 def normalize_abv(text: str | None) -> float | None:
@@ -176,7 +181,7 @@ def normalize_abv(text: str | None) -> float | None:
 
 def _keyword_follows_completed_abv_statement(text: str, start: int) -> bool:
     prefix = text[max(0, start - 16) : start]
-    return bool(re.search(r"\d{1,3}(?:\.\d+)?\s*(?:%|PERCENT)\s*$", prefix, flags=re.IGNORECASE))
+    return bool(re.search(rf"{ALCOHOL_NUMBER_PATTERN}\s*(?:%|PERCENT)\s*$", prefix, flags=re.IGNORECASE))
 
 
 NET_CONTENTS_UNIT_PATTERN = (

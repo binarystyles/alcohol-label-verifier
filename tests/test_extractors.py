@@ -115,6 +115,19 @@ def test_formula_approval_parser_handles_ttb_wine_multiline_range() -> None:
     assert fields["alcohol_content"] == "12.75-13.55% ABV"
 
 
+def test_formula_approval_parser_handles_decimal_comma_final_alcohol() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: W-9800
+    Yield Summary
+    Alcohol Content of Finished Product: Low 12,5 High 13,5 Unit % by Volume
+    Ingredients List
+    Grape juice 950.0 - 975.0 gal.
+    """
+    fields = parse_formula_approval_fields(text, "W-9800")
+    assert fields["alcohol_content"] == "12.5-13.5% ABV"
+
+
 def test_formula_approval_parser_handles_ttb_malt_rows_without_using_flavor_or_base_alcohol() -> None:
     text = """
     Formulas Online Entry

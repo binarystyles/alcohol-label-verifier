@@ -1896,6 +1896,35 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Application brand contains a diacritic that is absent from label text and still matches after normalization.",
         ),
+        SampleSpec(
+            filename="APP-098_decimal_comma_abv_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-098",
+                "product_type": "WINE",
+                "brand_name": "RIVAGE BLANC",
+                "fanciful_name": "",
+                "formula": "NO FORMULA REQUIRED",
+                "class_type": "White Wine",
+                "alcohol_content": "13.5% ABV",
+                "bottler_producer": "Example Imports LLC",
+                "country_of_origin": "France",
+                "imported": True,
+            },
+            label_lines=[
+                "RIVAGE BLANC",
+                "WINE",
+                "Class/Type: White Wine",
+                "13,5% vol",
+                "750 mL",
+                "Wine of France",
+                "Imported by Example Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported wine label uses decimal-comma alcohol content wording and still matches expected ABV.",
+            include_formula_approval=False,
+        ),
     ]
 
 

@@ -162,7 +162,9 @@ def test_abv_match_accepts_alcohol_colon_by_volume_wording() -> None:
 
 def test_abv_match_accepts_compact_percent_vol_wording() -> None:
     assert verify_alcohol_content("13.5% ABV", "SUNSET HOLLOW 13.5% vol").status == STATUS_PASS
+    assert verify_alcohol_content("13.5% ABV", "SUNSET HOLLOW 13,5% vol").status == STATUS_PASS
     assert verify_alcohol_content("13.5% ABV", "SUNSET HOLLOW Alc 13.5% Vol.").status == STATUS_PASS
+    assert verify_alcohol_content("13.5% ABV", "SUNSET HOLLOW Alc 13,5% Vol.").status == STATUS_PASS
 
 
 def test_abv_match_accepts_percent_by_volume_shorthand() -> None:

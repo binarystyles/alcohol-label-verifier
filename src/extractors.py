@@ -594,7 +594,7 @@ def _formula_alcohol_segment_before_label(line: str) -> str:
 
 
 def _formula_alcohol_numbers(segment: str) -> list[float]:
-    values = [float(match) for match in re.findall(r"\d{1,3}(?:\.\d+)?", segment)]
+    values = [float(match.replace(",", ".")) for match in re.findall(r"\d{1,3}(?:[.,]\d{1,2})?", segment)]
     return [value for value in values if 0 < value <= 200]
 
 

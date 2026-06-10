@@ -113,6 +113,8 @@ def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> li
             _label_unavailable_result("product_type", fields.product_type, reason),
             _label_unavailable_result("class_type", fields.class_type, reason),
             _label_unavailable_result("formula", fields.formula, reason),
+            _label_unavailable_result("grape_varietals", fields.grape_varietals, reason, optional=True),
+            _label_unavailable_result("wine_appellation", fields.wine_appellation, reason, optional=True),
             _label_unavailable_result("alcohol_content", fields.alcohol_content, reason),
             _label_unavailable_result("net_contents", fields.net_contents, reason),
             _label_unavailable_result("bottler_producer", fields.bottler_producer, reason, optional=True),
@@ -126,6 +128,8 @@ def build_field_results(fields: ApplicationFields, label: LabelExtraction) -> li
         verify_product_type(fields.product_type, label_text),
         verify_class_type(fields.class_type, label_text),
         verify_formula_alcohol_content(fields.formula, fields.alcohol_content, fields.raw_sources.get("alcohol_content", ""), label_text),
+        verify_grape_varietals(fields.grape_varietals, label_text),
+        verify_optional_fuzzy("wine_appellation", fields.wine_appellation, label_text, missing_status=STATUS_REVIEW),
         verify_alcohol_content(fields.alcohol_content, label_text),
         verify_net_contents(fields.net_contents, label_text),
         verify_bottler_producer(fields.bottler_producer, label_text),
@@ -175,6 +179,46 @@ def verify_optional_fuzzy(
     if score >= TEXT_FIELD_PASS_THRESHOLD:
         return _result(field, expected, expected, snippet_around(label_text, expected), STATUS_PASS, score / 100, "Expected text appears on the label.")
     return _result(field, expected, "", snippet_around(label_text), missing_status, score / 100, "Expected optional supplied text was not clearly found on the label.")
+
+
+def verify_grape_varietals(expected: str, label_text: str) -> FieldResult:
+    if not expected:
+        return _result("grape_varietals", "", "", "", STATUS_PASS, 1.0, "No expected value supplied; this optional field was not penalized.")
+    varietals = _split_expected_list(expected)
+    if not varietals:
+        return _result("grape_varietals", expected, "", "", STATUS_PASS, 1.0, "No expected value supplied; this optional field was not penalized.")
+    matched: list[str] = []
+    scores: list[float] = []
+    for varietal in varietals:
+        score = fuzzy_score(varietal, label_text)
+        scores.append(score)
+        if score >= TEXT_FIELD_PASS_THRESHOLD:
+            matched.append(varietal)
+    if len(matched) == len(varietals):
+        return _result(
+            "grape_varietals",
+            expected,
+            "; ".join(matched),
+            snippet_around(label_text, matched[0]),
+            STATUS_PASS,
+            min(scores) / 100,
+            "Expected grape varietal text appears on the label.",
+        )
+    missing = [varietal for varietal in varietals if varietal not in matched]
+    return _result(
+        "grape_varietals",
+        expected,
+        "; ".join(matched),
+        snippet_around(label_text),
+        STATUS_REVIEW,
+        max(scores, default=0.0) / 100,
+        f"Expected grape varietal text was not clearly found on the label: {', '.join(missing)}.",
+    )
+
+
+def _split_expected_list(expected: str) -> list[str]:
+    parts = re.split(r"\s*(?:;|,|/|\+|\bAND\b)\s*", expected, flags=re.IGNORECASE)
+    return [part.strip(" .:-") for part in parts if part.strip(" .:-")]
 
 
 def verify_bottler_producer(expected: str, label_text: str) -> FieldResult:

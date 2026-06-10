@@ -8,9 +8,11 @@ from src.verifier import (
     verify_brand,
     verify_bottler_producer,
     verify_class_type,
+    verify_grape_varietals,
     verify_government_warning,
     verify_formula_alcohol_content,
     verify_net_contents,
+    verify_optional_fuzzy,
     verify_product_type,
     verify_country_of_origin,
 )
@@ -304,6 +306,24 @@ def test_government_warning_damaged_heading_needs_review_when_statement_is_close
 def test_abv_mismatch_fails() -> None:
     result = verify_alcohol_content("45% ABV", "OLD TOM GIN 40% Alc./Vol.")
     assert result.status == STATUS_FAIL
+
+
+def test_grape_varietals_require_each_supplied_varietal_on_label() -> None:
+    label = "SUNSET HOLLOW Cabernet Sauvignon Merlot California 13.5% Alc./Vol."
+    result = verify_grape_varietals("Cabernet Sauvignon; Merlot", label)
+    assert result.status == STATUS_PASS
+    assert result.found == "Cabernet Sauvignon; Merlot"
+
+    missing = verify_grape_varietals("Cabernet Sauvignon; Merlot", "SUNSET HOLLOW Cabernet Sauvignon California")
+    assert missing.status == STATUS_REVIEW
+    assert "Merlot" in missing.reason
+
+
+def test_wine_appellation_is_reviewed_when_supplied_but_missing_from_label() -> None:
+    assert verify_optional_fuzzy("wine_appellation", "California", "SUNSET HOLLOW California", missing_status=STATUS_REVIEW).status == STATUS_PASS
+    result = verify_optional_fuzzy("wine_appellation", "California", "SUNSET HOLLOW 13.5% Alc./Vol.", missing_status=STATUS_REVIEW)
+    assert result.status == STATUS_REVIEW
+    assert result.field == "wine_appellation"
 
 
 def test_abv_match_accepts_percent_alc_by_vol_wording() -> None:

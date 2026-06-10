@@ -180,6 +180,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-168_percent_alcohol_volume_pass.pdf" in specs
     assert "APP-169_slash_alcohol_volume_pass.pdf" in specs
     assert "APP-170_brewed_canned_origin_pass.pdf" in specs
+    assert "APP-171_class_type_first_liqueur_pass.pdf" in specs
+    assert "APP-172_wine_varietal_appellation_missing_review.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -246,6 +248,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-150_chardonnay_varietal_wine_pass.pdf"].fields["product_type"] == "WINE"
     assert specs["APP-150_chardonnay_varietal_wine_pass.pdf"].fields["class_type"] == "Chardonnay"
     assert "Chardonnay" in specs["APP-150_chardonnay_varietal_wine_pass.pdf"].label_lines
+    assert "California" in specs["APP-150_chardonnay_varietal_wine_pass.pdf"].label_lines
     assert specs["APP-150_chardonnay_varietal_wine_pass.pdf"].expected_status == STATUS_PASS
     assert "Bottled exclusively for Example Distilling Co." in specs["APP-151_bottled_exclusively_for_pass.pdf"].label_lines
     assert specs["APP-151_bottled_exclusively_for_pass.pdf"].expected_status == STATUS_PASS
@@ -302,6 +305,12 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-171_class_type_first_liqueur_pass.pdf"].label_lines[0] == "Class/Type: Liqueur"
     assert "DISTILLED SPIRITS" not in specs["APP-171_class_type_first_liqueur_pass.pdf"].label_lines
     assert specs["APP-171_class_type_first_liqueur_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-172_wine_varietal_appellation_missing_review.pdf"].fields["grape_varietals"] == "Cabernet Sauvignon; Merlot"
+    assert specs["APP-172_wine_varietal_appellation_missing_review.pdf"].fields["wine_appellation"] == "California"
+    assert "Cabernet Sauvignon" in specs["APP-172_wine_varietal_appellation_missing_review.pdf"].label_lines
+    assert "Merlot" not in specs["APP-172_wine_varietal_appellation_missing_review.pdf"].label_lines
+    assert "California" not in specs["APP-172_wine_varietal_appellation_missing_review.pdf"].label_lines
+    assert specs["APP-172_wine_varietal_appellation_missing_review.pdf"].expected_status == STATUS_REVIEW
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

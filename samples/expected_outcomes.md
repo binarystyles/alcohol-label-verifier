@@ -173,5 +173,6 @@
 | `APP-169_slash_alcohol_volume_pass.pdf` | Pass | Pass | Slash-separated Alcohol/Vol. wording should normalize as ABV. |
 | `APP-170_brewed_canned_origin_pass.pdf` | Pass | Pass | Imported malt beverage origin can be stated as Brewed and canned in Belgium. |
 | `APP-171_class_type_first_liqueur_pass.pdf` | Pass | Pass | A first-line Class/Type statement can satisfy distilled spirits product type when no separate DISTILLED SPIRITS line appears. |
+| `APP-172_wine_varietal_appellation_missing_review.pdf` | Needs Review | Needs Review | Application supplies grape varietal and appellation values, but the label is missing Merlot and California, so wine-only fields need review. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

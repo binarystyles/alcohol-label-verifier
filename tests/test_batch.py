@@ -40,7 +40,7 @@ def test_zip_batch_processing(sample_paths: list[Path]) -> None:
 def test_export_dataframes_have_expected_rows(sample_bytes: dict[str, bytes]) -> None:
     results = process_batch([("APP-001_old_tom_pass.pdf", sample_bytes["APP-001_old_tom_pass.pdf"])], cache={})
     assert len(summary_dataframe(results)) == 1
-    assert len(field_results_dataframe(results)) == 11
+    assert len(field_results_dataframe(results)) == 13
     assert len(application_fields_dataframe(results)) == 1
 
 

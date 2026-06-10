@@ -172,3 +172,6 @@ APP-170_brewed_canned_origin_pass.pdf,APP-170,APP-170,LOWLAND ABBEY ALE,MALT BEV
 APP-171_class_type_first_liqueur_pass.pdf,APP-171,APP-171,MIDNIGHT CACAO LIQUEUR,DISTILLED SPIRITS,Pass,0.95,0.117,All required checks passed with adequate confidence.,,
 APP-172_wine_varietal_appellation_missing_review.pdf,APP-172,APP-172,VALLEY RIDGE,WINE,Needs Review,0.054,0.134,"Needs review: grape_varietals, wine_appellation",,
 APP-173_word_count_multipack_net_contents_pass.pdf,APP-173,APP-173,HARBOR LIGHT LAGER,MALT BEVERAGES,Pass,0.95,0.133,All required checks passed with adequate confidence.,,
+APP-174_first_line_sparkling_hard_seltzer_pass.pdf,APP-174,APP-174,HARBOR LIGHT SELTZER,MALT BEVERAGES,Pass,0.95,0.169,All required checks passed with adequate confidence.,,
+APP-175_first_line_imperial_stout_pass.pdf,APP-175,APP-175,BLACK PIER STOUT,MALT BEVERAGES,Pass,0.95,0.101,All required checks passed with adequate confidence.,,
+APP-176_first_line_straight_rye_whiskey_pass.pdf,APP-176,APP-176,RIVER BEND,DISTILLED SPIRITS,Pass,0.95,0.102,All required checks passed with adequate confidence.,,

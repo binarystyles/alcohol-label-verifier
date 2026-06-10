@@ -175,5 +175,8 @@
 | `APP-171_class_type_first_liqueur_pass.pdf` | Pass | Pass | A first-line Class/Type statement can satisfy distilled spirits product type when no separate DISTILLED SPIRITS line appears. |
 | `APP-172_wine_varietal_appellation_missing_review.pdf` | Needs Review | Needs Review | Application supplies grape varietal and appellation values, but the label is missing Merlot and California, so wine-only fields need review. |
 | `APP-173_word_count_multipack_net_contents_pass.pdf` | Pass | Pass | Word-count multipack net-contents wording such as six 12 fl oz cans should normalize to total package volume. |
+| `APP-174_first_line_sparkling_hard_seltzer_pass.pdf` | Pass | Pass | A first-line modified hard-seltzer class phrase should satisfy malt-beverage product type and class/type checks. |
+| `APP-175_first_line_imperial_stout_pass.pdf` | Pass | Pass | A first-line modified beer style should satisfy malt-beverage product type and class/type checks. |
+| `APP-176_first_line_straight_rye_whiskey_pass.pdf` | Pass | Pass | A first-line distilled-spirits class phrase should satisfy distilled-spirits product type and class/type checks. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

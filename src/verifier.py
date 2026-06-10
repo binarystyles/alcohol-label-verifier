@@ -600,6 +600,10 @@ def _is_explicit_product_type_line(line: str) -> bool:
             rf"(?:PRODUCT\s+TYPE\s*:?\s*)?(?:(?:LIGHT|LAGER|PILSNER|PILS|WHEAT)\s+BEER|(?:INDIA\s+PALE|PALE|BROWN|AMBER|BLONDE|RED|CREAM)\s+ALE|FLAVORED\s+MALT\s+BEVERAGE|MEAD|HONEY\s+WINE|SANGRIA|{WINE_TYPE_DESIGNATION_PATTERN})",
             normalized,
         )
+        or re.fullmatch(
+            r"(?:PRODUCT\s+TYPE\s*:?\s*)?(?:(?:SPARKLING|FLAVORED|FLAVOURED|ALCOHOLIC)\s+HARD\s+SELTZER|(?:IMPERIAL|DOUBLE|TRIPLE|HAZY|SESSION|WEST\s+COAST|NEW\s+ENGLAND|DRY[-\s]+HOPPED|BARREL[-\s]+AGED)\s+(?:STOUT|PORTER|IPA|PILSNER|PILS|LAGER|ALE)|(?:STRAIGHT\s+)?(?:(?:RYE|BOURBON|MALT|WHEAT|CORN)\s+)?WHISKEY|(?:SINGLE\s+MALT\s+)?SCOTCH\s+WHISKY|(?:IRISH|CANADIAN|STRAIGHT|RYE|BOURBON|MALT|WHEAT|CORN)\s+WHISKY|GIN|VODKA|RUM|TEQUILA|MEZCAL|BRANDY|COGNAC|LIQUEUR|CORDIAL|SCHNAPPS|AQUAVIT|BOURBON)",
+            normalized,
+        )
     )
 
 
@@ -655,7 +659,7 @@ def _class_type_candidate_text(label_text: str) -> str:
             if value:
                 candidates.append(value)
             continue
-        if index == 0:
+        if index == 0 and not _is_explicit_product_type_line(line):
             continue
         if _is_obvious_non_class_line(line):
             continue

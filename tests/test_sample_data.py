@@ -183,6 +183,9 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-171_class_type_first_liqueur_pass.pdf" in specs
     assert "APP-172_wine_varietal_appellation_missing_review.pdf" in specs
     assert "APP-173_word_count_multipack_net_contents_pass.pdf" in specs
+    assert "APP-174_first_line_sparkling_hard_seltzer_pass.pdf" in specs
+    assert "APP-175_first_line_imperial_stout_pass.pdf" in specs
+    assert "APP-176_first_line_straight_rye_whiskey_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -315,6 +318,12 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-173_word_count_multipack_net_contents_pass.pdf"].fields["net_contents"] == "72 fl oz"
     assert "Net Contents six 12 fl oz cans" in specs["APP-173_word_count_multipack_net_contents_pass.pdf"].label_lines
     assert specs["APP-173_word_count_multipack_net_contents_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-174_first_line_sparkling_hard_seltzer_pass.pdf"].label_lines[0] == "SPARKLING HARD SELTZER"
+    assert specs["APP-174_first_line_sparkling_hard_seltzer_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-175_first_line_imperial_stout_pass.pdf"].label_lines[0] == "IMPERIAL STOUT"
+    assert specs["APP-175_first_line_imperial_stout_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-176_first_line_straight_rye_whiskey_pass.pdf"].label_lines[0] == "STRAIGHT RYE WHISKEY"
+    assert specs["APP-176_first_line_straight_rye_whiskey_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

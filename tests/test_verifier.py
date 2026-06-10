@@ -636,6 +636,7 @@ def test_distilled_spirits_product_type_passes_from_class_type_context() -> None
     assert verify_product_type("DISTILLED SPIRITS", "OLD TOM GIN\nClass/Type: Gin\n45% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("DISTILLED SPIRITS", "Class/Type: Liqueur\n45% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("DISTILLED SPIRITS", "Class/Type: Vodka Cocktail").status == STATUS_PASS
+    assert verify_product_type("DISTILLED SPIRITS", "STRAIGHT RYE WHISKEY\nRIVER BEND\n90 Proof").status == STATUS_PASS
     assert (
         verify_product_type("DISTILLED SPIRITS", "RIVER BEND BOURBON\nStraight Bourbon Whiskey\n90 Proof").status
         == STATUS_PASS
@@ -652,6 +653,7 @@ def test_malt_product_type_first_label_line_passes_when_explicit() -> None:
     assert verify_product_type("MALT BEVERAGES", "BEER\nSUNNY FARMS\n5.5% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "LAGER BEER\nSUNNY FARMS\n5.5% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "INDIA PALE ALE\nSUNNY FARMS\n5.5% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("MALT BEVERAGES", "IMPERIAL STOUT\nHARBOR LIGHT\n9.0% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "MALT LIQUOR\nSUNNY FARMS\n5.5% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nClass/Type: IPA\n6.5% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nPilsner\n5.0% Alc./Vol.").status == STATUS_PASS
@@ -659,6 +661,8 @@ def test_malt_product_type_first_label_line_passes_when_explicit() -> None:
     assert verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nSPIKED SELTZER\n5.0% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nMALT-BASED SELTZER\n5.0% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "HARD SELTZER\nHARBOR LIGHT\n5.0% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("MALT BEVERAGES", "SPARKLING HARD SELTZER\nHARBOR LIGHT\n5.0% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("MALT BEVERAGES", "FLAVORED HARD SELTZER\nHARBOR LIGHT\n5.0% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "FLAVORED MALT BEVERAGE\nHARBOR TEA\n5.0% Alc./Vol.").status == STATUS_PASS
     assert (
         verify_product_type("MALT BEVERAGES", "PRODUCT TYPE: SPIKED SELTZER\nHARBOR LIGHT\n5.0% Alc./Vol.").status
@@ -681,6 +685,12 @@ def test_class_type_in_brand_line_only_needs_review() -> None:
     result = verify_class_type("Gin", "OLD TOM GIN\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL")
     assert result.status == STATUS_REVIEW
     assert "non-class context" in result.reason
+
+
+def test_class_type_first_label_line_passes_for_clear_class_phrases() -> None:
+    assert verify_class_type("Hard Seltzer", "SPARKLING HARD SELTZER\nHARBOR LIGHT\n5% Alc./Vol.").status == STATUS_PASS
+    assert verify_class_type("Stout", "IMPERIAL STOUT\nHARBOR LIGHT\n9% Alc./Vol.").status == STATUS_PASS
+    assert verify_class_type("Straight Rye Whiskey", "STRAIGHT RYE WHISKEY\nRIVER BEND\n90 Proof").status == STATUS_PASS
 
 
 def test_conflicting_class_type_statements_need_review() -> None:

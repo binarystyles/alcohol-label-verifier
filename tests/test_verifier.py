@@ -77,6 +77,17 @@ def test_bottler_producer_accepts_combined_responsible_party_statement() -> None
     assert result.status == STATUS_PASS
 
 
+def test_bottler_producer_accepts_comma_or_slash_responsible_party_actions() -> None:
+    assert (
+        verify_bottler_producer(
+            "Example Distilling Co.",
+            "Distilled, bottled and packaged by Example Distilling Co.",
+        ).status
+        == STATUS_PASS
+    )
+    assert verify_bottler_producer("Example Distilling Co.", "Produced/Bottled by Example Distilling Co.").status == STATUS_PASS
+
+
 def test_bottler_producer_conflicting_same_role_needs_review() -> None:
     result = verify_bottler_producer(
         "Example Distilling Co.",
@@ -85,6 +96,15 @@ def test_bottler_producer_conflicting_same_role_needs_review() -> None:
     assert result.status == STATUS_REVIEW
     assert result.found == "Canyon Creek Spirits"
     assert "conflicting responsible-party" in result.reason
+
+
+def test_bottler_producer_conflicting_role_inside_action_list_needs_review() -> None:
+    result = verify_bottler_producer(
+        "Example Distilling Co.",
+        "Distilled, bottled and packaged by Example Distilling Co.\nPackaged by Canyon Creek Spirits",
+    )
+    assert result.status == STATUS_REVIEW
+    assert result.found == "Canyon Creek Spirits"
 
 
 def test_bottler_producer_separate_importer_role_does_not_conflict() -> None:

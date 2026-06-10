@@ -96,5 +96,6 @@
 | `APP-092_formula_id_separator_variant_pass.pdf` | Pass | Pass | Application Formula ID uses a space while the submitted formula approval uses a hyphenated ID. |
 | `APP-093_supplemental_label_after_instructions_pass.pdf` | Pass | Pass | Page-one label area is blank, attached instructions are skipped, and a later supplemental label page is verified. |
 | `APP-094_long_attachment_before_label_pass.pdf` | Pass | Pass | Supplemental label appears after more than twelve attached instruction pages and still verifies. |
+| `APP-095_wine_of_origin_pass.pdf` | Pass | Pass | Imported wine states origin as Wine of France, a product-style country-of-origin statement. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

@@ -399,8 +399,12 @@ def test_imported_country_adjective_alone_is_not_enough() -> None:
     assert result.status == STATUS_REVIEW
 
 
+def test_imported_country_product_of_origin_wording_passes() -> None:
+    assert verify_country_of_origin("France", True, "Wine of France").status == STATUS_PASS
+    assert verify_country_of_origin("United Kingdom", True, "Whisky of Scotland").status == STATUS_PASS
+
+
 def test_imported_country_unhandled_origin_shorthand_needs_review() -> None:
-    assert verify_country_of_origin("France", True, "Wine of France").status == STATUS_REVIEW
     assert verify_country_of_origin("France", True, "Vinted in France").status == STATUS_REVIEW
     assert verify_country_of_origin("United Kingdom", True, "Aged in Scotland").status == STATUS_REVIEW
 

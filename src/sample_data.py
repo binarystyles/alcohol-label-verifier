@@ -1827,6 +1827,36 @@ def sample_specs() -> list[SampleSpec]:
             blank_label=True,
             instruction_pages_before_supplemental_label=13,
         ),
+        SampleSpec(
+            filename="APP-095_wine_of_origin_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-095",
+                "product_type": "WINE",
+                "brand_name": "CHATEAU LUMIERE",
+                "fanciful_name": "Red Blend",
+                "formula": "NO FORMULA REQUIRED",
+                "class_type": "Red Wine",
+                "alcohol_content": "13% ABV",
+                "bottler_producer": "Example Imports LLC",
+                "country_of_origin": "France",
+                "imported": True,
+            },
+            label_lines=[
+                "CHATEAU LUMIERE",
+                "Red Blend",
+                "WINE",
+                "Class/Type: Red Wine",
+                "13% Alc./Vol.",
+                "750 mL",
+                "Wine of France",
+                "Imported by Example Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported wine states origin as Wine of France, a product-style country-of-origin statement.",
+            include_formula_approval=False,
+        ),
     ]
 
 

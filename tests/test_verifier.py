@@ -482,6 +482,14 @@ def test_wine_product_type_passes_from_cfr_wine_class_terms() -> None:
     assert verify_product_type("WINE", "BRIGHT STAR\nClass/Type: Champagne\n12% Alc./Vol.").status == STATUS_PASS
 
 
+def test_wine_product_type_passes_from_mead_and_sangria_terms() -> None:
+    assert verify_product_type("WINE", "MEAD\nHONEY MOON\n12% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("WINE", "HONEY MOON\nClass/Type: Mead\n12% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("WINE", "HONEY WINE\nHONEY MOON\n12% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("WINE", "SANGRIA\nSUNSET PUNCH\n12% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("WINE", "SUNSET PUNCH\nClass/Type: Sangria\n12% Alc./Vol.").status == STATUS_PASS
+
+
 def test_distilled_spirits_product_type_passes_from_class_type_context() -> None:
     assert verify_product_type("DISTILLED SPIRITS", "OLD TOM GIN\nClass/Type: Gin\n45% Alc./Vol.").status == STATUS_PASS
     assert (
@@ -501,6 +509,7 @@ def test_malt_product_type_first_label_line_passes_when_explicit() -> None:
     assert verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nSPIKED SELTZER\n5.0% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nMALT-BASED SELTZER\n5.0% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "HARD SELTZER\nHARBOR LIGHT\n5.0% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("MALT BEVERAGES", "FLAVORED MALT BEVERAGE\nHARBOR TEA\n5.0% Alc./Vol.").status == STATUS_PASS
     assert (
         verify_product_type("MALT BEVERAGES", "PRODUCT TYPE: SPIKED SELTZER\nHARBOR LIGHT\n5.0% Alc./Vol.").status
         == STATUS_PASS

@@ -148,5 +148,7 @@
 | `APP-144_lager_beer_first_line_pass.pdf` | Pass | Pass | Malt beverage label states LAGER BEER before the brand; this should be treated as an explicit product-type statement. |
 | `APP-145_brand_number_symbol_pass.pdf` | Pass | Pass | Brand number marker in the application uses No. while the label uses #; this should pass as harmless formatting variation. |
 | `APP-146_finished_product_proof_formula_pass.pdf` | Pass | Pass | Matching formula support states Finished Product Proof rather than Alcohol Content of Finished Product; proof must convert to ABV for label comparison. |
+| `APP-147_mead_wine_class_pass.pdf` | Pass | Pass | Wine application uses Mead as the label class/type rather than the word WINE; this should still satisfy product type. |
+| `APP-148_flavored_malt_beverage_first_line_pass.pdf` | Pass | Pass | Malt application states FLAVORED MALT BEVERAGE before the brand; this should be treated as explicit product-type evidence. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

@@ -229,7 +229,7 @@ def extract_label(pdf_bytes: bytes) -> LabelExtraction:
             saw_readable_content = True
             texts.append(f"[{label} p.{page_index + 1}]\n{extracted.text.strip()}")
             confidences.append(extracted.confidence)
-        elif extracted.warning:
+        elif extracted.warning and extracted.nonwhite_ratio > 0.02:
             warnings.append(extracted.warning)
 
     if not saw_visual_content:

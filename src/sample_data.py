@@ -36,6 +36,7 @@ class SampleSpec:
     formula_approval_identifier_label: str = "TTB Formula ID"
     formula_approval_alcohol_label: str = "Alcohol Content of Finished Product"
     expected_status_without_ocr: str | None = None
+    instruction_pages_before_supplemental_label: int = 0
 
 
 BASE_FIELDS: dict[str, str | bool] = {
@@ -1808,6 +1809,15 @@ def sample_specs() -> list[SampleSpec]:
             note="Application Formula ID uses a space while the submitted formula approval uses a hyphenated ID.",
             formula_approval_id="F-9200",
         ),
+        SampleSpec(
+            filename="APP-093_supplemental_label_after_instructions_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-093", "formula": "F-9300"},
+            label_lines=good_label,
+            expected_status="Pass",
+            note="Page-one label area is blank, attached instructions are skipped, and a later supplemental label page is verified.",
+            blank_label=True,
+            instruction_pages_before_supplemental_label=3,
+        ),
     ]
 
 
@@ -1842,6 +1852,9 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
         _draw_raster_label(page, spec.label_lines)
     else:
         _draw_text_label(page, spec.label_lines)
+    if spec.instruction_pages_before_supplemental_label:
+        _append_instruction_pages(document, spec.instruction_pages_before_supplemental_label)
+        _append_supplemental_label_page(document, spec.label_lines)
     if spec.include_formula_approval:
         _append_formula_approval_page(
             document,
@@ -2042,6 +2055,51 @@ def _append_formula_approval_page(
         fontname="helv",
         color=(0, 0, 0),
     )
+
+
+def _append_instruction_pages(document: fitz.Document, count: int) -> None:
+    for _ in range(count):
+        page = document.new_page(width=612, height=792)
+        page.insert_textbox(
+            fitz.Rect(42, 42, 570, 720),
+            "\n\n".join(
+                (
+                    "GENERAL INSTRUCTIONS",
+                    "PAPERWORK REDUCTION ACT NOTICE",
+                    "This instruction page is attached to the completed application package and must not be read as label text.",
+                )
+            ),
+            fontsize=11,
+            fontname="helv",
+        )
+
+
+def _append_supplemental_label_page(document: fitz.Document, label_lines: list[str]) -> None:
+    page = document.new_page(width=612, height=792)
+    label_rect = fitz.Rect(72, 96, 540, 600)
+    page.draw_rect(label_rect, color=(0, 0, 0), fill=(1, 1, 1), width=1.2)
+    y = label_rect.y0 + 44
+    for index, line in enumerate(label_lines):
+        if index == 0:
+            text_width = fitz.get_text_length(line, fontname="helv", fontsize=26)
+            page.insert_text((label_rect.x0 + (label_rect.width - text_width) / 2, y), line, fontsize=26, fontname="helv")
+            y += 34
+        elif _looks_like_warning_line(line):
+            page.insert_textbox(
+                fitz.Rect(label_rect.x0 + 18, label_rect.y1 - 82, label_rect.x1 - 18, label_rect.y1 - 20),
+                line,
+                fontsize=6.5,
+                fontname="helv",
+            )
+        else:
+            page.insert_textbox(
+                fitz.Rect(label_rect.x0 + 36, y, label_rect.x1 - 36, y + 18),
+                line,
+                fontsize=10,
+                fontname="helv",
+                align=1,
+            )
+            y += 22
 
 
 def _low_high_values(value: str | bool) -> tuple[str, str]:

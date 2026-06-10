@@ -373,6 +373,16 @@ def test_label_extraction_finds_supplemental_label_after_attached_instructions()
     assert "PAPERWORK REDUCTION ACT" not in label.text
 
 
+def test_generated_supplemental_label_sample_skips_instruction_pages(sample_bytes: dict[str, bytes]) -> None:
+    label = extract_label(sample_bytes["APP-093_supplemental_label_after_instructions_pass.pdf"])
+
+    assert not label.missing_label_area
+    assert "OLD TOM GIN" in label.text
+    assert "supplemental-label-page" in label.text
+    assert "PAPERWORK REDUCTION ACT" not in label.text
+    assert "Local Tesseract OCR is not installed" not in " ".join(label.warnings)
+
+
 def test_label_extraction_skips_ocr_text_that_looks_like_instructions(monkeypatch) -> None:
     document = fitz.open()
     for _ in range(3):

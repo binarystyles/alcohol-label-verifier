@@ -3066,6 +3066,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Imported country of origin should need review when the label has only bottling-location wording, not clear origin wording.",
         ),
+        SampleSpec(
+            filename="APP-157_hyphenated_warning_heading_fail.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-157", "formula": "F-15700"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING.replace("GOVERNMENT WARNING", "GOVERNMENT-WARNING"),
+            ],
+            expected_status="Fail",
+            note="Readable labels with hyphenated government-warning headings should fail strict canonical-heading validation.",
+        ),
     ]
 
 

@@ -379,6 +379,12 @@ def contains_title_case_warning(text: str | None) -> bool:
     return has_non_uppercase_warning_heading(text)
 
 
+def contains_noncanonical_warning_heading_punctuation(text: str | None) -> bool:
+    if not text:
+        return False
+    return bool(re.search(r"\bGOVERNMENT\s*[-/]\s*WARNING\b", text))
+
+
 def has_non_uppercase_warning_heading(text: str | None) -> bool:
     if not text:
         return False

@@ -155,3 +155,4 @@ APP-153_ocr_character_confusion_brand_review.pdf,APP-153,APP-153,OLD TOM GIN,DIS
 APP-154_distributed_by_only_review.pdf,APP-154,APP-154,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.95,0.084,Needs review: bottler_producer,,
 APP-155_vodka_cocktail_class_product_type_pass.pdf,APP-155,APP-155,SPARK RIDGE,DISTILLED SPIRITS,Pass,0.95,1.439,All required checks passed with adequate confidence.,,
 APP-156_bottled_in_origin_review.pdf,APP-156,APP-156,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.6,0.112,Needs review: country_of_origin,,
+APP-157_hyphenated_warning_heading_fail.pdf,APP-157,APP-157,OLD TOM GIN,DISTILLED SPIRITS,Fail,0.9,0.112,Failed critical checks: government_warning,,

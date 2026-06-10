@@ -166,6 +166,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-152_distilled_spirits_specialty_class_pass.pdf" in specs
     assert "APP-155_vodka_cocktail_class_product_type_pass.pdf" in specs
     assert "APP-156_bottled_in_origin_review.pdf" in specs
+    assert "APP-157_hyphenated_warning_heading_fail.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -247,6 +248,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-156_bottled_in_origin_review.pdf"].fields["country_of_origin"] == "Mexico"
     assert "Bottled in Mexico" in specs["APP-156_bottled_in_origin_review.pdf"].label_lines
     assert specs["APP-156_bottled_in_origin_review.pdf"].expected_status == STATUS_REVIEW
+    assert "GOVERNMENT-WARNING" in specs["APP-157_hyphenated_warning_heading_fail.pdf"].label_lines[-1]
+    assert specs["APP-157_hyphenated_warning_heading_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

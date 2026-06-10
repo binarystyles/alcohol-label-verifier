@@ -19,6 +19,7 @@ from src.constants import (
 )
 from src.models import ApplicationFields, ApplicationResult, FieldResult, LabelExtraction
 from src.normalize import (
+    contains_noncanonical_warning_heading_punctuation,
     contains_title_case_warning,
     extract_abv_values,
     extract_net_contents_values,
@@ -474,6 +475,16 @@ def verify_government_warning(label_text: str, label_confidence: float) -> Field
         )
     if contains_title_case_warning(label_text):
         return _result("government_warning", GOVERNMENT_WARNING, "Government Warning", snippet_around(label_text, "Government Warning"), STATUS_FAIL, 0.95, "Government warning heading is not all caps.")
+    if contains_noncanonical_warning_heading_punctuation(label_text):
+        return _result(
+            "government_warning",
+            GOVERNMENT_WARNING,
+            "GOVERNMENT-WARNING",
+            snippet_around(label_text),
+            STATUS_FAIL,
+            0.95,
+            "Government warning heading punctuation is not canonical.",
+        )
     if government_warning_matches(label_text):
         return _result("government_warning", GOVERNMENT_WARNING, GOVERNMENT_WARNING, snippet_around(label_text, "GOVERNMENT WARNING"), STATUS_PASS, min(0.98, max(label_confidence, 0.9)), "Government warning text and all-caps heading match the canonical statement.")
     similarity = government_warning_similarity(label_text)

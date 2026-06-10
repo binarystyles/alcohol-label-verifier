@@ -158,5 +158,6 @@
 | `APP-154_distributed_by_only_review.pdf` | Needs Review | Needs Review | Distribution-only wording should not satisfy the expected bottler/producer responsible-party statement. |
 | `APP-155_vodka_cocktail_class_product_type_pass.pdf` | Pass | Pass | Distilled spirits specialty/cocktail class-type text can satisfy product type without a separate DISTILLED SPIRITS line. |
 | `APP-156_bottled_in_origin_review.pdf` | Needs Review | Needs Review | Imported country of origin should need review when the label has only bottling-location wording, not clear origin wording. |
+| `APP-157_hyphenated_warning_heading_fail.pdf` | Fail | Fail | Readable labels with hyphenated government-warning headings should fail strict canonical-heading validation. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

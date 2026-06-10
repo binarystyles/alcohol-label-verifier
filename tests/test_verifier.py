@@ -235,6 +235,13 @@ def test_government_warning_all_caps_heading_can_span_whitespace() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_government_warning_noncanonical_heading_punctuation_fails() -> None:
+    text = GOVERNMENT_WARNING.replace("GOVERNMENT WARNING", "GOVERNMENT-WARNING")
+    result = verify_government_warning(text, 0.95)
+    assert result.status == STATUS_FAIL
+    assert "punctuation" in result.reason
+
+
 def test_government_warning_missing_fails_when_label_is_readable() -> None:
     result = verify_government_warning("OLD TOM GIN 45% Alc./Vol. 750 mL", 0.95)
     assert result.status == STATUS_FAIL

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from src.constants import GOVERNMENT_WARNING
 from src.normalize import (
+    contains_noncanonical_warning_heading_punctuation,
     contains_title_case_warning,
     extract_abv_values,
     extract_net_contents_values,
@@ -156,3 +157,10 @@ def test_title_case_warning_is_detected() -> None:
     assert contains_title_case_warning("government warning: do not drink during pregnancy")
     assert not contains_title_case_warning("GOVERNMENT WARNING: do not drink during pregnancy")
     assert not contains_title_case_warning("GOVERNMENT\nWARNING: do not drink during pregnancy")
+
+
+def test_noncanonical_warning_heading_punctuation_is_detected() -> None:
+    assert contains_noncanonical_warning_heading_punctuation("GOVERNMENT-WARNING: do not drink during pregnancy")
+    assert contains_noncanonical_warning_heading_punctuation("GOVERNMENT / WARNING: do not drink during pregnancy")
+    assert not contains_noncanonical_warning_heading_punctuation("GOVERNMENT WARNING: do not drink during pregnancy")
+    assert not contains_noncanonical_warning_heading_punctuation("GOVERNMENT\nWARNING: do not drink during pregnancy")

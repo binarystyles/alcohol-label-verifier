@@ -12,11 +12,32 @@ from src.extractors import (
     extract_imported_status_from_widgets,
     extract_label,
     extract_product_type_from_widgets,
+    imported_checkbox_is_ambiguous,
     parse_application_summary,
     parse_formula_approval_fields,
+    product_type_checkbox_is_ambiguous,
 )
 from src.form_mapping import FORM_REGIONS
 from src.ocr import OCRText
+
+
+class _FakeCheckboxWidget:
+    field_type_string = "CheckBox"
+
+    def __init__(self, field_name: str, field_value: str = "Yes") -> None:
+        self.field_name = field_name
+        self.field_value = field_value
+
+    def button_states(self) -> dict[str, list[str]]:
+        return {"normal": ["Off", self.field_name]}
+
+
+class _FakePage:
+    def __init__(self, widgets: list[_FakeCheckboxWidget]) -> None:
+        self._widgets = widgets
+
+    def widgets(self) -> list[_FakeCheckboxWidget]:
+        return self._widgets
 
 
 def test_application_summary_parser_maps_expected_fields() -> None:
@@ -442,6 +463,16 @@ def test_region_based_application_extraction_from_generated_pdf(sample_bytes: di
     assert extraction.fields.product_type == "DISTILLED SPIRITS"
 
 
+def test_ambiguous_product_type_checkboxes_do_not_fall_back_to_label_or_boilerplate(
+    sample_bytes: dict[str, bytes],
+) -> None:
+    extraction = extract_application(sample_bytes["APP-135_ambiguous_product_type_checkboxes_review.pdf"])
+
+    assert extraction.fields.product_type == ""
+    assert extraction.fields.raw_sources["product_type"] == "ambiguous-source-checkbox"
+    assert "Item 5 product-type checkboxes contain multiple selected values." in extraction.warnings
+
+
 def test_product_type_checkbox_widget_extraction(sample_bytes: dict[str, bytes]) -> None:
     cases = {
         "APP-001_old_tom_pass.pdf": "DISTILLED SPIRITS",
@@ -457,6 +488,13 @@ def test_product_type_checkbox_widget_extraction(sample_bytes: dict[str, bytes])
             document.close()
 
 
+def test_product_type_checkbox_widget_ambiguity_is_not_guessed() -> None:
+    page = _FakePage([_FakeCheckboxWidget("Wine"), _FakeCheckboxWidget("Spirits")])
+
+    assert extract_product_type_from_widgets(page) == ""
+    assert product_type_checkbox_is_ambiguous(page) is True
+
+
 def test_imported_checkbox_widget_extraction(sample_bytes: dict[str, bytes]) -> None:
     document = fitz.open(stream=sample_bytes["APP-024_import_country_artwork_pass.pdf"], filetype="pdf")
     try:
@@ -469,6 +507,13 @@ def test_imported_checkbox_widget_extraction(sample_bytes: dict[str, bytes]) -> 
         assert extract_imported_status_from_widgets(domestic_document[0]) is False
     finally:
         domestic_document.close()
+
+
+def test_imported_checkbox_widget_ambiguity_is_not_guessed() -> None:
+    page = _FakePage([_FakeCheckboxWidget("Domestic"), _FakeCheckboxWidget("Imported")])
+
+    assert extract_imported_status_from_widgets(page) is None
+    assert imported_checkbox_is_ambiguous(page) is True
 
 
 def test_checkbox_mark_extraction_from_flattened_source_form() -> None:

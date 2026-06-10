@@ -189,20 +189,32 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
 
     if document.page_count:
         page = document[0]
+        product_type_checkbox_ambiguous = product_type_checkbox_is_ambiguous(page)
         if not fields.product_type:
-            product_type = extract_product_type_from_widgets(page)
+            product_type = "" if product_type_checkbox_ambiguous else extract_product_type_from_widgets(page)
             if product_type:
                 fields.product_type = product_type
                 fields.raw_sources["product_type"] = "source-checkbox"
                 fields.raw_confidences["product_type"] = 1.0
+            elif product_type_checkbox_ambiguous:
+                fields.raw_sources["product_type"] = "ambiguous-source-checkbox"
+                fields.raw_confidences["product_type"] = 0.0
+                warnings.append("Item 5 product-type checkboxes contain multiple selected values.")
         if "imported" not in fields.raw_sources:
-            imported_status = extract_imported_status_from_widgets(page)
+            imported_checkbox_ambiguous = imported_checkbox_is_ambiguous(page)
+            imported_status = None if imported_checkbox_ambiguous else extract_imported_status_from_widgets(page)
             if imported_status is not None:
                 fields.imported = imported_status
                 fields.raw_sources["imported"] = "source-checkbox"
                 fields.raw_confidences["imported"] = 1.0
+            elif imported_checkbox_ambiguous:
+                fields.raw_sources["imported"] = "ambiguous-source-checkbox"
+                fields.raw_confidences["imported"] = 0.0
+                warnings.append("Item 3 Domestic/Imported checkboxes contain multiple selected values.")
         for field_name in APPLICATION_FORM_FIELDS:
             if getattr(fields, field_name):
+                continue
+            if fields.raw_sources.get(field_name, "").startswith("ambiguous-"):
                 continue
             region = FORM_REGIONS[field_name].to_rect(page.rect)
             extracted = extract_region_text(page, region)
@@ -320,6 +332,25 @@ def extract_acroform_fields(pdf_bytes: bytes) -> dict[str, Any]:
 
 
 def extract_product_type_from_widgets(page: fitz.Page) -> str:
+    checked_values = _checked_product_type_widget_values(page)
+    if len(checked_values) == 1:
+        return checked_values[0]
+    if len(checked_values) > 1:
+        return ""
+    return _checked_option_from_marks(page, SOURCE_PRODUCT_CHECKBOXES) or ""
+
+
+def product_type_checkbox_is_ambiguous(page: fitz.Page) -> bool:
+    checked_values = _checked_product_type_widget_values(page)
+    if len(checked_values) > 1:
+        return True
+    if checked_values:
+        return False
+    return _checked_option_count_from_marks(page, SOURCE_PRODUCT_CHECKBOXES) > 1
+
+
+def _checked_product_type_widget_values(page: fitz.Page) -> list[str]:
+    values: set[str] = set()
     for widget in page.widgets() or []:
         if widget.field_type_string != "CheckBox":
             continue
@@ -327,24 +358,43 @@ def extract_product_type_from_widgets(page: fitz.Page) -> str:
             continue
         checkbox_text = _checkbox_option_text(widget)
         if "SPIRITS" in checkbox_text:
-            return "DISTILLED SPIRITS"
-        if "WINE" in checkbox_text:
-            return "WINE"
-        if "MALT" in checkbox_text:
-            return "MALT BEVERAGES"
-    return _checked_option_from_marks(page, SOURCE_PRODUCT_CHECKBOXES) or ""
+            values.add("DISTILLED SPIRITS")
+        elif "WINE" in checkbox_text:
+            values.add("WINE")
+        elif "MALT" in checkbox_text:
+            values.add("MALT BEVERAGES")
+    return sorted(values)
 
 
 def extract_imported_status_from_widgets(page: fitz.Page) -> bool | None:
+    checked_values = _checked_imported_widget_values(page)
+    if len(checked_values) == 1:
+        return checked_values[0]
+    if len(checked_values) > 1:
+        return None
+    return _checked_option_from_marks(page, SOURCE_IMPORT_CHECKBOXES)
+
+
+def imported_checkbox_is_ambiguous(page: fitz.Page) -> bool:
+    checked_values = _checked_imported_widget_values(page)
+    if len(checked_values) > 1:
+        return True
+    if checked_values:
+        return False
+    return _checked_option_count_from_marks(page, SOURCE_IMPORT_CHECKBOXES) > 1
+
+
+def _checked_imported_widget_values(page: fitz.Page) -> list[bool]:
+    values: set[bool] = set()
     for widget in page.widgets() or []:
         if widget.field_type_string != "CheckBox" or not _checkbox_is_checked(widget):
             continue
         checkbox_text = _checkbox_option_text(widget)
         if "IMPORT" in checkbox_text:
-            return True
-        if "DOMES" in checkbox_text or "DOMESTIC" in checkbox_text:
-            return False
-    return _checked_option_from_marks(page, SOURCE_IMPORT_CHECKBOXES)
+            values.add(True)
+        elif "DOMES" in checkbox_text or "DOMESTIC" in checkbox_text:
+            values.add(False)
+    return sorted(values)
 
 
 def _checkbox_is_checked(widget: fitz.Widget) -> bool:
@@ -371,6 +421,10 @@ def _checked_option_from_marks(page: fitz.Page, options: tuple[tuple[Any, tuple[
     if len(checked) != 1:
         return None
     return checked[0][0]
+
+
+def _checked_option_count_from_marks(page: fitz.Page, options: tuple[tuple[Any, tuple[float, float, float, float]], ...]) -> int:
+    return sum(1 for _, rect in options if _checkbox_mark_score(page, rect) >= CHECKBOX_MARK_THRESHOLD)
 
 
 def _checkbox_mark_score(page: fitz.Page, source_rect: tuple[float, float, float, float]) -> float:

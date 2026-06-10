@@ -42,6 +42,7 @@ class SampleSpec:
     expected_status_without_ocr: str | None = None
     instruction_pages_before_supplemental_label: int = 0
     artwork_style: str = "geometric"
+    source_product_type_checks: tuple[str, ...] = ()
 
 
 BASE_FIELDS: dict[str, str | bool] = {
@@ -2653,6 +2654,23 @@ def sample_specs() -> list[SampleSpec]:
             artwork_label=True,
             artwork_style="photo-low-contrast",
         ),
+        SampleSpec(
+            filename="APP-135_ambiguous_product_type_checkboxes_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-135", "formula": "F-13500", "product_type": ""},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Application has multiple Item 5 product-type checkboxes selected, so expected product type is ambiguous and must not be guessed from the label.",
+            source_product_type_checks=("WINE", "DISTILLED SPIRITS"),
+        ),
     ]
 
 
@@ -2672,7 +2690,7 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
     document = _new_document()
     page = document[0]
     if SOURCE_FORM.exists():
-        _fill_source_form_widgets(page, spec.fields)
+        _fill_source_form_widgets(page, spec.fields, product_type_checks=spec.source_product_type_checks)
         _draw_hidden_summary_block(page, spec.fields)
         _prepare_source_label_area(page)
     else:
@@ -2758,7 +2776,12 @@ def _new_sample_document() -> fitz.Document:
     return document
 
 
-def _fill_source_form_widgets(page: fitz.Page, fields: dict[str, str | bool]) -> None:
+def _fill_source_form_widgets(
+    page: fitz.Page,
+    fields: dict[str, str | bool],
+    *,
+    product_type_checks: tuple[str, ...] = (),
+) -> None:
     serial_digits = "".join(ch for ch in str(fields.get("serial_number", "")) if ch.isdigit())[-4:].zfill(4)
     field_values = {
         "YEAR 1": "2",
@@ -2787,24 +2810,34 @@ def _fill_source_form_widgets(page: fitz.Page, fields: dict[str, str | bool]) ->
             widget.field_value = field_values[widget.field_name]
             widget.update()
         elif widget.field_type_string == "CheckBox":
-            _set_source_checkbox(widget, fields)
+            _set_source_checkbox(widget, fields, product_type_checks=product_type_checks)
 
 
-def _set_source_checkbox(widget: fitz.Widget, fields: dict[str, str | bool]) -> None:
+def _set_source_checkbox(
+    widget: fitz.Widget,
+    fields: dict[str, str | bool],
+    *,
+    product_type_checks: tuple[str, ...] = (),
+) -> None:
     states = (widget.button_states() or {}).get("normal", [])
     state_names = {str(state).lower(): str(state) for state in states}
     value = "Off"
     rect = widget.rect
+    selected_product_types = set(product_type_checks)
 
     if "domes" in state_names and not fields.get("imported"):
         value = state_names["domes"]
     elif "import" in state_names and fields.get("imported"):
         value = state_names["import"]
-    elif "spirits" in state_names and fields.get("product_type") == "DISTILLED SPIRITS":
+    elif "spirits" in state_names and (
+        fields.get("product_type") == "DISTILLED SPIRITS" or "DISTILLED SPIRITS" in selected_product_types
+    ):
         value = state_names["spirits"]
-    elif "wine" in state_names and fields.get("product_type") == "WINE":
+    elif "wine" in state_names and (fields.get("product_type") == "WINE" or "WINE" in selected_product_types):
         value = state_names["wine"]
-    elif "malt" in state_names and fields.get("product_type") == "MALT BEVERAGES":
+    elif "malt" in state_names and (
+        fields.get("product_type") == "MALT BEVERAGES" or "MALT BEVERAGES" in selected_product_types
+    ):
         value = state_names["malt"]
     elif "yes" in state_names and 265 <= rect.y0 <= 276:
         value = state_names["yes"]

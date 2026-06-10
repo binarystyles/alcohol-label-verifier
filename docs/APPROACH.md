@@ -53,6 +53,7 @@ Needs Review is used for uncertainty:
 - Unreadable PDF.
 - Missing expected application value.
 - Source of product Domestic/Imported checkbox cannot be extracted with enough certainty.
+- Mutually exclusive source/product checkboxes contain multiple selected values, so the application value is ambiguous.
 - Supplied optional application value, such as a fanciful name, is not clearly found on the label.
 - Expected text appears only as a fragment inside a larger word, such as `Gin` inside `Ginger`.
 - Product-type words appear only in primary brand text, with no clear product/class label statement, or the label contains conflicting explicit product-type statements.

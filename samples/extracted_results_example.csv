@@ -133,3 +133,4 @@ APP-131_formula_alc_vol_heading_pass.pdf,APP-131,APP-131,OLD TOM GIN,DISTILLED S
 APP-132_scotch_whisky_origin_pass.pdf,APP-132,APP-132,HIGHLAND FORGE,DISTILLED SPIRITS,Pass,0.95,0.106,All required checks passed with adequate confidence.,,
 APP-133_photo_artwork_pass.pdf,APP-133,APP-133,OLD TOM GIN,DISTILLED SPIRITS,Pass,0.95,1.527,All required checks passed with adequate confidence.,,
 APP-134_photo_low_contrast_artwork_review.pdf,APP-134,APP-134,OLD TOM GIN,DISTILLED SPIRITS,Needs Review,0.0,1.193,"Needs review: brand_name, fanciful_name, product_type, class_type","Label image appears rotated, blurry, or low quality; OCR results require human review.; Label text is unreadable or low confidence.",
+APP-135_ambiguous_product_type_checkboxes_review.pdf,APP-135,APP-135,OLD TOM GIN,,Needs Review,0.0,0.111,Needs review: product_type,Item 5 product-type checkboxes contain multiple selected values.,

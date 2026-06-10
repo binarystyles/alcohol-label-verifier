@@ -2768,6 +2768,23 @@ def sample_specs() -> list[SampleSpec]:
             note="Formula support has an OCR-style row number before the low/high final-alcohol values and should still verify.",
             formula_approval_alcohol_row_number="3",
         ),
+        SampleSpec(
+            filename="APP-141_domestic_foreign_origin_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-141", "country_of_origin": "", "imported": False},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Product of Mexico",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Application is domestic/no imported origin, but the label contains foreign origin wording and should require review.",
+        ),
     ]
 
 

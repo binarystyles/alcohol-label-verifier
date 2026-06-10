@@ -142,5 +142,6 @@
 | `APP-138_flavoring_percent_with_abv_pass.pdf` | Pass | Pass | Non-alcohol flavoring percent-by-volume text must not conflict with the real label ABV statement. |
 | `APP-139_flavoring_percent_missing_abv_review.pdf` | Needs Review | Needs Review | Non-alcohol flavoring percent-by-volume text alone should not be treated as an ABV mismatch; missing actual ABV requires review. |
 | `APP-140_formula_row_number_pass.pdf` | Pass | Pass | Formula support has an OCR-style row number before the low/high final-alcohol values and should still verify. |
+| `APP-141_domestic_foreign_origin_review.pdf` | Needs Review | Needs Review | Application is domestic/no imported origin, but the label contains foreign origin wording and should require review. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

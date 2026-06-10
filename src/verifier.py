@@ -414,6 +414,21 @@ def _net_contents_tolerance(expected_ml: float) -> float:
 
 def verify_country_of_origin(expected: str, imported: bool, label_text: str) -> FieldResult:
     if not expected and not imported:
+        origin_countries = [
+            country
+            for country in _country_origin_statements_in_label(label_text)
+            if normalize_for_match(country) != "UNITED STATES"
+        ]
+        if origin_countries:
+            return _result(
+                "country_of_origin",
+                "",
+                ", ".join(origin_countries),
+                snippet_around(label_text),
+                STATUS_REVIEW,
+                0.75,
+                "Application is marked domestic/no imported origin, but the label contains origin-style country wording; reviewer should confirm source of product.",
+            )
         return _result("country_of_origin", "", "", "", STATUS_PASS, 1.0, "Country of origin was not required for this application.")
     if not expected:
         return _expected_missing("country_of_origin")
@@ -931,12 +946,19 @@ COUNTRY_ORIGIN_CANONICAL_ALIASES: dict[str, tuple[str, ...]] = {
 def _conflicting_country_origin_statements(expected: str, label_text: str) -> list[str]:
     expected_canonical = _canonical_country_origin(expected)
     conflicts: list[str] = []
-    for country, aliases in COUNTRY_ORIGIN_CANONICAL_ALIASES.items():
-        if country == expected_canonical:
+    for country in _country_origin_statements_in_label(label_text):
+        if normalize_for_match(country) == expected_canonical:
             continue
-        if any(_country_origin_statement_present(alias, label_text) for alias in aliases):
-            conflicts.append(country.title())
+        conflicts.append(country)
     return conflicts
+
+
+def _country_origin_statements_in_label(label_text: str) -> list[str]:
+    countries: list[str] = []
+    for country, aliases in COUNTRY_ORIGIN_CANONICAL_ALIASES.items():
+        if any(_country_origin_statement_present(alias, label_text) for alias in aliases):
+            countries.append(country.title())
+    return countries
 
 
 def _canonical_country_origin(country: str) -> str:

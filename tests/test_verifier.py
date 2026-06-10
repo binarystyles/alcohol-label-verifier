@@ -618,6 +618,18 @@ def test_imported_country_of_origin_needs_review_when_missing_from_label() -> No
     assert result.status == STATUS_REVIEW
 
 
+def test_domestic_application_with_foreign_origin_statement_needs_review() -> None:
+    result = verify_country_of_origin("", False, "OLD TOM GIN Product of Mexico")
+    assert result.status == STATUS_REVIEW
+    assert result.found == "Mexico"
+    assert "marked domestic" in result.reason
+
+
+def test_domestic_application_with_us_origin_statement_still_passes() -> None:
+    result = verify_country_of_origin("", False, "OLD TOM GIN Product of USA")
+    assert result.status == STATUS_PASS
+
+
 def test_imported_country_name_in_importer_name_is_not_enough() -> None:
     result = verify_country_of_origin("Mexico", True, "CASA VERDE TEQUILA Imported by Mexico Trading LLC")
     assert result.status == STATUS_REVIEW

@@ -297,6 +297,17 @@ def verify_formula_alcohol_content(formula: str, approved_alcohol_content: str, 
         return _result("formula", "", "", "", STATUS_REVIEW, 0.0, "Required Item 9 Formula ID could not be extracted.")
     if _is_no_formula_required_statement(formula):
         return _result("formula", formula, formula, "", STATUS_PASS, 1.0, "Item 9 states that no formula is required.")
+    if alcohol_source.startswith("formula-approval-unapproved"):
+        status = alcohol_source.split(":", 1)[1] if ":" in alcohol_source else "not approved"
+        return _result(
+            "formula",
+            formula,
+            status,
+            "",
+            STATUS_REVIEW,
+            0.0,
+            "The matching formula/pre-import approval document is not approved, so its final alcohol content cannot be used as expected label evidence.",
+        )
     if alcohol_source != "formula-approval":
         return _result(
             "formula",

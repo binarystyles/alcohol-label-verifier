@@ -81,6 +81,7 @@ FORMULA_FINAL_ALCOHOL_PATTERN = re.compile(
     r"(?:ALCOHOL\s+CONTENT\s+OF\s+FINISHED\s+PRODUCT|FINAL\s+ALCOHOL\s+CONTENT|FINISHED\s+ALCOHOL\s+CONTENT|FINISHED\s+PRODUCT\s+ALCOHOL\s+CONTENT|FINAL\s+PRODUCT\s+ALCOHOL\s+CONTENT|TARGET\s+ALCOHOL\s+CONTENT)",
     flags=re.IGNORECASE,
 )
+FORMULA_STATUS_PATTERN = re.compile(r"\b(?:APPROVAL\s+)?STATUS\s*[:\-]?\s*(?P<status>.+)$", flags=re.IGNORECASE)
 FORMULA_ALPHANUMERIC_ID_PATTERN = r"[A-Z]{1,8}\s*[-./]?\s*\d[A-Z0-9]*(?:\s*[-./]\s*[A-Z0-9]+)*"
 FORMULA_NUMERIC_ID_PATTERN = r"(?:\d{4,}|\d{2,}\s*[-./]\s*\d{2,})(?:\s*[-./]\s*[A-Z0-9]+)*"
 FORMULA_ID_VALUE_PATTERN = rf"(?:{FORMULA_ALPHANUMERIC_ID_PATTERN}|{FORMULA_NUMERIC_ID_PATTERN})"
@@ -427,11 +428,17 @@ def parse_formula_approval_fields(text: str, formula_id: str) -> dict[str, str]:
 
     matched_formula_document = False
     matched_class_type = ""
+    unapproved_status = ""
     for window in windows:
         normalized_window = normalize_text(window)
         if not _looks_like_formula_approval_text(normalized_window):
             continue
         matched_formula_document = True
+        status = _formula_approval_status(window)
+        if status and not _formula_status_is_approved(status):
+            if not unapproved_status:
+                unapproved_status = status
+            continue
         alcohol_content = _extract_formula_final_alcohol_content(window)
         class_type = _extract_labeled_value(window, ("class/type", "class type", "classification"))
         if class_type and not matched_class_type:
@@ -442,6 +449,8 @@ def parse_formula_approval_fields(text: str, formula_id: str) -> dict[str, str]:
         if class_type:
             fields["class_type"] = class_type
         return fields
+    if unapproved_status:
+        return {"alcohol_content": "", "_formula_approval_status": unapproved_status}
     if matched_formula_document:
         fields = {"alcohol_content": ""}
         if matched_class_type:
@@ -585,6 +594,12 @@ def _merge_formula_approval(fields: ApplicationFields, package_text: str) -> Non
         fields.formula = formula_id
         fields.raw_sources["formula"] = "formula-id"
     approval_fields = parse_formula_approval_fields(package_text, formula_id)
+    formula_status = approval_fields.pop("_formula_approval_status", "")
+    if formula_status:
+        fields.alcohol_content = ""
+        fields.raw_sources["alcohol_content"] = f"formula-approval-unapproved:{formula_status}"
+        fields.raw_confidences["alcohol_content"] = 1.0
+        return
     for key, value in approval_fields.items():
         if key == "class_type" and fields.class_type:
             continue
@@ -650,6 +665,32 @@ def _is_formula_document_boundary(normalized_line: str) -> bool:
         "PRE IMPORT APPROVAL LETTER",
         "PREIMPORT APPROVAL LETTER",
     }
+
+
+def _formula_approval_status(text: str) -> str:
+    for line in text.splitlines():
+        match = FORMULA_STATUS_PATTERN.search(line.strip())
+        if not match:
+            continue
+        status = normalize_text(match.group("status"))
+        status = re.split(
+            r"\b(?:TTB\s+FORMULA|FORMULA\s+ID|BRAND\s+NAME|CLASS\s*/?\s*TYPE|YIELD\s+SUMMARY|ALCOHOL\s+CONTENT|COMPANY\s+FORMULA)\b",
+            status,
+            maxsplit=1,
+        )[0]
+        status = status.strip(" .:-")
+        if status:
+            return status
+    return ""
+
+
+def _formula_status_is_approved(status: str) -> bool:
+    normalized = normalize_text(status)
+    if not normalized:
+        return False
+    if "NOT APPROVED" in normalized or "DISAPPROVED" in normalized:
+        return False
+    return "APPROVED" in normalized
 
 
 def _extract_formula_final_alcohol_content(text: str) -> str:

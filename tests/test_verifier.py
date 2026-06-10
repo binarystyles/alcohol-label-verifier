@@ -388,6 +388,18 @@ def test_matched_formula_without_final_alcohol_needs_review() -> None:
     assert "did not contain extractable final alcohol content" in result.reason
 
 
+def test_unapproved_formula_document_needs_review() -> None:
+    result = verify_formula_alcohol_content(
+        "F-12700",
+        "",
+        "formula-approval-unapproved:REJECTED",
+        "OLD TOM GIN 45% Alc./Vol.",
+    )
+    assert result.status == STATUS_REVIEW
+    assert result.found == "REJECTED"
+    assert "not approved" in result.reason
+
+
 def test_product_type_mismatch_fails() -> None:
     result = verify_product_type("DISTILLED SPIRITS", "OLD TOM GIN MALT BEVERAGES 45% Alc./Vol.")
     assert result.status == STATUS_FAIL

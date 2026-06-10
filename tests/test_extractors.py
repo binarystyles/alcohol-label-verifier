@@ -112,6 +112,19 @@ def test_formula_approval_parser_matches_pre_import_approval_reference() -> None
     assert fields["class_type"] == "Gin"
 
 
+def test_formula_approval_parser_rejects_nonapproved_status() -> None:
+    text = """
+    FORMULAS ONLINE APPROVAL DETERMINATION
+    TTB Formula ID: F-12700
+    Status: Rejected
+    Class/Type: Gin
+    Yield Summary
+    Alcohol Content of Finished Product: 45% ABV
+    """
+    fields = parse_formula_approval_fields(text, "F-12700")
+    assert fields == {"alcohol_content": "", "_formula_approval_status": "REJECTED"}
+
+
 def test_formula_approval_parser_matches_numeric_formula_identifiers() -> None:
     for label, expected in (
         ("TTB Formula ID: 123456", "123456"),

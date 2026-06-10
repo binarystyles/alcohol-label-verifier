@@ -3205,6 +3205,26 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Fail",
             note="Readable government warning heading with colon punctuation between GOVERNMENT and WARNING should fail strict canonical-heading validation.",
         ),
+        SampleSpec(
+            filename="APP-164_hyphen_pack_net_contents_pass.pdf",
+            fields={
+                **malt_fields,
+                "serial_number": "APP-164",
+                "formula": "MB-16400",
+                "net_contents": "48 fl oz",
+            },
+            label_lines=[
+                "HARBOR LIGHT LAGER",
+                "MALT BEVERAGES",
+                "Class/Type: Flavored Malt Beverage",
+                "5.5% Alc./Vol.",
+                "Net Contents 4-pack of 12 fl oz cans",
+                "Brewed by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Hyphenated pack net-contents wording such as 4-pack of 12 fl oz cans should normalize to total package volume.",
+        ),
     ]
 
 

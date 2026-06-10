@@ -165,5 +165,6 @@
 | `APP-161_formula_bottling_proof_pass.pdf` | Pass | Pass | Formula support states final packaged strength as Bottling Proof and should verify against the label proof statement. |
 | `APP-162_dash_multipack_net_contents_pass.pdf` | Pass | Pass | Dash-separated multipack net-contents wording such as 4-50 mL should normalize to the total package volume. |
 | `APP-163_colon_warning_heading_fail.pdf` | Fail | Fail | Readable government warning heading with colon punctuation between GOVERNMENT and WARNING should fail strict canonical-heading validation. |
+| `APP-164_hyphen_pack_net_contents_pass.pdf` | Pass | Pass | Hyphenated pack net-contents wording such as 4-pack of 12 fl oz cans should normalize to total package volume. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

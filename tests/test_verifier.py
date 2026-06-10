@@ -835,6 +835,8 @@ def test_net_contents_match_passes_with_multipack_statement() -> None:
     assert verify_net_contents("200 mL", "Net Contents 4 x 50 mL").status == STATUS_PASS
     assert verify_net_contents("200 mL", "Net Contents 4-50 mL").status == STATUS_PASS
     assert verify_net_contents("200 mL", "Net Contents 4 - 50 mL").status == STATUS_PASS
+    assert verify_net_contents("200 mL", "Net Contents 4-pack 50 mL").status == STATUS_PASS
+    assert verify_net_contents("48 fl oz", "Net Contents 4-pack of 12 fl oz cans").status == STATUS_PASS
     assert verify_net_contents("200 mL", "Net Contents 50 mL x 4").status == STATUS_PASS
     assert verify_net_contents("200 mL", "Net Contents 200 mL (4 x 50 mL)").status == STATUS_PASS
 

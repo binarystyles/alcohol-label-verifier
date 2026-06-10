@@ -775,6 +775,7 @@ def test_imported_country_product_of_origin_wording_passes() -> None:
 def test_imported_country_unhandled_origin_shorthand_needs_review() -> None:
     assert verify_country_of_origin("France", True, "Vinted in France").status == STATUS_REVIEW
     assert verify_country_of_origin("United Kingdom", True, "Aged in Scotland").status == STATUS_REVIEW
+    assert verify_country_of_origin("Mexico", True, "Bottled in Mexico").status == STATUS_REVIEW
 
 
 def test_net_contents_match_passes_with_liters() -> None:

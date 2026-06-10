@@ -157,5 +157,6 @@
 | `APP-153_ocr_character_confusion_brand_review.pdf` | Needs Review | Needs Review | OCR-style zero/letter substitutions in required brand text should be treated as a similar-but-not-certain Needs Review case. |
 | `APP-154_distributed_by_only_review.pdf` | Needs Review | Needs Review | Distribution-only wording should not satisfy the expected bottler/producer responsible-party statement. |
 | `APP-155_vodka_cocktail_class_product_type_pass.pdf` | Pass | Pass | Distilled spirits specialty/cocktail class-type text can satisfy product type without a separate DISTILLED SPIRITS line. |
+| `APP-156_bottled_in_origin_review.pdf` | Needs Review | Needs Review | Imported country of origin should need review when the label has only bottling-location wording, not clear origin wording. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

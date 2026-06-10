@@ -3043,6 +3043,29 @@ def sample_specs() -> list[SampleSpec]:
             artwork_label=True,
             artwork_style="warning-panel",
         ),
+        SampleSpec(
+            filename="APP-156_bottled_in_origin_review.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-156",
+                "formula": "F-15600",
+                "imported": True,
+                "country_of_origin": "Mexico",
+            },
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                "Bottled in Mexico",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Imported country of origin should need review when the label has only bottling-location wording, not clear origin wording.",
+        ),
     ]
 
 

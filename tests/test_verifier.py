@@ -189,6 +189,20 @@ def test_bottler_producer_bottled_for_does_not_block_expected_bottled_by() -> No
         "Bottled for Old Tom Brands\nBottled by Example Distilling Co.",
     )
     assert result.status == STATUS_PASS
+    assert (
+        verify_bottler_producer(
+            "Example Distilling Co.",
+            "Bottled for Old Tom Brands by Example Distilling Co.",
+        ).status
+        == STATUS_PASS
+    )
+    assert (
+        verify_bottler_producer(
+            "Example Distilling Co.",
+            "Bottled by Example Distilling Co. for Old Tom Brands",
+        ).status
+        == STATUS_PASS
+    )
 
 
 def test_bottler_producer_bottled_for_still_reviews_different_bottled_by() -> None:
@@ -199,6 +213,12 @@ def test_bottler_producer_bottled_for_still_reviews_different_bottled_by() -> No
     assert result.status == STATUS_REVIEW
     assert result.found == "Example Distilling Co"
     assert "conflicting responsible-party" in result.reason
+    by_first = verify_bottler_producer(
+        "Old Tom Brands",
+        "Bottled by Example Distilling Co. for Old Tom Brands",
+    )
+    assert by_first.status == STATUS_REVIEW
+    assert by_first.found == "Example Distilling Co"
 
 
 def test_bottler_producer_company_abbreviation_passes() -> None:

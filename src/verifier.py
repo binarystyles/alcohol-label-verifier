@@ -734,9 +734,28 @@ def _responsible_party_entries(label_text: str) -> list[tuple[frozenset[str], st
         )
         role = normalize_text(match.group("role"))
         party = match.group("party").strip(" .:-")
-        if actions.intersection(RESPONSIBLE_PARTY_REQUIRED_ACTIONS) and party:
-            entries.append((actions, role, party))
+        if not actions.intersection(RESPONSIBLE_PARTY_REQUIRED_ACTIONS) or not party:
+            continue
+        for entry_role, entry_party in _split_chained_responsible_party(role, party):
+            entries.append((actions, entry_role, entry_party))
     return entries
+
+
+def _split_chained_responsible_party(role: str, party: str) -> list[tuple[str, str]]:
+    opposite_role = "BY" if role == "FOR" else "FOR"
+    pattern = re.compile(rf"\s+\b{opposite_role}\b\s*(?::|-|\.)?\s+", re.IGNORECASE)
+    for match in pattern.finditer(party):
+        first_party = party[: match.start()].strip(" .:-")
+        second_party = party[match.end() :].strip(" .:-")
+        if _looks_like_chained_responsible_party_split(first_party, second_party):
+            return [(role, first_party), (opposite_role, second_party)]
+    return [(role, party)]
+
+
+def _looks_like_chained_responsible_party_split(first_party: str, second_party: str) -> bool:
+    first_tokens = re.findall(r"[A-Za-z0-9]+", first_party)
+    second_tokens = re.findall(r"[A-Za-z0-9]+", second_party)
+    return len(first_tokens) >= 2 and len(second_tokens) >= 2
 
 
 def _conflicting_responsible_party_values(expected: str, label_text: str) -> list[str]:

@@ -3538,6 +3538,43 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Separate Bottled for and Bottled by statements should pass when the application identifies the actual Bottled by entity.",
         ),
+        SampleSpec(
+            filename="APP-180_oneline_bottled_for_by_actual_bottler_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-180", "formula": "F-18000"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled for Old Tom Brands by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="One-line Bottled for ... by ... wording should pass when the application identifies the actual Bottled by entity.",
+        ),
+        SampleSpec(
+            filename="APP-181_oneline_bottled_for_brand_owner_review.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-181",
+                "formula": "F-18100",
+                "bottler_producer": "Old Tom Brands",
+            },
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled for Old Tom Brands by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="One-line Bottled for ... by ... wording should need review when the application identifies the brand owner but a different actual bottler appears.",
+        ),
     ]
 
 

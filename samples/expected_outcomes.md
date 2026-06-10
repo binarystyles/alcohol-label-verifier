@@ -168,5 +168,6 @@
 | `APP-164_hyphen_pack_net_contents_pass.pdf` | Pass | Pass | Hyphenated pack net-contents wording such as 4-pack of 12 fl oz cans should normalize to total package volume. |
 | `APP-165_slash_multipack_net_contents_pass.pdf` | Pass | Pass | Slash-separated multipack net-contents wording such as 4/12 fl oz cans should normalize to total package volume rather than a fractional ounce. |
 | `APP-166_imported_bottled_distributed_by_pass.pdf` | Pass | Pass | Responsible-party wording can include distribution when it is combined with valid imported/bottled actions. |
+| `APP-167_colon_bottled_by_pass.pdf` | Pass | Pass | Colon punctuation after Bottled by should still satisfy responsible-party evidence. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

@@ -3271,6 +3271,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Responsible-party wording can include distribution when it is combined with valid imported/bottled actions.",
         ),
+        SampleSpec(
+            filename="APP-167_colon_bottled_by_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-167", "formula": "F-16700"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by: Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Colon punctuation after Bottled by should still satisfy responsible-party evidence.",
+        ),
     ]
 
 

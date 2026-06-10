@@ -132,6 +132,19 @@ def test_bottler_producer_accepts_distribution_inside_valid_action_list() -> Non
     assert result.status == STATUS_PASS
 
 
+def test_bottler_producer_accepts_punctuation_after_by_or_for() -> None:
+    assert verify_bottler_producer("Example Distilling Co.", "Bottled by: Example Distilling Co.").status == STATUS_PASS
+    assert verify_bottler_producer("Example Imports LLC", "Imported by: Example Imports LLC").status == STATUS_PASS
+    assert verify_bottler_producer("Example Distilling Co.", "Produced for: Example Distilling Co.").status == STATUS_PASS
+    assert (
+        verify_bottler_producer(
+            "Example Distilling Co.",
+            "Distilled, bottled and packaged by: Example Distilling Co.",
+        ).status
+        == STATUS_PASS
+    )
+
+
 def test_bottler_producer_conflicting_same_role_needs_review() -> None:
     result = verify_bottler_producer(
         "Example Distilling Co.",

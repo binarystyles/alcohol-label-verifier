@@ -63,6 +63,8 @@ def fuzzy_score(expected: str | None, actual: str | None) -> float:
     actual_tokens = actual_norm.split()
     if _contains_token_sequence(expected_tokens, actual_tokens):
         return 100.0
+    if _contains_compact_sequence(expected_tokens, actual_tokens):
+        return 100.0
     score = float(fuzz.token_set_ratio(expected_norm, actual_norm))
     if _has_conflicting_legal_suffix(expected_tokens, actual_tokens):
         return min(score, 84.0)
@@ -74,7 +76,11 @@ def ordered_fuzzy_score(expected: str | None, actual: str | None) -> float:
     actual_norm = normalize_name(actual)
     if not expected_norm or not actual_norm:
         return 0.0
-    if _contains_token_sequence(expected_norm.split(), actual_norm.split()):
+    expected_tokens = expected_norm.split()
+    actual_tokens = actual_norm.split()
+    if _contains_token_sequence(expected_tokens, actual_tokens):
+        return 100.0
+    if _contains_compact_sequence(expected_tokens, actual_tokens):
         return 100.0
     return float(fuzz.ratio(expected_norm, actual_norm))
 
@@ -88,6 +94,22 @@ def _contains_token_sequence(expected_tokens: list[str], actual_tokens: list[str
         return False
     width = len(expected_tokens)
     return any(actual_tokens[index : index + width] == expected_tokens for index in range(len(actual_tokens) - width + 1))
+
+
+def _contains_compact_sequence(expected_tokens: list[str], actual_tokens: list[str]) -> bool:
+    return any(
+        len(expected_compact) >= 8 and expected_compact in actual_compact
+        for expected_compact in _compact_token_variants(expected_tokens)
+        for actual_compact in _compact_token_variants(actual_tokens)
+    )
+
+
+def _compact_token_variants(tokens: list[str]) -> set[str]:
+    variants = {"".join(tokens)}
+    for index, token in enumerate(tokens[:-1]):
+        if token == "COMPANY":
+            variants.add("".join(tokens[:index] + [f"CO{tokens[index + 1]}"] + tokens[index + 2 :]))
+    return variants
 
 
 LEGAL_SUFFIX_TOKENS = {"COMPANY", "CORPORATION", "INCORPORATED", "LIMITED", "LLC"}
@@ -153,7 +175,7 @@ VOLUME_RATIO_PATTERN = r"(?:\bV\s*/\s*V\b|\bV\s*[I1]\s*V\b)"
 
 ABV_PATTERNS = (
     re.compile(
-        rf"(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|{ABV_ABBREVIATION_PATTERN}|{VOLUME_RATIO_PATTERN}|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)",
+        rf"(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|{ABV_ABBREVIATION_PATTERN}|{VOLUME_RATIO_PATTERN}|ALCOHOL\s+(?:BY\s+)?VOL(?:UME)?\.?)",
         re.IGNORECASE,
     ),
     re.compile(

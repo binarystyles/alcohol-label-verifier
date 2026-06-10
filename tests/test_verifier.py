@@ -329,6 +329,8 @@ def test_abv_match_accepts_compact_percent_vol_wording() -> None:
 def test_abv_match_accepts_percent_by_volume_shorthand() -> None:
     assert verify_alcohol_content("45% ABV", "OLD TOM GIN 45% by volume").status == STATUS_PASS
     assert verify_alcohol_content("45% ABV", "OLD TOM GIN 45 percent by volume").status == STATUS_PASS
+    assert verify_alcohol_content("45% ABV", "OLD TOM GIN 45% Alcohol Vol.").status == STATUS_PASS
+    assert verify_alcohol_content("45% ABV", "OLD TOM GIN 45% Alcohol Volume").status == STATUS_PASS
 
 
 def test_proof_match_accepts_degrees_wording() -> None:

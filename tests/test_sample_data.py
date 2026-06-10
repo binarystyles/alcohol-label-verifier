@@ -177,6 +177,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-165_slash_multipack_net_contents_pass.pdf" in specs
     assert "APP-166_imported_bottled_distributed_by_pass.pdf" in specs
     assert "APP-167_colon_bottled_by_pass.pdf" in specs
+    assert "APP-168_percent_alcohol_volume_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -288,6 +289,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-166_imported_bottled_distributed_by_pass.pdf"].expected_status == STATUS_PASS
     assert "Bottled by: Example Distilling Co." in specs["APP-167_colon_bottled_by_pass.pdf"].label_lines
     assert specs["APP-167_colon_bottled_by_pass.pdf"].expected_status == STATUS_PASS
+    assert "45% Alcohol Vol." in specs["APP-168_percent_alcohol_volume_pass.pdf"].label_lines
+    assert specs["APP-168_percent_alcohol_volume_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

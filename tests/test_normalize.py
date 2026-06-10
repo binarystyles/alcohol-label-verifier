@@ -32,6 +32,7 @@ def test_text_normalization_handles_brand_punctuation() -> None:
 def test_brand_fuzzy_matching_allows_harmless_variations() -> None:
     score = fuzzy_score("STONE'S THROW", "STONES THROW Straight Bourbon Whiskey")
     assert score >= 88
+    assert fuzzy_score("COPPER RIDGE VODKA", "CO PPER RIDGE VODKA") == 100
 
 
 def test_fuzzy_score_does_not_match_inside_larger_words() -> None:
@@ -47,6 +48,8 @@ def test_fuzzy_score_does_not_match_inside_larger_words() -> None:
 
 def test_ordered_fuzzy_score_preserves_brand_word_order() -> None:
     assert ordered_fuzzy_score("OLD TOM GIN", "OLD TOM GIN Reserve") == 100
+    assert ordered_fuzzy_score("COPPER RIDGE VODKA", "CO PPER RIDGE VODKA") == 100
+    assert ordered_fuzzy_score("RIVER BEND BOURBON", "RI VER BEND BOURBON Reserve Selection") == 100
     assert ordered_fuzzy_score("OLD TOM GIN", "TOM OLD GIN") < 74
     assert ordered_fuzzy_score("OLD TOM GIN", "OLD TOMATO GIN") < 92
 
@@ -95,6 +98,8 @@ def test_abv_and_proof_extraction_normalize_to_abv() -> None:
     assert extract_abv_values("Alc 13,5% Vol.") == [13.5]
     assert extract_abv_values("45% Alc. by Vol.") == [45.0]
     assert extract_abv_values("45% Alcohol by Vol.") == [45.0]
+    assert extract_abv_values("45% Alcohol Vol.") == [45.0]
+    assert extract_abv_values("45% Alcohol Volume") == [45.0]
     assert extract_abv_values("45% A.B.V.") == [45.0]
     assert extract_abv_values("A.B.V. 45%") == [45.0]
     assert extract_abv_values("A B V 45%") == [45.0]

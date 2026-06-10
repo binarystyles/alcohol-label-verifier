@@ -3287,6 +3287,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Colon punctuation after Bottled by should still satisfy responsible-party evidence.",
         ),
+        SampleSpec(
+            filename="APP-168_percent_alcohol_volume_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-168", "formula": "F-16800"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alcohol Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Percent Alcohol Vol. wording should normalize as ABV.",
+        ),
     ]
 
 

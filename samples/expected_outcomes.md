@@ -129,5 +129,8 @@
 | `APP-125_comma_responsible_party_pass.pdf` | Pass | Pass | Label uses comma-separated responsible-party actions before By and should still match the application entity. |
 | `APP-126_pre_import_approval_pass.pdf` | Pass | Pass | Item 9 references a pre-import approval letter in the same PDF package, and the approved alcohol content matches the label. |
 | `APP-127_rejected_formula_review.pdf` | Needs Review | Needs Review | Matching formula support has Status: Rejected, so final alcohol content cannot be used as approved expected evidence. |
+| `APP-128_dotted_abv_crest_artwork_pass.pdf` | Pass | Needs Review | Color crest-style artwork uses dotted A.B.V. alcohol-content wording and should still verify. |
+| `APP-129_vv_textured_artwork_pass.pdf` | Pass | Needs Review | Textured color artwork uses v/v alcohol-content wording and should still verify. |
+| `APP-130_spaced_abv_dark_artwork_pass.pdf` | Pass | Needs Review | Dark color artwork uses OCR-spaced A B V alcohol-content wording and should still verify. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

@@ -137,10 +137,12 @@ def extract_product_type(text: str | None) -> str:
     return ""
 
 ALCOHOL_NUMBER_PATTERN = r"\d{1,3}(?:[.,]\d{1,2})?"
+ABV_ABBREVIATION_PATTERN = r"(?:ABV|A\.?\s*B\.?\s*V\.?)"
+VOLUME_RATIO_PATTERN = r"(?:\bV\s*/\s*V\b|\bV\s*[I1]\s*V\b)"
 
 ABV_PATTERNS = (
     re.compile(
-        rf"(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)",
+        rf"(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|{ABV_ABBREVIATION_PATTERN}|{VOLUME_RATIO_PATTERN}|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)",
         re.IGNORECASE,
     ),
     re.compile(
@@ -152,11 +154,11 @@ ABV_PATTERNS = (
         re.IGNORECASE,
     ),
     re.compile(
-        rf"(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV)",
+        rf"(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|{ABV_ABBREVIATION_PATTERN}|{VOLUME_RATIO_PATTERN})",
         re.IGNORECASE,
     ),
     re.compile(
-        rf"(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|ABV|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)\s*:?\s*(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)?",
+        rf"(?:ALC\.?\s*(?:/|BY\s+)?\s*VOL(?:UME)?\.?|{ABV_ABBREVIATION_PATTERN}|{VOLUME_RATIO_PATTERN}|ALCOHOL\s+BY\s+VOL(?:UME)?\.?)\s*:?\s*(?P<num>{ALCOHOL_NUMBER_PATTERN})\s*(?:%|PERCENT|PCT\.?)?",
         re.IGNORECASE,
     ),
     re.compile(

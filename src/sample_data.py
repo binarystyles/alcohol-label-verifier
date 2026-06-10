@@ -2523,6 +2523,63 @@ def sample_specs() -> list[SampleSpec]:
             note="Matching formula support has Status: Rejected, so final alcohol content cannot be used as approved expected evidence.",
             formula_approval_status="Rejected",
         ),
+        SampleSpec(
+            filename="APP-128_dotted_abv_crest_artwork_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-128", "formula": "F-12800"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% A.B.V.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            expected_status_without_ocr="Needs Review",
+            note="Color crest-style artwork uses dotted A.B.V. alcohol-content wording and should still verify.",
+            artwork_label=True,
+            artwork_style="crest",
+        ),
+        SampleSpec(
+            filename="APP-129_vv_textured_artwork_pass.pdf",
+            fields={**malt_fields, "serial_number": "APP-129", "formula": "MB-12900", "class_type": "Lager"},
+            label_lines=[
+                "HARBOR LIGHT LAGER",
+                "Golden Lager",
+                "MALT BEVERAGES",
+                "Class/Type: Lager",
+                "5.5% v/v",
+                "12 fl oz",
+                "Brewed by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            expected_status_without_ocr="Needs Review",
+            note="Textured color artwork uses v/v alcohol-content wording and should still verify.",
+            artwork_label=True,
+            artwork_style="texture",
+        ),
+        SampleSpec(
+            filename="APP-130_spaced_abv_dark_artwork_pass.pdf",
+            fields={**bourbon_fields, "serial_number": "APP-130", "formula": "F-13000"},
+            label_lines=[
+                "RIVER BEND BOURBON",
+                "Reserve Selection",
+                "DISTILLED SPIRITS",
+                "Class/Type: Straight Bourbon Whiskey",
+                "A B V 50%",
+                "750 mL",
+                "Bottled by River Bend Spirits LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            expected_status_without_ocr="Needs Review",
+            note="Dark color artwork uses OCR-spaced A B V alcohol-content wording and should still verify.",
+            artwork_label=True,
+            artwork_style="dark",
+        ),
     ]
 
 
@@ -2974,6 +3031,23 @@ def _draw_artwork_background(
                 x0 = 155 + (index * 89) % (width - 310)
                 y0 = 250 + (index * 53) % (height - 470)
                 draw.rectangle((x0, y0, x0 + 130, y0 + 34), fill=palette["accent2"])
+    elif style == "crest":
+        draw.ellipse((58, 130, 486, 558), fill=palette["accent"], outline=palette["border"], width=8)
+        draw.polygon(
+            [(272, 174), (432, 270), (392, 485), (272, 570), (152, 485), (112, 270)],
+            fill=palette["accent2"],
+            outline=palette["border"],
+        )
+        draw.line((168, 330, 376, 330), fill=palette["border"], width=7)
+        draw.line((206, 395, 338, 395), fill=palette["border"], width=5)
+        for index in range(7):
+            x0 = width - 470 + index * 47
+            draw.arc((x0, 142, x0 + 165, 330), 200, 342, fill=palette["accent"], width=5)
+    elif style == "texture":
+        for index in range(-height, width, 54):
+            draw.line((index, 122, index + height, height - 20), fill=palette["accent"], width=4)
+        for index in range(0, width, 120):
+            draw.rectangle((index, height - 154, index + 56, height - 24), fill=palette["accent2"])
     else:
         draw.ellipse((-190, 100, 560, 840), fill=palette["accent"])
         draw.polygon(
@@ -3021,6 +3095,30 @@ def _artwork_palette(seed: str, *, style: str = "geometric") -> dict[str, tuple[
             "text": (18, 32, 44),
             "warning_panel": (18, 78, 122),
             "warning_text": (255, 255, 255),
+        }
+    if style == "crest":
+        return {
+            "background": (232, 236, 229),
+            "band": (87, 31, 44),
+            "band_text": (255, 252, 246),
+            "panel": (255, 252, 246),
+            "accent": (218, 173, 72),
+            "accent2": (35, 89, 108),
+            "border": (55, 35, 35),
+            "text": (30, 24, 22),
+            "warning_panel": (255, 252, 246),
+        }
+    if style == "texture":
+        return {
+            "background": (226, 235, 242),
+            "band": (29, 76, 106),
+            "band_text": (255, 255, 255),
+            "panel": (253, 253, 249),
+            "accent": (188, 216, 226),
+            "accent2": (236, 183, 87),
+            "border": (38, 55, 74),
+            "text": (20, 30, 43),
+            "warning_panel": (255, 255, 250),
         }
     if style == "busy-low-contrast":
         return {

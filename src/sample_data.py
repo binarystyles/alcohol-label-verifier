@@ -1954,6 +1954,31 @@ def sample_specs() -> list[SampleSpec]:
             note="Application alcohol-content range uses decimal commas and still matches the high-end label ABV.",
             include_formula_approval=False,
         ),
+        SampleSpec(
+            filename="APP-100_expected_proof_range_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-100",
+                "brand_name": "PROOF RANGE BOURBON",
+                "fanciful_name": "",
+                "formula": "NO FORMULA REQUIRED",
+                "class_type": "Straight Bourbon Whiskey",
+                "alcohol_content": "80-90 Proof",
+                "bottler_producer": "Example Distilling Co.",
+            },
+            label_lines=[
+                "PROOF RANGE BOURBON",
+                "DISTILLED SPIRITS",
+                "Class/Type: Straight Bourbon Whiskey",
+                "90 Proof",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Application alcohol-content range is stated in proof and is converted to ABV before label comparison.",
+            include_formula_approval=False,
+        ),
     ]
 
 

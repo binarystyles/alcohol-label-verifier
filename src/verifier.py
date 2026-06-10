@@ -528,7 +528,7 @@ def _is_obvious_non_brand_line(line: str) -> bool:
         return True
     return bool(
         re.search(
-            r"\b(CLASS\s*/?\s*TYPE|DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?|GOVERNMENT\s+WARNING|PRODUCT\s+OF|PRODUCED\s+IN|MADE\s+IN|COUNTRY\s+OF\s+ORIGIN|BOTTLED\s+BY|PRODUCED\s+BY|IMPORTED\s+BY|BREWED\s+BY|CANNED\s+BY|NET\s+CONTENTS?|SERVING\s+SIZE|ALC|ALCOHOL|PROOF)\b",
+            r"\b(CLASS\s*/?\s*TYPE|DISTILLED\s+SPIRITS|MALT\s+BEVERAGES?|GOVERNMENT\s+WARNING|PRODUCT\s+OF|PRODUCED\s+IN|MADE\s+IN|COUNTRY\s+OF\s+ORIGIN|BOTTLED\s+BY|PRODUCED\s+BY|IMPORTED\s+BY|BREWED\s+BY|CANNED\s+BY|NET\s+CONTENTS?|SERVING\s+SIZE|ALC|ALCOHOL\s+\d|PROOF\s*\d|\d{1,3}(?:\.\d+)?\s*(?:%|PERCENT|PROOF))\b",
             normalized,
         )
     )
@@ -589,6 +589,21 @@ def _downgrade_low_confidence_expected_result(result: FieldResult, fields: Appli
 
 
 def _expected_abv_bounds(expected: str) -> tuple[float, float] | None:
+    proof_range_match = re.search(
+        r"(?P<low>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:-|TO|\u2013|\u2014|â€“|â€”)\s*(?P<high>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:\u00b0|DEGREES?)?\s*PROOF\b",
+        expected,
+        flags=re.IGNORECASE,
+    ) or re.search(
+        r"\bPROOF\s*:?\s*(?P<low>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:-|TO|\u2013|\u2014|â€“|â€”)\s*(?P<high>\d{1,3}(?:[.,]\d{1,2})?)\b",
+        expected,
+        flags=re.IGNORECASE,
+    )
+    if proof_range_match:
+        low = float(proof_range_match.group("low").replace(",", ".")) / 2.0
+        high = float(proof_range_match.group("high").replace(",", ".")) / 2.0
+        if 0 < low <= 100 and 0 < high <= 100:
+            return (min(low, high), max(low, high))
+
     decimal_range_match = re.search(
         r"(?P<low>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:-|TO|\u2013|\u2014|â€“|â€”)\s*(?P<high>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:%|PERCENT)?\s*(?:ABV|ALC\.?\s*/?\s*VOL\.?|ALCOHOL\s+BY\s+VOLUME)?",
         expected,

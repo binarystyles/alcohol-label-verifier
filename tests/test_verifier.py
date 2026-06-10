@@ -46,6 +46,11 @@ def test_brand_common_word_abbreviations_pass() -> None:
     assert verify_brand("MT. HOOD VODKA", "MOUNT HOOD VODKA\nDISTILLED SPIRITS").status == STATUS_PASS
 
 
+def test_brand_containing_proof_word_is_not_treated_as_alcohol_statement() -> None:
+    result = verify_brand("PROOF RANGE BOURBON", "PROOF RANGE BOURBON\nDISTILLED SPIRITS\n90 Proof")
+    assert result.status == STATUS_PASS
+
+
 def test_brand_word_order_mismatch_fails() -> None:
     result = verify_brand("OLD TOM GIN", "TOM OLD GIN\nDISTILLED SPIRITS\n45% Alc./Vol.\n750 mL")
     assert result.status == STATUS_FAIL
@@ -205,6 +210,19 @@ def test_alcohol_content_decimal_comma_range_matches_high_end_label() -> None:
     result = verify_alcohol_content("12,5-13,5% ABV", "SUNSET HOLLOW 13.5% vol")
     assert result.status == STATUS_PASS
     assert result.expected == "12.5-13.5% ABV"
+
+
+def test_expected_proof_range_converts_to_abv_before_label_comparison() -> None:
+    result = verify_alcohol_content("80-90 Proof", "PROOF RANGE BOURBON 90 Proof")
+    assert result.status == STATUS_PASS
+    assert result.expected == "40-45% ABV"
+    assert result.found == "45% ABV"
+
+
+def test_expected_proof_prefix_range_converts_to_abv_before_label_comparison() -> None:
+    result = verify_alcohol_content("Proof 80-90", "PROOF RANGE BOURBON 45% Alc./Vol.")
+    assert result.status == STATUS_PASS
+    assert result.expected == "40-45% ABV"
 
 
 def test_formula_alcohol_content_decimal_comma_range_matches_high_end_label() -> None:

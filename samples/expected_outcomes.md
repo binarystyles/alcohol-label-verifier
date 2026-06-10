@@ -152,5 +152,6 @@
 | `APP-148_flavored_malt_beverage_first_line_pass.pdf` | Pass | Pass | Malt application states FLAVORED MALT BEVERAGE before the brand; this should be treated as explicit product-type evidence. |
 | `APP-149_superseded_formula_review.pdf` | Needs Review | Needs Review | Matching formula support says Status: Approved - Superseded, so it should not be used as current approved expected evidence. |
 | `APP-150_chardonnay_varietal_wine_pass.pdf` | Pass | Pass | Wine label uses the grape varietal Chardonnay as the type designation without a separate WINE statement, which should still satisfy product type. |
+| `APP-151_bottled_exclusively_for_pass.pdf` | Pass | Pass | Responsible-party wording may include a modifier such as Bottled exclusively for before the expected entity. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

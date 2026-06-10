@@ -146,6 +146,34 @@ def test_bottler_producer_accepts_bottled_for_statement() -> None:
     assert verify_bottler_producer("Example Distilling Co.", "For sale in Oregon only").status == STATUS_REVIEW
 
 
+def test_bottler_producer_accepts_responsible_party_modifiers() -> None:
+    assert (
+        verify_bottler_producer("Example Distilling Co.", "Bottled exclusively for Example Distilling Co.").status
+        == STATUS_PASS
+    )
+    assert (
+        verify_bottler_producer("Example Distilling Co.", "Produced specially by Example Distilling Co.").status
+        == STATUS_PASS
+    )
+    assert verify_bottler_producer("Example Imports LLC", "Imported solely by Example Imports LLC").status == STATUS_PASS
+    assert (
+        verify_bottler_producer(
+            "Example Distilling Co.",
+            "Distilled and bottled exclusively for Example Distilling Co.",
+        ).status
+        == STATUS_PASS
+    )
+
+
+def test_bottler_producer_modifier_conflicting_same_role_needs_review() -> None:
+    result = verify_bottler_producer(
+        "Example Distilling Co.",
+        "Bottled exclusively for Example Distilling Co.\nBottled by Canyon Creek Spirits",
+    )
+    assert result.status == STATUS_REVIEW
+    assert result.found == "Canyon Creek Spirits"
+
+
 def test_bottler_producer_accepts_packed_by_statement() -> None:
     assert verify_bottler_producer("Example Winery", "Packed by Example Winery").status == STATUS_PASS
     assert verify_bottler_producer("Example Winery", "Packed and bottled by Example Winery").status == STATUS_PASS

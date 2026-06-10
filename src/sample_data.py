@@ -2948,6 +2948,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Wine label uses the grape varietal Chardonnay as the type designation without a separate WINE statement, which should still satisfy product type.",
         ),
+        SampleSpec(
+            filename="APP-151_bottled_exclusively_for_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-151", "formula": "F-15100"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled exclusively for Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Responsible-party wording may include a modifier such as Bottled exclusively for before the expected entity.",
+        ),
     ]
 
 

@@ -3346,6 +3346,28 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Imported malt beverage origin can be stated as Brewed and canned in Belgium.",
         ),
+        SampleSpec(
+            filename="APP-171_class_type_first_liqueur_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-171",
+                "brand_name": "MIDNIGHT CACAO LIQUEUR",
+                "fanciful_name": "Chocolate Cream",
+                "formula": "F-17100",
+                "class_type": "Liqueur",
+            },
+            label_lines=[
+                "Class/Type: Liqueur",
+                "MIDNIGHT CACAO LIQUEUR",
+                "Chocolate Cream",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="A first-line Class/Type statement can satisfy distilled spirits product type when no separate DISTILLED SPIRITS line appears.",
+        ),
     ]
 
 

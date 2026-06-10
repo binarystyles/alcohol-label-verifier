@@ -614,10 +614,18 @@ def test_wine_varietal_brand_or_descriptor_context_stays_conservative() -> None:
 
 def test_distilled_spirits_product_type_passes_from_class_type_context() -> None:
     assert verify_product_type("DISTILLED SPIRITS", "OLD TOM GIN\nClass/Type: Gin\n45% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("DISTILLED SPIRITS", "Class/Type: Liqueur\n45% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("DISTILLED SPIRITS", "Class/Type: Vodka Cocktail").status == STATUS_PASS
     assert (
         verify_product_type("DISTILLED SPIRITS", "RIVER BEND BOURBON\nStraight Bourbon Whiskey\n90 Proof").status
         == STATUS_PASS
     )
+
+
+def test_class_type_first_line_can_expose_product_type_mismatch() -> None:
+    result = verify_product_type("MALT BEVERAGES", "Class/Type: Liqueur\n45% Alc./Vol.")
+    assert result.status == STATUS_FAIL
+    assert result.found == "DISTILLED SPIRITS"
 
 
 def test_malt_product_type_first_label_line_passes_when_explicit() -> None:

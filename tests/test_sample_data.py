@@ -298,6 +298,10 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-170_brewed_canned_origin_pass.pdf"].fields["country_of_origin"] == "Belgium"
     assert "Brewed and canned in Belgium" in specs["APP-170_brewed_canned_origin_pass.pdf"].label_lines
     assert specs["APP-170_brewed_canned_origin_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-171_class_type_first_liqueur_pass.pdf"].fields["class_type"] == "Liqueur"
+    assert specs["APP-171_class_type_first_liqueur_pass.pdf"].label_lines[0] == "Class/Type: Liqueur"
+    assert "DISTILLED SPIRITS" not in specs["APP-171_class_type_first_liqueur_pass.pdf"].label_lines
+    assert specs["APP-171_class_type_first_liqueur_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

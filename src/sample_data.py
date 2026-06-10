@@ -2923,6 +2923,31 @@ def sample_specs() -> list[SampleSpec]:
             note="Matching formula support says Status: Approved - Superseded, so it should not be used as current approved expected evidence.",
             formula_approval_status="Approved - Superseded",
         ),
+        SampleSpec(
+            filename="APP-150_chardonnay_varietal_wine_pass.pdf",
+            fields={
+                **wine_fields,
+                "serial_number": "APP-150",
+                "brand_name": "SUNSET HOLLOW",
+                "fanciful_name": "",
+                "formula": "W-15000",
+                "grape_varietals": "Chardonnay",
+                "wine_appellation": "California",
+                "class_type": "Chardonnay",
+                "alcohol_content": "13.5% ABV",
+                "bottler_producer": "Sunset Hollow Winery",
+            },
+            label_lines=[
+                "SUNSET HOLLOW",
+                "Chardonnay",
+                "13.5% Alc./Vol.",
+                "750 mL",
+                "Bottled by Sunset Hollow Winery",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Wine label uses the grape varietal Chardonnay as the type designation without a separate WINE statement, which should still satisfy product type.",
+        ),
     ]
 
 

@@ -99,6 +99,14 @@ def _has_conflicting_legal_suffix(expected_tokens: list[str], actual_tokens: lis
     return bool(expected_suffixes and actual_suffixes and expected_suffixes.isdisjoint(actual_suffixes))
 
 
+WINE_TYPE_DESIGNATION_PATTERN = (
+    r"CHARDONNAY|CABERNET\s+SAUVIGNON|CABERNET\s+FRANC|PINOT\s+NOIR|PINOT\s+GRIGIO|PINOT\s+GRIS|"
+    r"SAUVIGNON\s+BLANC|MERLOT|RIESLING|ZINFANDEL|SYRAH|SHIRAZ|MALBEC|SANGIOVESE|TEMPRANILLO|"
+    r"GRENACHE|MOURVEDRE|MUSCAT|MOSCATO|GEWURZTRAMINER|VIOGNIER|CHENIN\s+BLANC|PETITE\s+SIRAH|"
+    r"RED\s+BLEND|WHITE\s+BLEND|ROSE"
+)
+
+
 def extract_product_type(text: str | None) -> str:
     normalized = normalize_text(text)
     if not normalized:
@@ -126,6 +134,8 @@ def extract_product_type(text: str | None) -> str:
         normalized,
     ):
         return "DISTILLED SPIRITS"
+    if re.search(rf"\b(?:{WINE_TYPE_DESIGNATION_PATTERN})\b", normalized):
+        return "WINE"
     if re.search(r"\b(?:HARD\s+)?(?:CIDER|PERRY)\b", normalized):
         return "WINE"
     if "SPIRIT" in normalized or "LIQUOR" in normalized:

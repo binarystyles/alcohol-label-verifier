@@ -32,6 +32,7 @@ from src.normalize import (
     normalize_text,
     ordered_fuzzy_score,
     snippet_around,
+    WINE_TYPE_DESIGNATION_PATTERN,
 )
 
 WARNING_OCR_REVIEW_THRESHOLD = 86.0
@@ -523,7 +524,7 @@ def _is_explicit_product_type_line(line: str) -> bool:
             normalized,
         )
         or re.fullmatch(
-            r"(?:PRODUCT\s+TYPE\s*:?\s*)?(?:(?:LIGHT|LAGER|PILSNER|PILS|WHEAT)\s+BEER|(?:INDIA\s+PALE|PALE|BROWN|AMBER|BLONDE|RED|CREAM)\s+ALE|FLAVORED\s+MALT\s+BEVERAGE|MEAD|HONEY\s+WINE|SANGRIA)",
+            rf"(?:PRODUCT\s+TYPE\s*:?\s*)?(?:(?:LIGHT|LAGER|PILSNER|PILS|WHEAT)\s+BEER|(?:INDIA\s+PALE|PALE|BROWN|AMBER|BLONDE|RED|CREAM)\s+ALE|FLAVORED\s+MALT\s+BEVERAGE|MEAD|HONEY\s+WINE|SANGRIA|{WINE_TYPE_DESIGNATION_PATTERN})",
             normalized,
         )
     )

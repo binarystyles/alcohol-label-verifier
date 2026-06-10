@@ -490,6 +490,25 @@ def test_wine_product_type_passes_from_mead_and_sangria_terms() -> None:
     assert verify_product_type("WINE", "SUNSET PUNCH\nClass/Type: Sangria\n12% Alc./Vol.").status == STATUS_PASS
 
 
+def test_wine_product_type_passes_from_varietal_type_designations() -> None:
+    assert verify_product_type("WINE", "CHARDONNAY\nSUNSET HOLLOW\n13.5% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("WINE", "SUNSET HOLLOW\nChardonnay\n13.5% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("WINE", "SUNSET HOLLOW\nCabernet Sauvignon\n13.5% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("WINE", "SUNSET HOLLOW\nRed Blend\n13.5% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("WINE", "SUNSET HOLLOW\nRose\n13.5% Alc./Vol.").status == STATUS_PASS
+
+
+def test_wine_varietal_brand_or_descriptor_context_stays_conservative() -> None:
+    assert verify_product_type("WINE", "CHARDONNAY HILL ESTATE\n13.5% Alc./Vol.").status == STATUS_REVIEW
+    assert (
+        verify_product_type(
+            "DISTILLED SPIRITS",
+            "OLD TOM GIN\nChardonnay Cask Finished\nClass/Type: Gin\n45% Alc./Vol.",
+        ).status
+        == STATUS_PASS
+    )
+
+
 def test_distilled_spirits_product_type_passes_from_class_type_context() -> None:
     assert verify_product_type("DISTILLED SPIRITS", "OLD TOM GIN\nClass/Type: Gin\n45% Alc./Vol.").status == STATUS_PASS
     assert (

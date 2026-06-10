@@ -161,6 +161,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-134_photo_low_contrast_artwork_review.pdf" in specs
     assert "APP-135_ambiguous_product_type_checkboxes_review.pdf" in specs
     assert "APP-136_ambiguous_import_checkboxes_review.pdf" in specs
+    assert "APP-150_chardonnay_varietal_wine_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -224,6 +225,10 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-148_flavored_malt_beverage_first_line_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-149_superseded_formula_review.pdf"].formula_approval_status == "Approved - Superseded"
     assert specs["APP-149_superseded_formula_review.pdf"].expected_status == STATUS_REVIEW
+    assert specs["APP-150_chardonnay_varietal_wine_pass.pdf"].fields["product_type"] == "WINE"
+    assert specs["APP-150_chardonnay_varietal_wine_pass.pdf"].fields["class_type"] == "Chardonnay"
+    assert "Chardonnay" in specs["APP-150_chardonnay_varietal_wine_pass.pdf"].label_lines
+    assert specs["APP-150_chardonnay_varietal_wine_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

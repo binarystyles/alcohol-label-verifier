@@ -3225,6 +3225,26 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Hyphenated pack net-contents wording such as 4-pack of 12 fl oz cans should normalize to total package volume.",
         ),
+        SampleSpec(
+            filename="APP-165_slash_multipack_net_contents_pass.pdf",
+            fields={
+                **malt_fields,
+                "serial_number": "APP-165",
+                "formula": "MB-16500",
+                "net_contents": "48 fl oz",
+            },
+            label_lines=[
+                "HARBOR LIGHT LAGER",
+                "MALT BEVERAGES",
+                "Class/Type: Flavored Malt Beverage",
+                "5.5% Alc./Vol.",
+                "Net Contents 4/12 fl oz cans",
+                "Brewed by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Slash-separated multipack net-contents wording such as 4/12 fl oz cans should normalize to total package volume rather than a fractional ounce.",
+        ),
     ]
 
 

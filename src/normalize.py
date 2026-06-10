@@ -294,6 +294,10 @@ NET_CONTENTS_MULTIPACK_PATTERNS = (
         re.IGNORECASE,
     ),
     re.compile(
+        rf"(?<![A-Z0-9])(?P<count>\d{{1,3}})\s*/\s*(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\s+(?:BOTTLES?|CANS?|CONTAINERS?|PACKS?|PK)(?=$|[^A-Z0-9])",
+        re.IGNORECASE,
+    ),
+    re.compile(
         rf"(?<![A-Z0-9])(?P<count>\d{{1,3}})\s*(?:(?:-|\u2010|\u2011|\u2012|\u2013|\u2014|\u2015)\s*)?(?:BOTTLES?|CANS?|CONTAINERS?|PACK|PACKS|PK)\s+(?:OF\s+)?(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})(?:\s+EACH)?{NET_CONTENTS_UNIT_BOUNDARY}",
         re.IGNORECASE,
     ),

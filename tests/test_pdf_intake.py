@@ -98,6 +98,17 @@ def test_cached_invalid_files_keep_current_filename_as_application_id() -> None:
     ]
 
 
+def test_cache_separates_identical_bytes_by_intake_type() -> None:
+    data = b"not a real application"
+    results = process_batch([("first.zip", data), ("second.pdf", data)], cache={})
+
+    assert results[0].filename == "first.zip"
+    assert any("ZIP archive could not be opened" in error for error in results[0].errors)
+    assert results[1].filename == "second.pdf"
+    assert any("PDF could not be opened" in error for error in results[1].errors)
+    assert not any("ZIP archive could not be opened" in error for error in results[1].errors)
+
+
 def test_zip_without_supported_applications_returns_clear_review_result() -> None:
     zip_buffer = BytesIO()
     with zipfile.ZipFile(zip_buffer, "w", compression=zipfile.ZIP_DEFLATED) as archive:

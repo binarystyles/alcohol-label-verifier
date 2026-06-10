@@ -30,7 +30,7 @@ There is no manual-entry mode and no separate single-application page. Batch mod
 - Batch PDF, scanned image, and ZIP intake.
 - One-button verification workflow.
 - Top-page light/dark mode toggle.
-- Session-only PDF hash caching.
+- Session-only intake-type plus file-hash caching.
 - Best-effort AcroForm extraction with checkbox, region, and summary fallback.
 - Separate application extraction and label evidence extraction.
 - Local Tesseract OCR fallback for raster label areas.

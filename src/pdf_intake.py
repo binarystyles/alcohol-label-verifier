@@ -5,6 +5,7 @@ from __future__ import annotations
 from copy import deepcopy
 from io import BytesIO
 import hashlib
+from pathlib import PurePosixPath
 import time
 import zipfile
 
@@ -23,6 +24,10 @@ SUPPORTED_UPLOAD_TYPES = ["pdf", "png", "jpg", "jpeg", "tif", "tiff", "bmp"]
 
 def sha256_bytes(data: bytes) -> str:
     return hashlib.sha256(data).hexdigest()
+
+
+def cache_key_for_file(filename: str, data: bytes) -> tuple[str, str]:
+    return (_intake_type_for_cache(filename), sha256_bytes(data))
 
 
 def expand_named_files(named_files: list[tuple[str, bytes]]) -> list[tuple[str, bytes]]:
@@ -142,10 +147,14 @@ def process_application_file(filename: str, file_bytes: bytes) -> ApplicationRes
         )
 
 
-def process_application_file_cached(filename: str, file_bytes: bytes, cache: dict[str, ApplicationResult] | None = None) -> ApplicationResult:
+def process_application_file_cached(
+    filename: str,
+    file_bytes: bytes,
+    cache: dict[tuple[str, str], ApplicationResult] | None = None,
+) -> ApplicationResult:
     if cache is None:
         return process_application_file(filename, file_bytes)
-    key = sha256_bytes(file_bytes)
+    key = cache_key_for_file(filename, file_bytes)
     if key not in cache:
         cache[key] = process_application_file(filename, file_bytes)
     result = deepcopy(cache[key])
@@ -160,6 +169,15 @@ def process_pdf(filename: str, pdf_bytes: bytes) -> ApplicationResult:
     return process_application_file(filename, pdf_bytes)
 
 
-def process_pdf_cached(filename: str, pdf_bytes: bytes, cache: dict[str, ApplicationResult] | None = None) -> ApplicationResult:
+def process_pdf_cached(
+    filename: str,
+    pdf_bytes: bytes,
+    cache: dict[tuple[str, str], ApplicationResult] | None = None,
+) -> ApplicationResult:
     """Backward-compatible alias for cached PDF processing."""
     return process_application_file_cached(filename, pdf_bytes, cache=cache)
+
+
+def _intake_type_for_cache(filename: str) -> str:
+    suffix = PurePosixPath(filename.replace("\\", "/")).suffix.lower()
+    return suffix or "<no-extension>"

@@ -2,7 +2,7 @@
 
 ## Architecture
 
-The app is a standalone Streamlit workflow that treats each completed application PDF or scanned application image as a self-contained verification package. Users upload one or many files, or a ZIP containing supported files. The batch processor expands ZIP files in memory, hashes each file for session-only caching, normalizes scanned image files to an in-memory PDF representation, extracts application data, extracts label-area text, runs deterministic checks, and produces summary and detailed CSV outputs.
+The app is a standalone Streamlit workflow that treats each completed application PDF or scanned application image as a self-contained verification package. Users upload one or many files, or a ZIP containing supported files. The batch processor expands ZIP files in memory, caches each file by intake type plus hash for the current session, normalizes scanned image files to an in-memory PDF representation, extracts application data, extracts label-area text, runs deterministic checks, and produces summary and detailed CSV outputs.
 
 The main modules are:
 
@@ -20,7 +20,7 @@ See `docs/TOOLS_USED.md` for the implementation, OCR, test, and deployment toolc
 ## Pipeline
 
 1. Read uploaded file bytes in memory.
-2. Compute a SHA-256 hash for Streamlit session caching.
+2. Compute an intake-type plus SHA-256 key for Streamlit session caching.
 3. Convert scanned images to an in-memory PDF page so the same region pipeline applies.
 4. Try `pypdf` AcroForm extraction for PDFs.
 5. Read current source-form checkbox widgets, or visible checkbox marks on flattened/scanned source-form pages, for Item 3 Domestic/Imported and Item 5 product type.
@@ -85,6 +85,6 @@ The app avoids full-document OCR unless necessary:
 - Only mapped page-one regions and candidate label areas are rendered.
 - Unreadable scanned attachment pages do not downgrade the result when a later supplemental label page is readable.
 - Label OCR tries conservative adaptive-threshold, grayscale, contrast, and Otsu-preprocessed variants, then keeps the strongest local Tesseract result. This improves colored artwork, crest-style/logo-like artwork, textured and photo-like backgrounds, dark/reversed text, and colored warning panels without making network calls.
-- Results are cached by PDF hash during the Streamlit session.
+- Results are cached by intake type plus file hash during the Streamlit session, so identical bytes uploaded as different file types still take the correct PDF/image/ZIP processing path.
 
 On clean text-layer PDFs and generated samples, processing is typically well under the 5-second target per application. Scanned images, scanned PDFs, and rotated raster labels depend on local Tesseract speed and image quality.

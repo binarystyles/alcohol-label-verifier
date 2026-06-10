@@ -356,6 +356,8 @@ def test_formula_approval_parser_accepts_final_alcohol_by_volume_wording() -> No
         "Final Alcohol by Volume: 45%",
         "Alcohol by Volume of Finished Product: 45%",
         "Finished Product Alcohol: 45% ABV",
+        "Target ABV: 45%",
+        "Target Alc/Vol: 45%",
     ):
         text = f"""
         Formulas Online Entry

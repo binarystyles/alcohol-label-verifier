@@ -3103,6 +3103,23 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Multipack net-contents wording such as 4 x 50 mL should normalize to the total package volume.",
         ),
+        SampleSpec(
+            filename="APP-159_formula_target_abv_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-159", "formula": "F-15900"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Formula support states final alcohol with Target ABV shorthand and should verify against the label.",
+            formula_approval_alcohol_label="Target ABV",
+        ),
     ]
 
 

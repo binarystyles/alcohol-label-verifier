@@ -160,5 +160,6 @@
 | `APP-156_bottled_in_origin_review.pdf` | Needs Review | Needs Review | Imported country of origin should need review when the label has only bottling-location wording, not clear origin wording. |
 | `APP-157_hyphenated_warning_heading_fail.pdf` | Fail | Fail | Readable labels with hyphenated government-warning headings should fail strict canonical-heading validation. |
 | `APP-158_multipack_net_contents_pass.pdf` | Pass | Pass | Multipack net-contents wording such as 4 x 50 mL should normalize to the total package volume. |
+| `APP-159_formula_target_abv_pass.pdf` | Pass | Pass | Formula support states final alcohol with Target ABV shorthand and should verify against the label. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

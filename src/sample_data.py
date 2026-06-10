@@ -30,6 +30,7 @@ class SampleSpec:
     note: str
     raster_label: bool = False
     artwork_label: bool = False
+    split_panel_label: bool = False
     blank_label: bool = False
     include_formula_approval: bool = True
     formula_approval_id: str | None = None
@@ -3739,6 +3740,45 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="A descriptor-first barrel-aged beer statement should verify as a malt beverage without being misread as distilled spirits because it contains Tequila.",
         ),
+        SampleSpec(
+            filename="APP-191_split_front_back_panels_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-191", "formula": "F-19100"},
+            label_lines=[
+                "FRONT PANEL",
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "BACK PANEL",
+                "Net Contents 750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Required label elements split across front and back panels should verify as one self-contained label package.",
+            split_panel_label=True,
+        ),
+        SampleSpec(
+            filename="APP-192_split_panel_conflicting_abv_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-192", "formula": "F-19200"},
+            label_lines=[
+                "FRONT PANEL",
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "BACK PANEL",
+                "Alcohol: 40% by Volume",
+                "Net Contents 750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Conflicting front/back panel alcohol-content statements should require review instead of passing on the closest matching value.",
+            split_panel_label=True,
+        ),
     ]
 
 
@@ -3772,6 +3812,8 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
         _draw_summary_block(page, spec.fields)
     if spec.blank_label:
         pass
+    elif spec.split_panel_label:
+        _draw_split_panel_label(page, spec.label_lines)
     elif spec.artwork_label:
         _draw_artwork_label(page, spec.label_lines, low_quality=spec.raster_label, style=spec.artwork_style)
     elif spec.raster_label:
@@ -4115,6 +4157,46 @@ def _draw_text_label(page: fitz.Page, label_lines: list[str]) -> None:
         else:
             page.insert_textbox(fitz.Rect(label_rect.x0 + 20, y, label_rect.x1 - 20, y + 16), line, fontsize=8.8, fontname="helv", align=1)
             y += 17
+
+
+def _draw_split_panel_label(page: fitz.Page, label_lines: list[str]) -> None:
+    label_rect = _inner_label_rect(page)
+    gap = 8
+    panel_width = (label_rect.width - gap) / 2
+    front_rect = fitz.Rect(label_rect.x0, label_rect.y0, label_rect.x0 + panel_width, label_rect.y1)
+    back_rect = fitz.Rect(front_rect.x1 + gap, label_rect.y0, label_rect.x1, label_rect.y1)
+    page.draw_rect(front_rect, color=(0.05, 0.05, 0.05), fill=(1, 1, 1), width=1.0)
+    page.draw_rect(back_rect, color=(0.05, 0.05, 0.05), fill=(0.98, 0.98, 0.96), width=1.0)
+
+    separator = next((index for index, line in enumerate(label_lines) if line.upper() == "BACK PANEL"), len(label_lines))
+    front_lines = [line for line in label_lines[:separator] if line.upper() != "FRONT PANEL"]
+    back_lines = label_lines[separator + 1 :] if separator < len(label_lines) else []
+    _draw_panel_lines(page, front_rect, "FRONT PANEL", front_lines)
+    _draw_panel_lines(page, back_rect, "BACK PANEL", back_lines)
+
+
+def _draw_panel_lines(page: fitz.Page, rect: fitz.Rect, heading: str, lines: list[str]) -> None:
+    page.insert_textbox(
+        fitz.Rect(rect.x0 + 8, rect.y0 + 8, rect.x1 - 8, rect.y0 + 24),
+        heading,
+        fontsize=6.8,
+        fontname="helv",
+        align=1,
+        color=(0.25, 0.25, 0.25),
+    )
+    y = rect.y0 + 42
+    for index, line in enumerate(lines):
+        if _looks_like_warning_line(line):
+            page.insert_textbox(
+                fitz.Rect(rect.x0 + 8, rect.y1 - 82, rect.x1 - 8, rect.y1 - 12),
+                line,
+                fontsize=4.7,
+                fontname="helv",
+            )
+            continue
+        fontsize = 10 if index == 0 else 7.4
+        page.insert_text((rect.x0 + 12, y), line, fontsize=fontsize, fontname="helv")
+        y += 20 if index == 0 else 15
 
 
 def _draw_raster_label(page: fitz.Page, label_lines: list[str]) -> None:

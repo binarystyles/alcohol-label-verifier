@@ -13,7 +13,7 @@ The main modules are:
 - `src/normalize.py`: text, brand, ABV/proof, net contents, product type, and warning normalization.
 - `src/verifier.py`: field checks and overall Pass / Needs Review / Fail aggregation.
 - `src/batch.py`: batch orchestration and CSV-ready dataframes.
-- `src/sample_data.py`: deterministic sample application package generation, including color-artwork labels.
+- `src/sample_data.py`: deterministic sample application package generation, including color-artwork labels and split front/back panel fixtures.
 
 See `docs/TOOLS_USED.md` for the implementation, OCR, test, and deployment toolchain.
 
@@ -61,7 +61,7 @@ Needs Review is used for uncertainty:
 - Class/type text appears only in brand, producer, warning, or other non-class context, or the label contains conflicting explicit class/type statements. Explicit `Class/Type:` values are preserved even when the value contains product-type words, such as `Distilled Spirits Specialty`, and clear distilled-spirits specialty/cocktail class-type text may satisfy Item 5 without a separate `DISTILLED SPIRITS` line, including when OCR returns the class/type line before the brand.
 - Supplied wine-only Item 10 grape-varietal values or Item 11 wine-appellation values are not clearly found on the label. Each listed grape varietal is checked separately, so a partially present list still requires review.
 - Bottler/producer text appears only in brand or other non-responsible-party context instead of wording such as `Bottled by`, `Bottled by:`, `Bottled for`, `Bottled exclusively for`, `Distilled by`, `Blended by`, `Imported solely by`, `Filled by`, `Made by`, `Prepared by`, `Manufactured by`, `Mfg. by`, `Mfr. by`, `Canned by`, `Packed by`, `Produced specially by`, `Produced and bottled by`, or comma/slash-separated action lists such as `Distilled, bottled and packaged by`, `Produced/Bottled by`, and `Imported, bottled and distributed by`, or the label contains conflicting same-role responsible-party statements. Distribution-only and bottled-under-authority wording are routed to Needs Review rather than treated as bottler/producer matches. Separate-line and one-line `Bottled for ... by ...` statements are role-aware: an expected actual `Bottled by` entity may pass, while an expected `Bottled for` entity with a different actual bottler still needs review. Harmless legal suffix variants pass, but distinct suffixes such as `LLC` versus `Limited` are not treated as the same entity.
-- Label contains both matching and conflicting alcohol-content or net-contents values.
+- Label contains both matching and conflicting alcohol-content or net-contents values, including repeated statements split across front and back panels.
 - Missing matching formula approval or pre-import approval content for an Item 9 reference.
 - Matching formula approval/source document or pre-import approval letter found but no final alcohol content is extractable.
 - Matching formula approval/source document or pre-import approval letter has an explicit non-approved or non-current status.
@@ -86,7 +86,7 @@ The app avoids full-document OCR unless necessary:
 - Current source-form checkbox widgets and visible checkbox marks are checked before OCR is trusted for checkbox-only values.
 - Only mapped page-one regions and candidate label areas are rendered.
 - Unreadable scanned attachment pages do not downgrade the result when a later supplemental label page is readable.
-- Label OCR tries conservative adaptive-threshold, grayscale, contrast, and Otsu-preprocessed variants, then keeps the strongest local Tesseract result. This improves colored artwork, crest-style/logo-like artwork, ornate overprint-style artwork, textured and photo-like backgrounds, dark/reversed text, and colored warning panels without making network calls. Tiny or low-quality warning text that cannot be read reliably is routed to Needs Review with an OCR-quality reason.
+- Label OCR tries conservative adaptive-threshold, grayscale, contrast, and Otsu-preprocessed variants, then keeps the strongest local Tesseract result. This improves colored artwork, crest-style/logo-like artwork, ornate overprint-style artwork, textured and photo-like backgrounds, dark/reversed text, and colored warning panels without making network calls. Required elements may be spread across front and back label panels, so readable text from the full affixed label area is treated as one label package. Tiny or low-quality warning text that cannot be read reliably is routed to Needs Review with an OCR-quality reason.
 - Results are cached by intake type plus file hash during the Streamlit session, so identical bytes uploaded as different file types still take the correct PDF/image/ZIP processing path.
 
 On clean text-layer PDFs and generated samples, processing is typically well under the 5-second target per application. Scanned images, scanned PDFs, and rotated raster labels depend on local Tesseract speed and image quality.

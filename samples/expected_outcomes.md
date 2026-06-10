@@ -192,5 +192,7 @@
 | `APP-188_modified_hard_cider_first_line_pass.pdf` | Pass | Pass | A first-line modified hard-cider statement should satisfy wine product type and class/type checks without requiring the literal word WINE. |
 | `APP-189_barleywine_ale_malt_pass.pdf` | Pass | Pass | Barleywine/Barley Wine is a malt-beverage beer style and should not be treated as wine or an ambiguous product type. |
 | `APP-190_tequila_barrel_aged_beer_pass.pdf` | Pass | Pass | A descriptor-first barrel-aged beer statement should verify as a malt beverage without being misread as distilled spirits because it contains Tequila. |
+| `APP-191_split_front_back_panels_pass.pdf` | Pass | Pass | Required label elements split across front and back panels should verify as one self-contained label package. |
+| `APP-192_split_panel_conflicting_abv_review.pdf` | Needs Review | Needs Review | Conflicting front/back panel alcohol-content statements should require review instead of passing on the closest matching value. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

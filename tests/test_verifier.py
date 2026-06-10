@@ -1040,6 +1040,35 @@ def test_overall_status_aggregation_pass() -> None:
     assert result.overall_status == STATUS_PASS
 
 
+def test_front_back_panel_label_text_verifies_as_single_package() -> None:
+    fields = ApplicationFields(
+        serial_number="APP-X",
+        product_type="DISTILLED SPIRITS",
+        brand_name="OLD TOM GIN",
+        formula="F-1001",
+        class_type="Gin",
+        alcohol_content="45% ABV",
+        net_contents="750 mL",
+        bottler_producer="Example Distilling Co.",
+        raw_sources={"alcohol_content": "formula-approval"},
+    )
+    label = LabelExtraction(
+        text=(
+            "FRONT PANEL\nOLD TOM GIN\nBotanical Reserve\nDISTILLED SPIRITS\nClass/Type: Gin\n45% Alc./Vol.\n"
+            f"BACK PANEL\nNet Contents 750 mL\nBottled by Example Distilling Co.\n{GOVERNMENT_WARNING}"
+        ),
+        confidence=0.97,
+    )
+    result = verify_application(
+        filename="split.pdf",
+        fields=fields,
+        label=label,
+        application_ocr_text="",
+        processing_time_seconds=0.1,
+    )
+    assert result.overall_status == STATUS_PASS
+
+
 def test_overall_status_aggregation_fail() -> None:
     fields = ApplicationFields(
         serial_number="APP-X",

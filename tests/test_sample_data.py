@@ -202,6 +202,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-188_modified_hard_cider_first_line_pass.pdf" in specs
     assert "APP-189_barleywine_ale_malt_pass.pdf" in specs
     assert "APP-190_tequila_barrel_aged_beer_pass.pdf" in specs
+    assert "APP-191_split_front_back_panels_pass.pdf" in specs
+    assert "APP-192_split_panel_conflicting_abv_review.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -530,6 +532,11 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-190_tequila_barrel_aged_beer_pass.pdf"].fields["class_type"] == "Barrel Aged Beer"
     assert "TEQUILA BARREL AGED BEER" in specs["APP-190_tequila_barrel_aged_beer_pass.pdf"].label_lines
     assert specs["APP-190_tequila_barrel_aged_beer_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-191_split_front_back_panels_pass.pdf"].split_panel_label is True
+    assert specs["APP-191_split_front_back_panels_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-192_split_panel_conflicting_abv_review.pdf"].split_panel_label is True
+    assert "Alcohol: 40% by Volume" in specs["APP-192_split_panel_conflicting_abv_review.pdf"].label_lines
+    assert specs["APP-192_split_panel_conflicting_abv_review.pdf"].expected_status == STATUS_REVIEW
     assert specs["APP-115_sake_wine_class_pass.pdf"].fields["class_type"] == "Sake"
     assert specs["APP-115_sake_wine_class_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-116_vermouth_wine_class_pass.pdf"].fields["class_type"] == "Vermouth"

@@ -3665,6 +3665,31 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Imported origin stated as a recognized distilled-spirits class term plus country should pass.",
         ),
+        SampleSpec(
+            filename="APP-188_modified_hard_cider_first_line_pass.pdf",
+            fields={
+                **wine_fields,
+                "serial_number": "APP-188",
+                "brand_name": "ORCHARD RIDGE",
+                "fanciful_name": "Apple Harvest",
+                "formula": "W-18800",
+                "class_type": "Hard Cider",
+                "alcohol_content": "6% ABV",
+                "net_contents": "12 fl oz",
+                "bottler_producer": "Orchard Ridge Cidery",
+            },
+            label_lines=[
+                "APPLE HARD CIDER",
+                "ORCHARD RIDGE",
+                "Apple Harvest",
+                "6% Alc./Vol.",
+                "12 fl oz",
+                "Bottled by Orchard Ridge Cidery",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="A first-line modified hard-cider statement should satisfy wine product type and class/type checks without requiring the literal word WINE.",
+        ),
     ]
 
 

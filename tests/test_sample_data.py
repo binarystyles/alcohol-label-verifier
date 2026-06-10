@@ -199,6 +199,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-185_tiny_warning_artwork_review.pdf" in specs
     assert "APP-186_champagne_of_france_origin_pass.pdf" in specs
     assert "APP-187_mezcal_of_mexico_origin_pass.pdf" in specs
+    assert "APP-188_modified_hard_cider_first_line_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -518,6 +519,9 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-187_mezcal_of_mexico_origin_pass.pdf"].fields["country_of_origin"] == "Mexico"
     assert "Mezcal of Mexico" in specs["APP-187_mezcal_of_mexico_origin_pass.pdf"].label_lines
     assert specs["APP-187_mezcal_of_mexico_origin_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-188_modified_hard_cider_first_line_pass.pdf"].fields["class_type"] == "Hard Cider"
+    assert "APPLE HARD CIDER" in specs["APP-188_modified_hard_cider_first_line_pass.pdf"].label_lines
+    assert specs["APP-188_modified_hard_cider_first_line_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-115_sake_wine_class_pass.pdf"].fields["class_type"] == "Sake"
     assert specs["APP-115_sake_wine_class_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-116_vermouth_wine_class_pass.pdf"].fields["class_type"] == "Vermouth"

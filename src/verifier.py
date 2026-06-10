@@ -584,6 +584,12 @@ def _product_type_candidate_text(label_text: str) -> str:
     )
 
 
+MODIFIED_CIDER_TYPE_PATTERN = (
+    r"(?:APPLE|PEAR|DRY|SEMI[-\s]+DRY|SWEET|SEMI[-\s]+SWEET|SPARKLING|STILL|HOPPED|"
+    r"BARREL[-\s]+AGED)\s+HARD\s+CIDER|HARD\s+(?:APPLE|PEAR)\s+CIDER|(?:APPLE|PEAR)\s+CIDER"
+)
+
+
 def _is_explicit_class_type_line(line: str) -> bool:
     normalized = normalize_text(line)
     return "CLASS/TYPE" in normalized or "CLASS TYPE" in normalized
@@ -597,7 +603,10 @@ def _is_explicit_product_type_line(line: str) -> bool:
             normalized,
         )
         or re.fullmatch(
-            rf"(?:PRODUCT\s+TYPE\s*:?\s*)?(?:(?:LIGHT|LAGER|PILSNER|PILS|WHEAT)\s+BEER|(?:INDIA\s+PALE|PALE|BROWN|AMBER|BLONDE|RED|CREAM)\s+ALE|FLAVORED\s+MALT\s+BEVERAGE|MEAD|HONEY\s+WINE|SANGRIA|{WINE_TYPE_DESIGNATION_PATTERN})",
+            rf"(?:PRODUCT\s+TYPE\s*:?\s*)?(?:(?:LIGHT|LAGER|PILSNER|PILS|WHEAT)\s+BEER|"
+            rf"(?:INDIA\s+PALE|PALE|BROWN|AMBER|BLONDE|RED|CREAM)\s+ALE|"
+            rf"FLAVORED\s+MALT\s+BEVERAGE|MEAD|HONEY\s+WINE|SANGRIA|{MODIFIED_CIDER_TYPE_PATTERN}|"
+            rf"{WINE_TYPE_DESIGNATION_PATTERN})",
             normalized,
         )
         or re.fullmatch(

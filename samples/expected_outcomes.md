@@ -189,5 +189,6 @@
 | `APP-185_tiny_warning_artwork_review.pdf` | Needs Review | Needs Review | Color artwork with tiny low-quality warning text should require human review for OCR/legibility instead of being treated as a confirmed missing warning. |
 | `APP-186_champagne_of_france_origin_pass.pdf` | Pass | Pass | Imported origin stated as a recognized wine class term plus country should pass, matching the existing Wine of France pattern. |
 | `APP-187_mezcal_of_mexico_origin_pass.pdf` | Pass | Pass | Imported origin stated as a recognized distilled-spirits class term plus country should pass. |
+| `APP-188_modified_hard_cider_first_line_pass.pdf` | Pass | Pass | A first-line modified hard-cider statement should satisfy wine product type and class/type checks without requiring the literal word WINE. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

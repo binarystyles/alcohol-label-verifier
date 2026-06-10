@@ -638,6 +638,10 @@ def test_product_type_first_label_line_passes_when_explicit() -> None:
 
 def test_wine_product_type_passes_from_cider_and_perry_terms() -> None:
     assert verify_product_type("WINE", "ORCHARD RIDGE\nClass/Type: Hard Cider").status == STATUS_PASS
+    assert verify_product_type("WINE", "APPLE HARD CIDER\nORCHARD RIDGE\n6% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("WINE", "DRY HARD CIDER\nORCHARD RIDGE\n6% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("WINE", "HARD APPLE CIDER\nORCHARD RIDGE\n6% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("WINE", "PEAR CIDER\nORCHARD RIDGE\n6% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("WINE", "PERRY\nClass/Type: Perry").status == STATUS_PASS
     assert verify_product_type("DISTILLED SPIRITS", "ORCHARD BRANDY\nClass/Type: Cider Brandy").status == STATUS_PASS
 
@@ -670,6 +674,7 @@ def test_wine_product_type_passes_from_varietal_type_designations() -> None:
 
 def test_wine_varietal_brand_or_descriptor_context_stays_conservative() -> None:
     assert verify_product_type("WINE", "CHARDONNAY HILL ESTATE\n13.5% Alc./Vol.").status == STATUS_REVIEW
+    assert verify_product_type("WINE", "ORCHARD RIDGE APPLE\n6% Alc./Vol.").status == STATUS_REVIEW
     assert (
         verify_product_type(
             "DISTILLED SPIRITS",

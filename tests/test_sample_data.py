@@ -145,6 +145,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-128_dotted_abv_crest_artwork_pass.pdf" in specs
     assert "APP-129_vv_textured_artwork_pass.pdf" in specs
     assert "APP-130_spaced_abv_dark_artwork_pass.pdf" in specs
+    assert "APP-131_formula_alc_vol_heading_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -164,6 +165,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-129_vv_textured_artwork_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-130_spaced_abv_dark_artwork_pass.pdf"].artwork_style == "dark"
     assert specs["APP-130_spaced_abv_dark_artwork_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-131_formula_alc_vol_heading_pass.pdf"].formula_approval_alcohol_label == "Finished Product Alc/Vol"
+    assert specs["APP-131_formula_alc_vol_heading_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

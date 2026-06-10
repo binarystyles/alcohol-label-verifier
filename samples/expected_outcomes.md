@@ -132,5 +132,6 @@
 | `APP-128_dotted_abv_crest_artwork_pass.pdf` | Pass | Needs Review | Color crest-style artwork uses dotted A.B.V. alcohol-content wording and should still verify. |
 | `APP-129_vv_textured_artwork_pass.pdf` | Pass | Needs Review | Textured color artwork uses v/v alcohol-content wording and should still verify. |
 | `APP-130_spaced_abv_dark_artwork_pass.pdf` | Pass | Needs Review | Dark color artwork uses OCR-spaced A B V alcohol-content wording and should still verify. |
+| `APP-131_formula_alc_vol_heading_pass.pdf` | Pass | Pass | Formula support states final alcohol with the abbreviated heading Finished Product Alc/Vol. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

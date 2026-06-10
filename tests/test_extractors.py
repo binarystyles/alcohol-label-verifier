@@ -218,6 +218,25 @@ def test_formula_approval_parser_handles_ttb_malt_rows_without_using_flavor_or_b
     assert fields["alcohol_content"] == "5.5-5.8% ABV"
 
 
+def test_formula_approval_parser_handles_abbreviated_finished_product_alcohol_headings() -> None:
+    for heading in (
+        "Alcohol Content Finished Product: 45% ABV",
+        "Finished Product Alc/Vol: 45%",
+        "Finished Product ABV: 45%",
+    ):
+        text = f"""
+        Formulas Online Entry
+        TTB Formula ID: F-13100
+        Yield Summary
+        {heading}
+        Alcohol From Base: 40 40 % by Volume
+        Ingredients List
+        Finished alcohol
+        """
+        fields = parse_formula_approval_fields(text, "F-13100")
+        assert fields["alcohol_content"] == "45% ABV"
+
+
 def test_formula_approval_parser_converts_proof_before_later_percent_rows() -> None:
     text = """
     Formulas Online Entry

@@ -2580,6 +2580,14 @@ def sample_specs() -> list[SampleSpec]:
             artwork_label=True,
             artwork_style="dark",
         ),
+        SampleSpec(
+            filename="APP-131_formula_alc_vol_heading_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-131", "formula": "F-13100"},
+            label_lines=good_label,
+            expected_status="Pass",
+            note="Formula support states final alcohol with the abbreviated heading Finished Product Alc/Vol.",
+            formula_approval_alcohol_label="Finished Product Alc/Vol",
+        ),
     ]
 
 

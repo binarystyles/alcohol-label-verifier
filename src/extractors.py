@@ -78,7 +78,7 @@ SUMMARY_KEYS: dict[str, str] = {
 PHONE_PATTERN = re.compile(r"(?:\+?1[\s.-]?)?(?:\(?\d{3}\)?[\s.-]?)\d{3}[\s.-]?\d{4}")
 EMAIL_PATTERN = re.compile(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.IGNORECASE)
 FORMULA_FINAL_ALCOHOL_PATTERN = re.compile(
-    r"(?:ALCOHOL\s+CONTENT\s+OF\s+FINISHED\s+PRODUCT|FINAL\s+ALCOHOL\s+CONTENT|FINISHED\s+ALCOHOL\s+CONTENT|FINISHED\s+PRODUCT\s+ALCOHOL\s+CONTENT|FINAL\s+PRODUCT\s+ALCOHOL\s+CONTENT|TARGET\s+ALCOHOL\s+CONTENT)",
+    r"(?:ALCOHOL\s+CONTENT\s+(?:OF\s+)?FINISHED\s+PRODUCT|FINAL\s+ALCOHOL\s+CONTENT|FINISHED\s+ALCOHOL\s+CONTENT|FINISHED\s+PRODUCT\s+(?:ALCOHOL\s+CONTENT|ALC\.?\s*/?\s*VOL\.?|ABV)|FINAL\s+PRODUCT\s+ALCOHOL\s+CONTENT|TARGET\s+ALCOHOL\s+CONTENT)",
     flags=re.IGNORECASE,
 )
 FORMULA_STATUS_PATTERN = re.compile(r"\b(?:APPROVAL\s+)?STATUS\s*[:\-]?\s*(?P<status>.+)$", flags=re.IGNORECASE)
@@ -713,17 +713,7 @@ def _extract_formula_final_alcohol_content(text: str) -> str:
 
 
 def _is_formula_final_alcohol_line(normalized_line: str) -> bool:
-    return any(
-        marker in normalized_line
-        for marker in (
-            "ALCOHOL CONTENT OF FINISHED PRODUCT",
-            "FINAL ALCOHOL CONTENT",
-            "FINISHED ALCOHOL CONTENT",
-            "FINISHED PRODUCT ALCOHOL CONTENT",
-            "FINAL PRODUCT ALCOHOL CONTENT",
-            "TARGET ALCOHOL CONTENT",
-        )
-    )
+    return bool(FORMULA_FINAL_ALCOHOL_PATTERN.search(normalized_line))
 
 
 def _formula_alcohol_segment_after_label(snippet: str) -> str:

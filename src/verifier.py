@@ -589,6 +589,28 @@ def _downgrade_low_confidence_expected_result(result: FieldResult, fields: Appli
 
 
 def _expected_abv_bounds(expected: str) -> tuple[float, float] | None:
+    repeated_unit_proof_range_match = re.search(
+        r"(?P<low>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:\u00b0|DEGREES?)?\s*PROOF\s*(?:-|TO|\u2013|\u2014|â€“|â€”)\s*(?P<high>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:\u00b0|DEGREES?)?\s*PROOF\b",
+        expected,
+        flags=re.IGNORECASE,
+    )
+    if repeated_unit_proof_range_match:
+        low = float(repeated_unit_proof_range_match.group("low").replace(",", ".")) / 2.0
+        high = float(repeated_unit_proof_range_match.group("high").replace(",", ".")) / 2.0
+        if 0 < low <= 100 and 0 < high <= 100:
+            return (min(low, high), max(low, high))
+
+    repeated_unit_abv_range_match = re.search(
+        r"(?P<low>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:%|PERCENT|PCT\.?)\s*(?:ABV|ALC\.?\s*/?\s*VOL\.?|ALCOHOL\s+BY\s+VOLUME|VOL(?:UME)?\.?)?\s*(?:-|TO|\u2013|\u2014|â€“|â€”)\s*(?P<high>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:%|PERCENT|PCT\.?)\s*(?:ABV|ALC\.?\s*/?\s*VOL\.?|ALCOHOL\s+BY\s+VOLUME|VOL(?:UME)?\.?)",
+        expected,
+        flags=re.IGNORECASE,
+    )
+    if repeated_unit_abv_range_match:
+        low = float(repeated_unit_abv_range_match.group("low").replace(",", "."))
+        high = float(repeated_unit_abv_range_match.group("high").replace(",", "."))
+        if 0 < low <= 100 and 0 < high <= 100:
+            return (min(low, high), max(low, high))
+
     proof_range_match = re.search(
         r"(?P<low>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:-|TO|\u2013|\u2014|â€“|â€”)\s*(?P<high>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:\u00b0|DEGREES?)?\s*PROOF\b",
         expected,

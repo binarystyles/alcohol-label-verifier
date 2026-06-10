@@ -1979,6 +1979,31 @@ def sample_specs() -> list[SampleSpec]:
             note="Application alcohol-content range is stated in proof and is converted to ABV before label comparison.",
             include_formula_approval=False,
         ),
+        SampleSpec(
+            filename="APP-101_repeated_unit_proof_range_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-101",
+                "brand_name": "RANGE HOUSE BOURBON",
+                "fanciful_name": "",
+                "formula": "NO FORMULA REQUIRED",
+                "class_type": "Straight Bourbon Whiskey",
+                "alcohol_content": "80 Proof - 90 Proof",
+                "bottler_producer": "Example Distilling Co.",
+            },
+            label_lines=[
+                "RANGE HOUSE BOURBON",
+                "DISTILLED SPIRITS",
+                "Class/Type: Straight Bourbon Whiskey",
+                "90 Proof",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Application alcohol-content proof range repeats the proof unit on both sides and still matches the label.",
+            include_formula_approval=False,
+        ),
     ]
 
 

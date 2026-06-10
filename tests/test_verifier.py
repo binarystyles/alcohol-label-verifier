@@ -225,6 +225,25 @@ def test_expected_proof_prefix_range_converts_to_abv_before_label_comparison() -
     assert result.expected == "40-45% ABV"
 
 
+def test_expected_repeated_unit_proof_range_converts_to_abv_before_label_comparison() -> None:
+    result = verify_alcohol_content("80 Proof - 90 Proof", "RANGE HOUSE BOURBON 90 Proof")
+    assert result.status == STATUS_PASS
+    assert result.expected == "40-45% ABV"
+    assert result.found == "45% ABV"
+
+
+def test_expected_repeated_unit_degree_proof_range_converts_to_abv() -> None:
+    result = verify_alcohol_content("80\u00b0 Proof - 90\u00b0 Proof", "RANGE HOUSE BOURBON 90 Proof")
+    assert result.status == STATUS_PASS
+    assert result.expected == "40-45% ABV"
+
+
+def test_expected_repeated_unit_abv_range_preserves_low_high_bounds() -> None:
+    result = verify_alcohol_content("12.5%-13.5% ABV", "RANGE ESTATE 13.5% vol")
+    assert result.status == STATUS_PASS
+    assert result.expected == "12.5-13.5% ABV"
+
+
 def test_formula_alcohol_content_decimal_comma_range_matches_high_end_label() -> None:
     result = verify_formula_alcohol_content("F-1001", "12,5-13,5% ABV", "formula-approval", "Label says 13.5% vol.")
     assert result.status == STATUS_PASS

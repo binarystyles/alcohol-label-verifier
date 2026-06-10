@@ -3017,6 +3017,32 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Distribution-only wording should not satisfy the expected bottler/producer responsible-party statement.",
         ),
+        SampleSpec(
+            filename="APP-155_vodka_cocktail_class_product_type_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-155",
+                "brand_name": "SPARK RIDGE",
+                "fanciful_name": "Cranberry Lime",
+                "formula": "F-15500",
+                "class_type": "Vodka Cocktail",
+                "alcohol_content": "7% ABV",
+                "net_contents": "355 mL",
+            },
+            label_lines=[
+                "SPARK RIDGE",
+                "Cranberry Lime",
+                "Class/Type: Vodka Cocktail",
+                "7% Alc./Vol.",
+                "355 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Distilled spirits specialty/cocktail class-type text can satisfy product type without a separate DISTILLED SPIRITS line.",
+            artwork_label=True,
+            artwork_style="warning-panel",
+        ),
     ]
 
 

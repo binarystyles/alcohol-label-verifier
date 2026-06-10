@@ -511,6 +511,13 @@ def test_wine_descriptor_does_not_override_distilled_spirits_class_type() -> Non
     )
 
 
+def test_distilled_spirits_specialty_class_can_satisfy_product_type() -> None:
+    label = "SPARK RIDGE\nCranberry Lime\nClass/Type: Vodka Cocktail\n7% Alc./Vol."
+    result = verify_product_type("DISTILLED SPIRITS", label)
+    assert result.status == STATUS_PASS
+    assert result.reason == "Product type matches."
+
+
 def test_explicit_wine_product_type_still_fails_distilled_spirits_application() -> None:
     result = verify_product_type("DISTILLED SPIRITS", "OLD TOM GIN\nWINE\nClass/Type: Gin\n45% Alc./Vol.")
     assert result.status == STATUS_FAIL

@@ -156,5 +156,6 @@
 | `APP-152_distilled_spirits_specialty_class_pass.pdf` | Pass | Pass | Explicit Class/Type values may contain product-type words such as Distilled Spirits Specialty and should still verify. |
 | `APP-153_ocr_character_confusion_brand_review.pdf` | Needs Review | Needs Review | OCR-style zero/letter substitutions in required brand text should be treated as a similar-but-not-certain Needs Review case. |
 | `APP-154_distributed_by_only_review.pdf` | Needs Review | Needs Review | Distribution-only wording should not satisfy the expected bottler/producer responsible-party statement. |
+| `APP-155_vodka_cocktail_class_product_type_pass.pdf` | Pass | Pass | Distilled spirits specialty/cocktail class-type text can satisfy product type without a separate DISTILLED SPIRITS line. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

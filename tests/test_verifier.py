@@ -105,6 +105,22 @@ def test_bottler_producer_accepts_comma_or_slash_responsible_party_actions() -> 
     assert verify_bottler_producer("Example Distilling Co.", "Produced/Bottled by Example Distilling Co.").status == STATUS_PASS
 
 
+def test_bottler_producer_accepts_additional_valid_function_words() -> None:
+    for text in (
+        "Filled by Example Distilling Co.",
+        "Made by Example Distilling Co.",
+        "Prepared by Example Distilling Co.",
+        "Brewed, filled and packaged by Example Distilling Co.",
+    ):
+        assert verify_bottler_producer("Example Distilling Co.", text).status == STATUS_PASS
+
+
+def test_bottler_producer_distributed_by_alone_needs_review() -> None:
+    result = verify_bottler_producer("Example Distilling Co.", "Distributed by Example Distilling Co.")
+    assert result.status == STATUS_REVIEW
+    assert "outside responsible-party" in result.reason
+
+
 def test_bottler_producer_conflicting_same_role_needs_review() -> None:
     result = verify_bottler_producer(
         "Example Distilling Co.",

@@ -236,6 +236,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-152_distilled_spirits_specialty_class_pass.pdf"].fields["class_type"] == "Distilled Spirits Specialty"
     assert "Class/Type: Distilled Spirits Specialty" in specs["APP-152_distilled_spirits_specialty_class_pass.pdf"].label_lines
     assert specs["APP-152_distilled_spirits_specialty_class_pass.pdf"].expected_status == STATUS_PASS
+    assert "Distributed by Example Distilling Co." in specs["APP-154_distributed_by_only_review.pdf"].label_lines
+    assert specs["APP-154_distributed_by_only_review.pdf"].expected_status == STATUS_REVIEW
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

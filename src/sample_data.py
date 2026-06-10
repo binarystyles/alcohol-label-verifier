@@ -3001,6 +3001,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="OCR-style zero/letter substitutions in required brand text should be treated as a similar-but-not-certain Needs Review case.",
         ),
+        SampleSpec(
+            filename="APP-154_distributed_by_only_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-154", "formula": "F-15400"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Distributed by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Distribution-only wording should not satisfy the expected bottler/producer responsible-party statement.",
+        ),
     ]
 
 

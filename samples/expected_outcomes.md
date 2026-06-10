@@ -155,5 +155,6 @@
 | `APP-151_bottled_exclusively_for_pass.pdf` | Pass | Pass | Responsible-party wording may include a modifier such as Bottled exclusively for before the expected entity. |
 | `APP-152_distilled_spirits_specialty_class_pass.pdf` | Pass | Pass | Explicit Class/Type values may contain product-type words such as Distilled Spirits Specialty and should still verify. |
 | `APP-153_ocr_character_confusion_brand_review.pdf` | Needs Review | Needs Review | OCR-style zero/letter substitutions in required brand text should be treated as a similar-but-not-certain Needs Review case. |
+| `APP-154_distributed_by_only_review.pdf` | Needs Review | Needs Review | Distribution-only wording should not satisfy the expected bottler/producer responsible-party statement. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

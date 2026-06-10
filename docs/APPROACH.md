@@ -27,7 +27,7 @@ See `docs/TOOLS_USED.md` for the implementation, OCR, test, and deployment toolc
 6. If expected values remain missing, render/extract defined page-one form regions.
 7. Parse an explicit `APPLICATION DATA SUMMARY` block when present in the package.
 8. Use Item 9 as a Formula ID/reference and look for an exact normalized matching formula approval/source document or pre-import approval letter inside the same uploaded package, ignoring unrelated approvals that may also be attached.
-9. Derive expected alcohol content from the matched approval/source document when an approved final/finished-product alcohol, ABV, Alc/Vol, or proof heading is available.
+9. Derive expected alcohol content from the matched approval/source document when an approved final/finished-product, target, or bottling alcohol, ABV, Alc/Vol, or proof heading is available.
 10. Extract label text only from the lower page-one label area and likely supplemental label pages in the first 30 pages, skipping attached instruction pages and formula approval/source documents.
 11. Compare expected application values to label evidence.
 12. Return one application result plus field-level results.

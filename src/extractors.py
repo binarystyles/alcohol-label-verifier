@@ -87,6 +87,7 @@ FORMULA_FINAL_ALCOHOL_PATTERN = re.compile(
     r"|FINISHED\s+PRODUCT\s+(?:ALCOHOL(?:\s+CONTENT)?|PROOF|ALC\.?\s*/?\s*VOL\.?|ABV)"
     r"|FINAL\s+PRODUCT\s+(?:ALCOHOL(?:\s+CONTENT)?|PROOF)"
     r"|TARGET\s+(?:ALCOHOL\s+CONTENT|PROOF|ABV|ALC\.?\s*/?\s*VOL\.?)"
+    r"|BOTTLING\s+(?:ALCOHOL\s+CONTENT|PROOF|ABV|ALC\.?\s*/?\s*VOL\.?)"
     r")",
     flags=re.IGNORECASE,
 )

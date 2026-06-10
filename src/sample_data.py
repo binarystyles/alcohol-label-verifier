@@ -3145,6 +3145,29 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Imported origin can be stated as Made and bottled in Italy, and abbreviated Mfg. by wording should satisfy responsible-party evidence.",
         ),
+        SampleSpec(
+            filename="APP-161_formula_bottling_proof_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-161",
+                "formula": "F-16100",
+                "alcohol_content": "90 Proof",
+            },
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "90 Proof",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Formula support states final packaged strength as Bottling Proof and should verify against the label proof statement.",
+            formula_approval_unit="Proof",
+            formula_approval_alcohol_label="Bottling Proof",
+        ),
     ]
 
 

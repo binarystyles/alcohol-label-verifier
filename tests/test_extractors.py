@@ -358,6 +358,9 @@ def test_formula_approval_parser_accepts_final_alcohol_by_volume_wording() -> No
         "Finished Product Alcohol: 45% ABV",
         "Target ABV: 45%",
         "Target Alc/Vol: 45%",
+        "Bottling ABV: 45%",
+        "Bottling Alc/Vol: 45%",
+        "Bottling Alcohol Content: 45% ABV",
     ):
         text = f"""
         Formulas Online Entry
@@ -369,6 +372,19 @@ def test_formula_approval_parser_accepts_final_alcohol_by_volume_wording() -> No
         """
         fields = parse_formula_approval_fields(text, "F-14601")
         assert fields["alcohol_content"] == "45% ABV"
+
+
+def test_formula_approval_parser_accepts_bottling_proof_wording() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: F-14602
+    Yield Summary
+    Bottling Proof: Low 90 High 90 Unit Proof
+    Ingredients List
+    Finished alcohol, botanicals, and water
+    """
+    fields = parse_formula_approval_fields(text, "F-14602")
+    assert fields["alcohol_content"] == "45% ABV"
 
 
 def test_formula_approval_parser_ignores_generic_alcohol_content_wording() -> None:

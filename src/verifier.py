@@ -628,15 +628,32 @@ def _explicit_class_type_values(label_text: str) -> list[str]:
 def _responsible_party_text(label_text: str) -> str:
     candidates: list[str] = []
     for line in _label_lines(label_text):
-        if _is_responsible_party_line(line):
+        if _responsible_party_entries(line):
             candidates.append(line)
     return "\n".join(candidates)
 
 
 RESPONSIBLE_PARTY_ACTION_PATTERN = (
-    r"(?:BOTTLED|PRODUCED|DISTILLED|BLENDED|IMPORTED|BREWED|VINTED|CELLARED|CANNED|PACKED|PACKAGED|FILLED|MADE|PREPARED|MANUFACTURED|MFG\.?|MFR\.?)"
+    r"(?:BOTTLED|PRODUCED|DISTILLED|BLENDED|IMPORTED|BREWED|VINTED|CELLARED|CANNED|PACKED|PACKAGED|FILLED|MADE|PREPARED|MANUFACTURED|MFG\.?|MFR\.?|DISTRIBUTED)"
 )
 RESPONSIBLE_PARTY_ACTION_ALIASES = {"MFG": "MANUFACTURED", "MFR": "MANUFACTURED"}
+RESPONSIBLE_PARTY_REQUIRED_ACTIONS = {
+    "BOTTLED",
+    "PRODUCED",
+    "DISTILLED",
+    "BLENDED",
+    "IMPORTED",
+    "BREWED",
+    "VINTED",
+    "CELLARED",
+    "CANNED",
+    "PACKED",
+    "PACKAGED",
+    "FILLED",
+    "MADE",
+    "PREPARED",
+    "MANUFACTURED",
+}
 RESPONSIBLE_PARTY_ACTION_LIST_PATTERN = (
     rf"{RESPONSIBLE_PARTY_ACTION_PATTERN}"
     rf"(?:(?:\s*(?:,|/|&)\s*|\s+AND\s+){RESPONSIBLE_PARTY_ACTION_PATTERN})*"
@@ -662,7 +679,7 @@ def _responsible_party_entries(label_text: str) -> list[tuple[frozenset[str], st
             for action in re.findall(RESPONSIBLE_PARTY_ACTION_PATTERN, normalize_text(match.group("actions")))
         )
         party = match.group("party").strip(" .:-")
-        if actions and party:
+        if actions.intersection(RESPONSIBLE_PARTY_REQUIRED_ACTIONS) and party:
             entries.append((actions, party))
     return entries
 

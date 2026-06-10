@@ -3245,6 +3245,32 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Slash-separated multipack net-contents wording such as 4/12 fl oz cans should normalize to total package volume rather than a fractional ounce.",
         ),
+        SampleSpec(
+            filename="APP-166_imported_bottled_distributed_by_pass.pdf",
+            fields={
+                **small_batch_fields,
+                "serial_number": "APP-166",
+                "brand_name": "CASA VERDE TEQUILA",
+                "class_type": "Tequila",
+                "formula": "F-16600",
+                "net_contents": "750 mL",
+                "bottler_producer": "Example Imports LLC",
+                "country_of_origin": "Mexico",
+                "imported": True,
+            },
+            label_lines=[
+                "CASA VERDE TEQUILA",
+                "DISTILLED SPIRITS",
+                "Class/Type: Tequila",
+                "40% Alc./Vol.",
+                "750 mL",
+                "Product of Mexico",
+                "Imported, bottled and distributed by Example Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Responsible-party wording can include distribution when it is combined with valid imported/bottled actions.",
+        ),
     ]
 
 

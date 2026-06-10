@@ -175,6 +175,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-163_colon_warning_heading_fail.pdf" in specs
     assert "APP-164_hyphen_pack_net_contents_pass.pdf" in specs
     assert "APP-165_slash_multipack_net_contents_pass.pdf" in specs
+    assert "APP-166_imported_bottled_distributed_by_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -281,6 +282,9 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-165_slash_multipack_net_contents_pass.pdf"].fields["net_contents"] == "48 fl oz"
     assert "Net Contents 4/12 fl oz cans" in specs["APP-165_slash_multipack_net_contents_pass.pdf"].label_lines
     assert specs["APP-165_slash_multipack_net_contents_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-166_imported_bottled_distributed_by_pass.pdf"].fields["country_of_origin"] == "Mexico"
+    assert "Imported, bottled and distributed by Example Imports LLC" in specs["APP-166_imported_bottled_distributed_by_pass.pdf"].label_lines
+    assert specs["APP-166_imported_bottled_distributed_by_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

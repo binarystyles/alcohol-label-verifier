@@ -124,6 +124,14 @@ def test_bottler_producer_distributed_by_alone_needs_review() -> None:
     assert "outside responsible-party" in result.reason
 
 
+def test_bottler_producer_accepts_distribution_inside_valid_action_list() -> None:
+    result = verify_bottler_producer(
+        "Example Imports LLC",
+        "Imported, bottled and distributed by Example Imports LLC",
+    )
+    assert result.status == STATUS_PASS
+
+
 def test_bottler_producer_conflicting_same_role_needs_review() -> None:
     result = verify_bottler_producer(
         "Example Distilling Co.",

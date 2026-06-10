@@ -26,6 +26,11 @@ def test_assignment_brand_case_example_passes() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_brand_diacritic_and_curly_apostrophe_variations_pass() -> None:
+    assert verify_brand("Caf\u00e9 Azul", "CAFE AZUL\nDISTILLED SPIRITS").status == STATUS_PASS
+    assert verify_brand("Distiller\u2019s Cut", "DISTILLERS CUT\nDISTILLED SPIRITS").status == STATUS_PASS
+
+
 def test_brand_ampersand_and_variation_passes() -> None:
     result = verify_brand("SMITH & SONS", "SMITH AND SONS Bourbon Whiskey")
     assert result.status == STATUS_PASS

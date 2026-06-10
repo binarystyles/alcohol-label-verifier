@@ -98,5 +98,6 @@
 | `APP-094_long_attachment_before_label_pass.pdf` | Pass | Pass | Supplemental label appears after more than twelve attached instruction pages and still verifies. |
 | `APP-095_wine_of_origin_pass.pdf` | Pass | Pass | Imported wine states origin as Wine of France, a product-style country-of-origin statement. |
 | `APP-096_multiple_formula_documents_pass.pdf` | Pass | Pass | Package includes an unrelated approved formula before the matching Formula ID; only the matching formula document is used. |
+| `APP-097_diacritic_brand_pass.pdf` | Pass | Pass | Application brand contains a diacritic that is absent from label text and still matches after normalization. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

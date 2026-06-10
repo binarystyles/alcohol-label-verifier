@@ -1873,6 +1873,29 @@ def sample_specs() -> list[SampleSpec]:
                 },
             ),
         ),
+        SampleSpec(
+            filename="APP-097_diacritic_brand_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-097",
+                "brand_name": "Caf\u00e9 Azul",
+                "fanciful_name": "",
+                "formula": "F-9700",
+                "class_type": "Tequila",
+                "alcohol_content": "40% ABV",
+            },
+            label_lines=[
+                "CAFE AZUL",
+                "DISTILLED SPIRITS",
+                "Class/Type: Tequila",
+                "40% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Application brand contains a diacritic that is absent from label text and still matches after normalization.",
+        ),
     ]
 
 

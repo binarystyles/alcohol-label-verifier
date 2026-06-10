@@ -15,11 +15,13 @@ from src.normalize import (
 
 def test_text_normalization_handles_brand_punctuation() -> None:
     assert normalize_name("Stone's Throw") == "STONES THROW"
+    assert normalize_name("Distiller\u2019s Cut") == "DISTILLERS CUT"
     assert normalize_name("Stone's   Throw") == "STONES THROW"
     assert normalize_name("Smith & Sons") == "SMITH AND SONS"
     assert normalize_name("Acme Distilling Co.") == "ACME DISTILLING COMPANY"
     assert normalize_name("St. George Gin") == "SAINT GEORGE GIN"
     assert normalize_name("Mt. Hood Vodka") == "MOUNT HOOD VODKA"
+    assert normalize_name("Caf\u00e9 Azul") == "CAFE AZUL"
 
 
 def test_brand_fuzzy_matching_allows_harmless_variations() -> None:

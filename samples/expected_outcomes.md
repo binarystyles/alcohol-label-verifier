@@ -116,5 +116,10 @@
 | `APP-112_dark_reverse_artwork_pass.pdf` | Pass | Needs Review | Dark color artwork with reversed/light text should pass when OCR can read the label. |
 | `APP-113_colored_warning_panel_pass.pdf` | Pass | Needs Review | Color-artwork wine label keeps the government warning inside a colored panel and should still pass. |
 | `APP-114_busy_low_contrast_artwork_review.pdf` | Needs Review | Needs Review | Busy low-contrast artwork should not be failed as missing fields; it should require review for OCR quality. |
+| `APP-115_sake_wine_class_pass.pdf` | Pass | Pass | Sake is a wine-from-other-agricultural-products class under 27 CFR 4.21, so a wine application can pass without the literal word WINE on the label. |
+| `APP-116_vermouth_wine_class_pass.pdf` | Pass | Pass | Vermouth is a type of aperitif wine under 27 CFR 4.21 and should satisfy wine product-type verification. |
+| `APP-117_sherry_wine_class_pass.pdf` | Pass | Pass | Sherry is a dessert wine type under 27 CFR 4.21 and should satisfy wine product-type verification. |
+| `APP-118_champagne_wine_class_pass.pdf` | Pass | Pass | Champagne is a sparkling grape wine type under 27 CFR 4.21 and should satisfy wine product-type verification. |
+| `APP-119_port_wine_class_pass.pdf` | Pass | Pass | Port is a dessert wine type under 27 CFR 4.21 and should satisfy wine product-type verification without confusing Porter malt-beverage labels. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

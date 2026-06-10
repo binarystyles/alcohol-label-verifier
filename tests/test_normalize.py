@@ -70,6 +70,12 @@ def test_product_type_matching() -> None:
     assert extract_product_type("Hard Cider") == "WINE"
     assert extract_product_type("Perry") == "WINE"
     assert extract_product_type("Cider Brandy") == "DISTILLED SPIRITS"
+    assert extract_product_type("Sake") == "WINE"
+    assert extract_product_type("Vermouth") == "WINE"
+    assert extract_product_type("Sherry") == "WINE"
+    assert extract_product_type("Port") == "WINE"
+    assert extract_product_type("Champagne") == "WINE"
+    assert extract_product_type("Porter") == "MALT BEVERAGES"
 
 
 def test_abv_and_proof_extraction_normalize_to_abv() -> None:

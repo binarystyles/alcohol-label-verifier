@@ -116,6 +116,11 @@ def extract_product_type(text: str | None) -> str:
     if re.search(r"\bWINE\b", normalized):
         return "WINE"
     if re.search(
+        r"\b(?:SAKE|VERMOUTH|SHERRY|ANGELICA|MADEIRA|MUSCATEL|PORT|CHAMPAGNE)\b",
+        normalized,
+    ):
+        return "WINE"
+    if re.search(
         r"\b(?:GIN|VODKA|RUM|TEQUILA|MEZCAL|WHISKEY|WHISKY|BOURBON|BRANDY|COGNAC|LIQUEUR|CORDIAL|SCHNAPPS|AQUAVIT)\b",
         normalized,
     ):

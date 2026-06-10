@@ -284,6 +284,16 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-113_colored_warning_panel_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-114_busy_low_contrast_artwork_review.pdf"].artwork_style == "busy-low-contrast"
     assert specs["APP-114_busy_low_contrast_artwork_review.pdf"].expected_status == STATUS_REVIEW
+    assert specs["APP-115_sake_wine_class_pass.pdf"].fields["class_type"] == "Sake"
+    assert specs["APP-115_sake_wine_class_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-116_vermouth_wine_class_pass.pdf"].fields["class_type"] == "Vermouth"
+    assert specs["APP-116_vermouth_wine_class_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-117_sherry_wine_class_pass.pdf"].fields["class_type"] == "Sherry"
+    assert specs["APP-117_sherry_wine_class_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-118_champagne_wine_class_pass.pdf"].fields["class_type"] == "Champagne"
+    assert specs["APP-118_champagne_wine_class_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-119_port_wine_class_pass.pdf"].fields["class_type"] == "Port"
+    assert specs["APP-119_port_wine_class_pass.pdf"].expected_status == STATUS_PASS
 
 
 def test_sample_generator_uses_real_source_form_when_available(sample_paths: list[Path]) -> None:

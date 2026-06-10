@@ -2147,6 +2147,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Fail",
             note="Government warning statement is exact, but the heading is mixed case instead of all caps.",
         ),
+        SampleSpec(
+            filename="APP-109_wine_descriptor_spirits_class_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-109", "formula": "F-10900"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "Wine Barrel Finished",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Distilled spirits class/type should control when wine appears only as a finish descriptor.",
+        ),
     ]
 
 

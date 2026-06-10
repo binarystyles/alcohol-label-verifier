@@ -348,6 +348,29 @@ def test_product_type_descriptor_does_not_override_explicit_product_type() -> No
     assert result.status == STATUS_PASS
 
 
+def test_wine_descriptor_does_not_override_distilled_spirits_class_type() -> None:
+    assert (
+        verify_product_type(
+            "DISTILLED SPIRITS",
+            "OLD TOM GIN\nWine Barrel Finished\nClass/Type: Gin\n45% Alc./Vol.",
+        ).status
+        == STATUS_PASS
+    )
+    assert (
+        verify_product_type(
+            "DISTILLED SPIRITS",
+            "OLD TOM GIN\nMade with wine botanicals\nClass/Type: Gin\n45% Alc./Vol.",
+        ).status
+        == STATUS_PASS
+    )
+
+
+def test_explicit_wine_product_type_still_fails_distilled_spirits_application() -> None:
+    result = verify_product_type("DISTILLED SPIRITS", "OLD TOM GIN\nWINE\nClass/Type: Gin\n45% Alc./Vol.")
+    assert result.status == STATUS_FAIL
+    assert result.found == "WINE"
+
+
 def test_product_type_first_label_line_passes_when_explicit() -> None:
     result = verify_product_type("DISTILLED SPIRITS", "DISTILLED SPIRITS\nOLD TOM GIN\nClass/Type: Gin\n45% Alc./Vol.")
     assert result.status == STATUS_PASS

@@ -192,6 +192,21 @@ def verify_product_type(expected: str, label_text: str) -> FieldResult:
     found = extract_product_type(candidate_text)
     if found == expected_type:
         return _result("product_type", expected_type, found, snippet_around(candidate_text, found), STATUS_PASS, 0.95, "Product type matches.")
+    if (
+        expected_type == "DISTILLED SPIRITS"
+        and found == "WINE"
+        and _distilled_spirits_class_statement_present(candidate_text)
+        and not _explicit_product_type_statement_present(candidate_text, "WINE")
+    ):
+        return _result(
+            "product_type",
+            expected_type,
+            "DISTILLED SPIRITS",
+            snippet_around(candidate_text),
+            STATUS_PASS,
+            0.9,
+            "Distilled spirits product type is supported by class/type text; wine wording appears only as a descriptor.",
+        )
     if found:
         return _result("product_type", expected_type, found, snippet_around(candidate_text, found), STATUS_FAIL, 0.9, "Label shows a different product type than the completed application.")
     return _result("product_type", expected_type, "", snippet_around(label_text), STATUS_REVIEW, 0.45, "Product type was not clearly found on the label.")
@@ -438,6 +453,25 @@ def _is_obvious_non_product_type_line(line: str) -> bool:
             normalized,
         )
     )
+
+
+def _explicit_product_type_statement_present(label_text: str, product_type: str) -> bool:
+    return any(_is_explicit_product_type_line(line) and extract_product_type(line) == product_type for line in _label_lines(label_text))
+
+
+def _distilled_spirits_class_statement_present(label_text: str) -> bool:
+    for line in _label_lines(label_text):
+        normalized = normalize_text(line)
+        if "CLASS/TYPE" in normalized or "CLASS TYPE" in normalized:
+            value = re.split(r"CLASS\s*/?\s*TYPE\s*:?", line, maxsplit=1, flags=re.IGNORECASE)[-1]
+            if extract_product_type(value) == "DISTILLED SPIRITS":
+                return True
+            continue
+        if _is_obvious_non_class_line(line):
+            continue
+        if extract_product_type(line) == "DISTILLED SPIRITS":
+            return True
+    return False
 
 
 def _class_type_candidate_text(label_text: str) -> str:

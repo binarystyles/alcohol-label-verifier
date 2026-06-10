@@ -108,3 +108,4 @@ APP-106_estimated_net_contents_mark_pass.pdf,APP-106,APP-106,OLD TOM GIN,DISTILL
 APP-107_dotted_net_contents_unit_pass.pdf,APP-107,APP-107,OLD TOM GIN,DISTILLED SPIRITS,Pass,0.95,0.074,All required checks passed with adequate confidence.,,
 APP-108_mixed_case_warning_heading_fail.pdf,APP-108,APP-108,OLD TOM GIN,DISTILLED SPIRITS,Fail,0.95,0.096,Failed critical checks: government_warning,,
 APP-109_wine_descriptor_spirits_class_pass.pdf,APP-109,APP-109,OLD TOM GIN,DISTILLED SPIRITS,Pass,0.9,0.096,All required checks passed with adequate confidence.,,
+APP-110_numeric_formula_id_pass.pdf,APP-110,APP-110,OLD TOM GIN,DISTILLED SPIRITS,Pass,0.95,0.096,All required checks passed with adequate confidence.,,

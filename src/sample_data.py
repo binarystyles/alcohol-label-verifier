@@ -2163,6 +2163,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Distilled spirits class/type should control when wine appears only as a finish descriptor.",
         ),
+        SampleSpec(
+            filename="APP-110_numeric_formula_id_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-110", "formula": "123456"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Item 9 and formula support use a numeric TTB Formula ID instead of a letter-prefixed ID.",
+        ),
     ]
 
 

@@ -47,6 +47,11 @@ def test_formula_identifier_extraction() -> None:
     assert extract_formula_identifier("Formula #: F-1001") == "F-1001"
     assert extract_formula_identifier("Approved Formula #: F-1001") == "F-1001"
     assert extract_formula_identifier("TTB ID Number: DS 3400") == "DS 3400"
+    assert extract_formula_identifier("TTB Formula ID: 123456") == "123456"
+    assert extract_formula_identifier("Formula Number: 24-001") == "24-001"
+    assert extract_formula_identifier("Lab Number: 12345") == "12345"
+    assert extract_formula_identifier("123456") == "123456"
+    assert extract_formula_identifier("45% ABV") == ""
 
 
 def test_formula_approval_parser_matches_id_and_final_alcohol_content() -> None:
@@ -83,6 +88,24 @@ def test_formula_approval_parser_matches_formula_symbol_and_id_number_labels() -
         Alcohol Content of Finished Product: Low 45 High 45 Unit % by Volume
         """
         fields = parse_formula_approval_fields(text, "F-10500")
+        assert fields["alcohol_content"] == "45% ABV"
+        assert fields["class_type"] == "Gin"
+
+
+def test_formula_approval_parser_matches_numeric_formula_identifiers() -> None:
+    for label, expected in (
+        ("TTB Formula ID: 123456", "123456"),
+        ("Formula Number: 24-001", "24-001"),
+        ("Lab Number: 12345", "12345"),
+    ):
+        text = f"""
+        FORMULAS ONLINE ENTRY
+        {label}
+        Class/Type: Gin
+        Yield Summary
+        Alcohol Content of Finished Product: Low 45 High 45 Unit % by Volume
+        """
+        fields = parse_formula_approval_fields(text, expected)
         assert fields["alcohol_content"] == "45% ABV"
         assert fields["class_type"] == "Gin"
 

@@ -81,6 +81,7 @@ The app avoids full-document OCR unless necessary:
 - AcroForms are checked before region OCR.
 - Current source-form checkbox widgets and visible checkbox marks are checked before OCR is trusted for checkbox-only values.
 - Only mapped page-one regions and candidate label areas are rendered.
+- Unreadable scanned attachment pages do not downgrade the result when a later supplemental label page is readable.
 - Label OCR tries conservative adaptive-threshold, grayscale, contrast, and Otsu-preprocessed variants, then keeps the strongest local Tesseract result. This improves colored artwork, dark/reversed text, and colored warning panels without making network calls.
 - Results are cached by PDF hash during the Streamlit session.
 

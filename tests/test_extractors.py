@@ -570,6 +570,45 @@ def test_label_extraction_skips_ocr_text_that_looks_like_instructions(monkeypatc
     assert "PAPERWORK REDUCTION ACT" not in label.text
 
 
+def test_unreadable_attachment_page_does_not_downgrade_later_readable_label(monkeypatch) -> None:
+    document = fitz.open()
+    for _ in range(3):
+        document.new_page(width=612, height=792)
+    try:
+        pdf_bytes = document.write()
+    finally:
+        document.close()
+
+    def fake_extract_region_text(page: fitz.Page, rect: fitz.Rect) -> OCRText:
+        if page.number == 1:
+            return OCRText(
+                text="",
+                confidence=0.0,
+                source="tesseract",
+                warning="Local OCR could not read this page.",
+                nonwhite_ratio=0.5,
+                sharpness=0.0,
+            )
+        if page.number == 2:
+            return OCRText(
+                text="OLD TOM GIN 45% Alc./Vol. GOVERNMENT WARNING",
+                confidence=0.93,
+                source="tesseract",
+                nonwhite_ratio=0.3,
+                sharpness=500.0,
+            )
+        return OCRText(text="", confidence=0.0, source="pdf-text", nonwhite_ratio=0.0)
+
+    monkeypatch.setattr("src.extractors.extract_region_text", fake_extract_region_text)
+
+    label = extract_label(pdf_bytes)
+
+    assert label.text.startswith("[supplemental-label-page p.3]")
+    assert "OLD TOM GIN" in label.text
+    assert not label.unreadable
+    assert label.warnings == []
+
+
 def test_label_extraction_marks_low_sharpness_ocr_as_unreadable(monkeypatch) -> None:
     document = fitz.open()
     document.new_page(width=612, height=792)

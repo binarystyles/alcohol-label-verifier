@@ -183,5 +183,7 @@
 | `APP-179_bottled_for_by_actual_bottler_pass.pdf` | Pass | Pass | Separate Bottled for and Bottled by statements should pass when the application identifies the actual Bottled by entity. |
 | `APP-180_oneline_bottled_for_by_actual_bottler_pass.pdf` | Pass | Pass | One-line Bottled for ... by ... wording should pass when the application identifies the actual Bottled by entity. |
 | `APP-181_oneline_bottled_for_brand_owner_review.pdf` | Needs Review | Needs Review | One-line Bottled for ... by ... wording should need review when the application identifies the brand owner but a different actual bottler appears. |
+| `APP-182_formula_final_abv_heading_pass.pdf` | Pass | Pass | Formula support states final alcohol with Final ABV shorthand and should verify against the label. |
+| `APP-183_formula_as_bottled_heading_pass.pdf` | Pass | Pass | Formula support states final alcohol as Alcohol Content as Bottled and should verify against the label. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

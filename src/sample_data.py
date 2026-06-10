@@ -3575,6 +3575,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="One-line Bottled for ... by ... wording should need review when the application identifies the brand owner but a different actual bottler appears.",
         ),
+        SampleSpec(
+            filename="APP-182_formula_final_abv_heading_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-182", "formula": "F-18200"},
+            label_lines=good_label,
+            expected_status="Pass",
+            note="Formula support states final alcohol with Final ABV shorthand and should verify against the label.",
+            formula_approval_alcohol_label="Final ABV",
+        ),
+        SampleSpec(
+            filename="APP-183_formula_as_bottled_heading_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-183", "formula": "F-18300"},
+            label_lines=good_label,
+            expected_status="Pass",
+            note="Formula support states final alcohol as Alcohol Content as Bottled and should verify against the label.",
+            formula_approval_alcohol_label="Alcohol Content as Bottled",
+        ),
     ]
 
 

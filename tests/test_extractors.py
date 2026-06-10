@@ -354,10 +354,18 @@ def test_formula_approval_parser_accepts_finished_product_proof_wording() -> Non
 def test_formula_approval_parser_accepts_final_alcohol_by_volume_wording() -> None:
     for heading in (
         "Final Alcohol by Volume: 45%",
+        "Finished Alcohol by Volume: 45%",
+        "Final ABV: 45%",
+        "Final Alc/Vol: 45%",
         "Alcohol by Volume of Finished Product: 45%",
+        "Alcohol Content at Bottling: 45% ABV",
+        "Alcohol Content as Bottled: 45% ABV",
+        "Alcohol Content of the Packaged Product: 45% ABV",
         "Finished Product Alcohol: 45% ABV",
         "Target ABV: 45%",
         "Target Alc/Vol: 45%",
+        "Packaged Alcohol Content: 45% ABV",
+        "Packaged Product ABV: 45%",
         "Bottling ABV: 45%",
         "Bottling Alc/Vol: 45%",
         "Bottling Alcohol Content: 45% ABV",

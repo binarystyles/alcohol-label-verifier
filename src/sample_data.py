@@ -2588,6 +2588,33 @@ def sample_specs() -> list[SampleSpec]:
             note="Formula support states final alcohol with the abbreviated heading Finished Product Alc/Vol.",
             formula_approval_alcohol_label="Finished Product Alc/Vol",
         ),
+        SampleSpec(
+            filename="APP-132_scotch_whisky_origin_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-132",
+                "brand_name": "HIGHLAND FORGE",
+                "fanciful_name": "",
+                "formula": "F-13200",
+                "class_type": "Scotch Whisky",
+                "alcohol_content": "46% ABV",
+                "bottler_producer": "Highland Forge Distilling Co.",
+                "country_of_origin": "United Kingdom",
+                "imported": True,
+            },
+            label_lines=[
+                "HIGHLAND FORGE",
+                "SCOTCH WHISKY",
+                "Class/Type: Scotch Whisky",
+                "46% Alc./Vol.",
+                "750 mL",
+                "Bottled by Highland Forge Distilling Co.",
+                "Imported by Example Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Imported spirits origin is satisfied by the protected Scotch Whisky designation without a separate Product of statement.",
+        ),
     ]
 
 

@@ -872,6 +872,12 @@ def _country_origin_statement_present(expected: str, label_text: str) -> bool:
                 rf"\b{country}\s+ORIGIN\b",
             )
         )
+        if country_name == "SCOTLAND":
+            patterns.append(r"\bSCOTCH\s+WHISK(?:Y|EY)\b")
+        elif country_name in {"IRELAND", "REPUBLIC OF IRELAND"}:
+            patterns.append(r"\bIRISH\s+WHISK(?:Y|EY)\b")
+        elif country_name == "CANADA":
+            patterns.append(r"\bCANADIAN\s+WHISK(?:Y|EY)\b")
     return any(re.search(pattern, normalized_label) for pattern in patterns)
 
 

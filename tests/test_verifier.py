@@ -567,6 +567,12 @@ def test_imported_country_of_origin_allows_uk_abbreviations() -> None:
     assert verify_country_of_origin("United Kingdom", True, "Product of England").status == STATUS_PASS
 
 
+def test_imported_country_of_origin_allows_protected_whisky_origin_terms() -> None:
+    assert verify_country_of_origin("United Kingdom", True, "HIGHLAND FORGE Scotch Whisky").status == STATUS_PASS
+    assert verify_country_of_origin("Ireland", True, "OLD HARBOR Irish Whiskey").status == STATUS_PASS
+    assert verify_country_of_origin("Canada", True, "MAPLE RIDGE Canadian Whisky").status == STATUS_PASS
+
+
 def test_imported_country_of_origin_allows_the_netherlands_variants() -> None:
     assert verify_country_of_origin("The Netherlands", True, "Product of Netherlands").status == STATUS_PASS
     assert verify_country_of_origin("Netherlands", True, "Product of the Netherlands").status == STATUS_PASS
@@ -606,6 +612,7 @@ def test_imported_country_name_in_importer_name_is_not_enough() -> None:
 def test_imported_country_adjective_alone_is_not_enough() -> None:
     result = verify_country_of_origin("France", True, "French Wine")
     assert result.status == STATUS_REVIEW
+    assert verify_country_of_origin("Italy", True, "Italian Wine").status == STATUS_REVIEW
 
 
 def test_imported_country_product_of_origin_wording_passes() -> None:

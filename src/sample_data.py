@@ -3168,6 +3168,27 @@ def sample_specs() -> list[SampleSpec]:
             formula_approval_unit="Proof",
             formula_approval_alcohol_label="Bottling Proof",
         ),
+        SampleSpec(
+            filename="APP-162_dash_multipack_net_contents_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-162",
+                "formula": "F-16200",
+                "net_contents": "200 mL",
+            },
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "Net Contents 4-50 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Dash-separated multipack net-contents wording such as 4-50 mL should normalize to the total package volume.",
+        ),
     ]
 
 

@@ -163,5 +163,6 @@
 | `APP-159_formula_target_abv_pass.pdf` | Pass | Pass | Formula support states final alcohol with Target ABV shorthand and should verify against the label. |
 | `APP-160_mfg_made_bottled_origin_pass.pdf` | Pass | Pass | Imported origin can be stated as Made and bottled in Italy, and abbreviated Mfg. by wording should satisfy responsible-party evidence. |
 | `APP-161_formula_bottling_proof_pass.pdf` | Pass | Pass | Formula support states final packaged strength as Bottling Proof and should verify against the label proof statement. |
+| `APP-162_dash_multipack_net_contents_pass.pdf` | Pass | Pass | Dash-separated multipack net-contents wording such as 4-50 mL should normalize to the total package volume. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

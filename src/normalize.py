@@ -203,31 +203,32 @@ def _keyword_follows_completed_abv_statement(text: str, start: int) -> bool:
 
 
 NET_CONTENTS_UNIT_PATTERN = (
-    r"ML|MLS|M\.L\.|MILLILITERS?|MILLILITRES?|CL|C\.L\.|CENTILITERS?|CENTILITRES?|L|LITERS?|LITRES?|"
-    r"PT\.?|PINTS?|FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?"
+    r"M\s*\.?\s*L\.?|MLS|MILLILITERS?|MILLILITRES?|C\s*\.?\s*L\.?|CENTILITERS?|CENTILITRES?|L\.?|LITERS?|LITRES?|"
+    r"PT\.?|PINTS?|F\s*\.?\s*L\.?\s*O\s*\.?\s*Z\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?"
 )
+NET_CONTENTS_UNIT_BOUNDARY = r"(?=$|[^A-Z0-9])"
 NUMBER_WORD_PATTERN = (
     r"ZERO|ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|TEN|ELEVEN|TWELVE|THIRTEEN|FOURTEEN|FIFTEEN|SIXTEEN|"
     r"SEVENTEEN|EIGHTEEN|NINETEEN|TWENTY|THIRTY|FORTY|FOURTY|FIFTY|SIXTY|SEVENTY|EIGHTY|NINETY|HUNDRED|THOUSAND|AND"
 )
 NET_CONTENTS_COMPOUND_PATTERN = re.compile(
-    r"(?<![A-Z0-9])(?P<pints>\d+(?:\.\d+)?)\s*(?:PT\.?|PINTS?)\s+(?P<ounces>\d+(?:\.\d+)?)\s*(?:FL\.?\s*OZ\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)\b",
+    r"(?<![A-Z0-9])(?P<pints>\d+(?:\.\d+)?)\s*(?:PT\.?|PINTS?)\s+(?P<ounces>\d+(?:\.\d+)?)\s*(?:F\s*\.?\s*L\.?\s*O\s*\.?\s*Z\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)(?=$|[^A-Z0-9])",
     re.IGNORECASE,
 )
 NET_CONTENTS_FRACTION_PATTERN = re.compile(
-    rf"(?<![A-Z0-9])(?P<num>\d+)\s*/\s*(?P<den>\d+)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\b",
+    rf"(?<![A-Z0-9])(?P<num>\d+)\s*/\s*(?P<den>\d+)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN}){NET_CONTENTS_UNIT_BOUNDARY}",
     re.IGNORECASE,
 )
 NET_CONTENTS_WORD_PATTERN = re.compile(
-    rf"(?<![A-Z0-9])(?P<words>(?:{NUMBER_WORD_PATTERN})(?:[\s-]+(?:{NUMBER_WORD_PATTERN}))*)\s+(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\b",
+    rf"(?<![A-Z0-9])(?P<words>(?:{NUMBER_WORD_PATTERN})(?:[\s-]+(?:{NUMBER_WORD_PATTERN}))*)\s+(?P<unit>{NET_CONTENTS_UNIT_PATTERN}){NET_CONTENTS_UNIT_BOUNDARY}",
     re.IGNORECASE,
 )
 NET_CONTENTS_DECIMAL_COMMA_PATTERN = re.compile(
-    rf"(?<![A-Z0-9/])(?P<num>\d+,\d{{1,2}})\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\b",
+    rf"(?<![A-Z0-9/])(?P<num>\d+,\d{{1,2}})\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN}){NET_CONTENTS_UNIT_BOUNDARY}",
     re.IGNORECASE,
 )
 NET_CONTENTS_PATTERN = re.compile(
-    rf"(?<![A-Z0-9/])(?P<num>(?:\d{{1,3}}(?:,\d{{3}})+(?:\.\d+)?)|(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\b",
+    rf"(?<![A-Z0-9/])(?P<num>(?:\d{{1,3}}(?:,\d{{3}})+(?:\.\d+)?)|(?:\d+(?:\.\d+)?)|(?:\.\d+))\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN}){NET_CONTENTS_UNIT_BOUNDARY}",
     re.IGNORECASE,
 )
 

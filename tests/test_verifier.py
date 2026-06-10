@@ -483,6 +483,8 @@ def test_net_contents_match_passes_with_liters() -> None:
     assert result.status == STATUS_PASS
     assert verify_net_contents("750 mL", "Net Contents 0,75 L").status == STATUS_PASS
     assert verify_net_contents("750 mL", "Net Contents e750 mL").status == STATUS_PASS
+    assert verify_net_contents("750 mL", "Net Contents 750 M.L.").status == STATUS_PASS
+    assert verify_net_contents("750 mL", "Net Contents 750 M L").status == STATUS_PASS
 
 
 def test_net_contents_match_passes_with_comma_thousands() -> None:
@@ -502,6 +504,7 @@ def test_net_contents_match_passes_with_pints() -> None:
 
 def test_net_contents_match_passes_with_plain_ounces() -> None:
     assert verify_net_contents("12 fl oz", "Net Contents 12 OZ").status == STATUS_PASS
+    assert verify_net_contents("12 fl oz", "Net Contents 12 F L OZ").status == STATUS_PASS
     assert verify_net_contents("12 fl oz", "Serving size 12 OZ").status == STATUS_REVIEW
     assert verify_net_contents("8 fl oz", "Serving size 1/2 Pint").status == STATUS_REVIEW
 

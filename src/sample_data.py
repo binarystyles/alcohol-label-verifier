@@ -2115,6 +2115,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label prefixes net contents with a compact estimated quantity mark, e750 mL.",
         ),
+        SampleSpec(
+            filename="APP-107_dotted_net_contents_unit_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-107", "formula": "F-10700"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "Net Contents 750 M.L.",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label states net contents with dotted metric unit styling, 750 M.L.",
+        ),
     ]
 
 

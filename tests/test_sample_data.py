@@ -124,6 +124,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-104_bottler_legal_suffix_pass.pdf" in specs
     assert "APP-105_formula_symbol_label_pass.pdf" in specs
     assert "APP-106_estimated_net_contents_mark_pass.pdf" in specs
+    assert "APP-107_dotted_net_contents_unit_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
@@ -258,6 +259,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-105_formula_symbol_label_pass.pdf"].expected_status == STATUS_PASS
     assert "Net Contents e750 mL" in specs["APP-106_estimated_net_contents_mark_pass.pdf"].label_lines
     assert specs["APP-106_estimated_net_contents_mark_pass.pdf"].expected_status == STATUS_PASS
+    assert "Net Contents 750 M.L." in specs["APP-107_dotted_net_contents_unit_pass.pdf"].label_lines
+    assert specs["APP-107_dotted_net_contents_unit_pass.pdf"].expected_status == STATUS_PASS
 
 
 def test_sample_generator_uses_real_source_form_when_available(sample_paths: list[Path]) -> None:

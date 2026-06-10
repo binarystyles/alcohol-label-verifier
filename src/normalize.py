@@ -89,7 +89,7 @@ def extract_product_type(text: str | None) -> str:
     if "MALT BEVERAGES" in normalized or "MALT BEVERAGE" in normalized or "MALT LIQUOR" in normalized:
         return "MALT BEVERAGES"
     if re.search(
-        r"\b(?:BEER|ALE|LAGER|STOUT|PORTER|IPA|PILSNER|PILS|SAISON|GOSE|KOLSCH|KOELSCH|BOCK|DOPPELBOCK|WITBIER|HEFEWEIZEN|LAMBIC|CERVEZA)\b",
+        r"\b(?:BEER|ALE|LAGER|STOUT|PORTER|IPA|PILSNER|PILS|SAISON|GOSE|KOLSCH|KOELSCH|BOCK|DOPPELBOCK|WITBIER|HEFEWEIZEN|LAMBIC|CERVEZA|FMB|HARD\s+SELTZER|SPIKED\s+SELTZER|MALT[-\s]+BASED[-\s]+SELTZER)\b",
         normalized,
     ) and not re.search(
         r"\b(?:RED|WHITE|ROSE|SPARKLING|TABLE|DESSERT)\s+WINE\b", normalized
@@ -107,7 +107,7 @@ def extract_product_type(text: str | None) -> str:
     if "SPIRIT" in normalized or "LIQUOR" in normalized:
         return "DISTILLED SPIRITS"
     if re.search(
-        r"\b(?:BEER|ALE|LAGER|STOUT|PORTER|IPA|PILSNER|PILS|SAISON|GOSE|KOLSCH|KOELSCH|BOCK|DOPPELBOCK|WITBIER|HEFEWEIZEN|LAMBIC|CERVEZA)\b",
+        r"\b(?:BEER|ALE|LAGER|STOUT|PORTER|IPA|PILSNER|PILS|SAISON|GOSE|KOLSCH|KOELSCH|BOCK|DOPPELBOCK|WITBIER|HEFEWEIZEN|LAMBIC|CERVEZA|FMB|HARD\s+SELTZER|SPIKED\s+SELTZER|MALT[-\s]+BASED[-\s]+SELTZER)\b",
         normalized,
     ):
         return "MALT BEVERAGES"

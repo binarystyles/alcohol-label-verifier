@@ -10,6 +10,7 @@ from src.extractors import (
     extract_application,
     extract_formula_identifier,
     extract_label,
+    extract_product_type_from_widgets,
     parse_application_summary,
     parse_formula_approval_fields,
 )
@@ -347,6 +348,21 @@ def test_region_based_application_extraction_from_generated_pdf(sample_bytes: di
     extraction = extract_application(sample_bytes["APP-002_stones_throw_variation.pdf"])
     assert extraction.fields.brand_name == "STONE'S THROW"
     assert extraction.fields.product_type == "DISTILLED SPIRITS"
+
+
+def test_product_type_checkbox_widget_extraction(sample_bytes: dict[str, bytes]) -> None:
+    cases = {
+        "APP-001_old_tom_pass.pdf": "DISTILLED SPIRITS",
+        "APP-017_wine_artwork_pass.pdf": "WINE",
+        "APP-018_malt_artwork_pass.pdf": "MALT BEVERAGES",
+    }
+
+    for filename, expected in cases.items():
+        document = fitz.open(stream=sample_bytes[filename], filetype="pdf")
+        try:
+            assert extract_product_type_from_widgets(document[0]) == expected
+        finally:
+            document.close()
 
 
 def test_generated_pdf_application_fields_do_not_keep_form_boilerplate(sample_bytes: dict[str, bytes]) -> None:

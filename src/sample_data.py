@@ -2004,6 +2004,33 @@ def sample_specs() -> list[SampleSpec]:
             note="Application alcohol-content proof range repeats the proof unit on both sides and still matches the label.",
             include_formula_approval=False,
         ),
+        SampleSpec(
+            filename="APP-102_hard_seltzer_malt_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-102",
+                "product_type": "MALT BEVERAGES",
+                "brand_name": "HARBOR LIGHT SELTZER",
+                "fanciful_name": "Lime Splash",
+                "formula": "F-10200",
+                "class_type": "Hard Seltzer",
+                "alcohol_content": "5% ABV",
+                "net_contents": "12 FL OZ",
+                "bottler_producer": "Harbor Light Brewing Co.",
+            },
+            label_lines=[
+                "HARBOR LIGHT SELTZER",
+                "Lime Splash",
+                "HARD SELTZER",
+                "Class/Type: Hard Seltzer",
+                "5% Alc./Vol.",
+                "12 FL OZ",
+                "Brewed and canned by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Malt beverage hard seltzer label uses hard-seltzer wording instead of beer-style terms.",
+        ),
     ]
 
 

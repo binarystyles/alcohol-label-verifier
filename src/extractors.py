@@ -168,6 +168,12 @@ def extract_application(pdf_bytes: bytes) -> ApplicationExtraction:
 
     if document.page_count:
         page = document[0]
+        if not fields.product_type:
+            product_type = extract_product_type_from_widgets(page)
+            if product_type:
+                fields.product_type = product_type
+                fields.raw_sources["product_type"] = "acroform-checkbox"
+                fields.raw_confidences["product_type"] = 1.0
         for field_name in APPLICATION_FORM_FIELDS:
             if getattr(fields, field_name):
                 continue
@@ -275,6 +281,22 @@ def extract_acroform_fields(pdf_bytes: bytes) -> dict[str, Any]:
         if target:
             mapped[target] = str(value).strip()
     return mapped
+
+
+def extract_product_type_from_widgets(page: fitz.Page) -> str:
+    for widget in page.widgets() or []:
+        if widget.field_type_string != "CheckBox":
+            continue
+        value = normalize_text(str(widget.field_value or ""))
+        if not value or value == "OFF":
+            continue
+        if "SPIRITS" in value:
+            return "DISTILLED SPIRITS"
+        if "WINE" in value:
+            return "WINE"
+        if "MALT" in value:
+            return "MALT BEVERAGES"
+    return ""
 
 
 def parse_application_summary(text: str) -> dict[str, Any]:

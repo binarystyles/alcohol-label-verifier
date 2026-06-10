@@ -353,6 +353,9 @@ def test_malt_product_type_first_label_line_passes_when_explicit() -> None:
     assert verify_product_type("MALT BEVERAGES", "MALT LIQUOR\nSUNNY FARMS\n5.5% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nClass/Type: IPA\n6.5% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nPilsner\n5.0% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nHARD SELTZER\n5.0% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nSPIKED SELTZER\n5.0% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("MALT BEVERAGES", "HARBOR LIGHT\nMALT-BASED SELTZER\n5.0% Alc./Vol.").status == STATUS_PASS
 
 
 def test_wine_brand_with_spirit_word_does_not_fail_product_type() -> None:

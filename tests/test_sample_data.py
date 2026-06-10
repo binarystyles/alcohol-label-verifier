@@ -211,6 +211,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-142_domestic_imported_from_origin_review.pdf"].fields["imported"] is False
     assert specs["APP-142_domestic_imported_from_origin_review.pdf"].expected_status == STATUS_REVIEW
     assert specs["APP-143_dual_proof_abv_statement_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-144_lager_beer_first_line_pass.pdf"].fields["product_type"] == "MALT BEVERAGES"
+    assert specs["APP-144_lager_beer_first_line_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS

@@ -2818,6 +2818,21 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Label states proof immediately before ABV; the parser must not reread the ABV number as Proof 45.",
         ),
+        SampleSpec(
+            filename="APP-144_lager_beer_first_line_pass.pdf",
+            fields={**malt_fields, "serial_number": "APP-144"},
+            label_lines=[
+                "LAGER BEER",
+                "HARBOR LIGHT LAGER",
+                "Class/Type: Flavored Malt Beverage",
+                "5.5% Alc./Vol.",
+                "12 fl oz",
+                "Brewed by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Malt beverage label states LAGER BEER before the brand; this should be treated as an explicit product-type statement.",
+        ),
     ]
 
 

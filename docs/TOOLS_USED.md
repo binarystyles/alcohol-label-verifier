@@ -19,7 +19,7 @@ This project is implemented as a local, deterministic Streamlit application. It 
 | PyMuPDF (`pymupdf`, imported as `fitz`) | Opens PDFs, renders page regions, reads text layers, fills/generates sample PDFs, and converts scanned image inputs into in-memory PDF pages. |
 | pypdf | Reads PDF AcroForm field values from completed applications. |
 | PyMuPDF checkbox rendering | Reads visible checkbox marks for current source-form Item 3 Domestic/Imported and Item 5 product type when widgets are flattened or scanned. |
-| Pillow | Image loading, scanned-image conversion, sample label artwork generation, and raster label manipulation. |
+| Pillow | Image loading, scanned-image conversion, sample label artwork generation, photo-like artwork fixtures, and raster label manipulation. |
 | OpenCV headless | OCR image preprocessing variants, Otsu/adaptive thresholding, and sharpness scoring for low-quality/rotated label detection. |
 | NumPy | Image-array operations for preprocessing, nonwhite-pixel ratio, and sharpness calculations. |
 
@@ -27,7 +27,7 @@ This project is implemented as a local, deterministic Streamlit application. It 
 
 | Tool | Use |
 | --- | --- |
-| Tesseract OCR (`tesseract-ocr`, `tesseract-ocr-eng`) | Local OCR engine for scanned PDFs, scanned images, and raster label artwork, including colored and reversed-text label variants. Installed through `packages.txt` and the Dockerfile. |
+| Tesseract OCR (`tesseract-ocr`, `tesseract-ocr-eng`) | Local OCR engine for scanned PDFs, scanned images, and raster label artwork, including colored, photo-like, low-contrast, and reversed-text label variants. Installed through `packages.txt` and the Dockerfile. |
 | pytesseract | Python wrapper used to call local Tesseract and collect text/confidence data. |
 | RapidFuzz | Fuzzy matching for brand, class/type, bottler/producer, Item 15, and other tolerant text comparisons. |
 
@@ -45,7 +45,7 @@ This project is implemented as a local, deterministic Streamlit application. It 
 | Tool | Use |
 | --- | --- |
 | PyMuPDF | Fills the tracked `docs/source/f510031.pdf` form template and writes synthetic completed application PDFs. |
-| Pillow | Builds raster color-artwork labels, low-quality labels, rotated labels, and scanned-image fixtures. |
+| Pillow | Builds raster color-artwork labels, photo-like label backgrounds, low-quality labels, rotated labels, and scanned-image fixtures. |
 | zipfile | Creates the sample batch ZIP and expands uploaded ZIP files in memory. |
 | openpyxl | Installed spreadsheet dependency available for future workbook export; current app outputs CSV only. |
 | reportlab | Included as a PDF-generation dependency, though current sample generation is handled with PyMuPDF. |

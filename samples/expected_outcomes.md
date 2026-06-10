@@ -134,5 +134,7 @@
 | `APP-130_spaced_abv_dark_artwork_pass.pdf` | Pass | Needs Review | Dark color artwork uses OCR-spaced A B V alcohol-content wording and should still verify. |
 | `APP-131_formula_alc_vol_heading_pass.pdf` | Pass | Pass | Formula support states final alcohol with the abbreviated heading Finished Product Alc/Vol. |
 | `APP-132_scotch_whisky_origin_pass.pdf` | Pass | Pass | Imported spirits origin is satisfied by the protected Scotch Whisky designation without a separate Product of statement. |
+| `APP-133_photo_artwork_pass.pdf` | Pass | Needs Review | Photo-like color artwork with scenic background and readable panels should still verify. |
+| `APP-134_photo_low_contrast_artwork_review.pdf` | Needs Review | Needs Review | Photo-like low-contrast artwork should require review for OCR quality instead of failing as missing text. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

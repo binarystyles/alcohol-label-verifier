@@ -2615,6 +2615,44 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Imported spirits origin is satisfied by the protected Scotch Whisky designation without a separate Product of statement.",
         ),
+        SampleSpec(
+            filename="APP-133_photo_artwork_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-133", "formula": "F-13300"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            expected_status_without_ocr="Needs Review",
+            note="Photo-like color artwork with scenic background and readable panels should still verify.",
+            artwork_label=True,
+            artwork_style="photo",
+        ),
+        SampleSpec(
+            filename="APP-134_photo_low_contrast_artwork_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-134", "formula": "F-13400"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Needs Review",
+            note="Photo-like low-contrast artwork should require review for OCR quality instead of failing as missing text.",
+            raster_label=True,
+            artwork_label=True,
+            artwork_style="photo-low-contrast",
+        ),
     ]
 
 
@@ -3083,6 +3121,26 @@ def _draw_artwork_background(
             draw.line((index, 122, index + height, height - 20), fill=palette["accent"], width=4)
         for index in range(0, width, 120):
             draw.rectangle((index, height - 154, index + 56, height - 24), fill=palette["accent2"])
+    elif style in {"photo", "photo-low-contrast"}:
+        sky = palette["accent"]
+        ground = palette["accent2"]
+        ridge = palette["border"]
+        for index in range(122, height - 18):
+            ratio = (index - 122) / max(height - 140, 1)
+            color = tuple(int(sky[channel] * (1 - ratio) + ground[channel] * ratio) for channel in range(3))
+            draw.line((18, index, width - 18, index), fill=color, width=1)
+        draw.polygon(
+            [(18, 420), (360, 245), (640, 420), (910, 270), (1210, 420), (width - 18, 282), (width - 18, 578), (18, 578)],
+            fill=ridge,
+        )
+        draw.polygon(
+            [(18, 578), (350, 505), (730, 590), (1120, 520), (1480, 594), (width - 18, 505), (width - 18, height - 18), (18, height - 18)],
+            fill=ground,
+        )
+        for index in range(12):
+            x0 = 145 + index * 155
+            draw.line((x0, 612, x0 + 90, height - 80), fill=palette["accent3"], width=7)
+            draw.line((x0 + 74, 612, x0 - 12, height - 80), fill=palette["accent3"], width=4)
     else:
         draw.ellipse((-190, 100, 560, 840), fill=palette["accent"])
         draw.polygon(
@@ -3167,6 +3225,33 @@ def _artwork_palette(seed: str, *, style: str = "geometric") -> dict[str, tuple[
             "text": (112, 118, 108),
             "warning_panel": (225, 228, 221),
             "warning_text": (112, 118, 108),
+        }
+    if style == "photo":
+        return {
+            "background": (222, 236, 242),
+            "band": (38, 71, 52),
+            "band_text": (255, 255, 246),
+            "panel": (255, 252, 238),
+            "accent": (123, 182, 214),
+            "accent2": (144, 102, 62),
+            "accent3": (76, 106, 66),
+            "border": (54, 82, 66),
+            "text": (28, 31, 28),
+            "warning_panel": (255, 252, 238),
+        }
+    if style == "photo-low-contrast":
+        return {
+            "background": (208, 213, 205),
+            "band": (145, 151, 138),
+            "band_text": (236, 238, 232),
+            "panel": (222, 225, 218),
+            "accent": (185, 197, 203),
+            "accent2": (184, 175, 157),
+            "accent3": (167, 177, 156),
+            "border": (145, 152, 140),
+            "text": (111, 116, 106),
+            "warning_panel": (223, 225, 219),
+            "warning_text": (111, 116, 106),
         }
     palettes = [
         {

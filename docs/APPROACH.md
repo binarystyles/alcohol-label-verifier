@@ -83,7 +83,7 @@ The app avoids full-document OCR unless necessary:
 - Current source-form checkbox widgets and visible checkbox marks are checked before OCR is trusted for checkbox-only values.
 - Only mapped page-one regions and candidate label areas are rendered.
 - Unreadable scanned attachment pages do not downgrade the result when a later supplemental label page is readable.
-- Label OCR tries conservative adaptive-threshold, grayscale, contrast, and Otsu-preprocessed variants, then keeps the strongest local Tesseract result. This improves colored artwork, crest-style/logo-like artwork, textured backgrounds, dark/reversed text, and colored warning panels without making network calls.
+- Label OCR tries conservative adaptive-threshold, grayscale, contrast, and Otsu-preprocessed variants, then keeps the strongest local Tesseract result. This improves colored artwork, crest-style/logo-like artwork, textured and photo-like backgrounds, dark/reversed text, and colored warning panels without making network calls.
 - Results are cached by PDF hash during the Streamlit session.
 
 On clean text-layer PDFs and generated samples, processing is typically well under the 5-second target per application. Scanned images, scanned PDFs, and rotated raster labels depend on local Tesseract speed and image quality.

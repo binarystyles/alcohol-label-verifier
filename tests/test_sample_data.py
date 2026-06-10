@@ -34,12 +34,22 @@ def test_expected_status_set_is_complete() -> None:
 def test_sample_corpus_includes_color_artwork_ocr_cases() -> None:
     specs = sample_specs()
     artwork_specs = [spec for spec in specs if spec.artwork_label]
-    assert len(artwork_specs) >= 22
+    assert len(artwork_specs) >= 24
     assert any(spec.expected_status == STATUS_PASS for spec in artwork_specs)
     assert any(spec.expected_status == STATUS_FAIL for spec in artwork_specs)
     assert any(spec.expected_status == STATUS_REVIEW for spec in artwork_specs)
     artwork_styles = {spec.artwork_style for spec in artwork_specs}
-    assert {"geometric", "busy", "dark", "warning-panel", "busy-low-contrast", "crest", "texture"} <= artwork_styles
+    assert {
+        "geometric",
+        "busy",
+        "dark",
+        "warning-panel",
+        "busy-low-contrast",
+        "crest",
+        "texture",
+        "photo",
+        "photo-low-contrast",
+    } <= artwork_styles
 
 
 def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
@@ -171,6 +181,10 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-132_scotch_whisky_origin_pass.pdf"].fields["country_of_origin"] == "United Kingdom"
     assert "SCOTCH WHISKY" in specs["APP-132_scotch_whisky_origin_pass.pdf"].label_lines
     assert specs["APP-132_scotch_whisky_origin_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-133_photo_artwork_pass.pdf"].artwork_style == "photo"
+    assert specs["APP-133_photo_artwork_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-134_photo_low_contrast_artwork_review.pdf"].artwork_style == "photo-low-contrast"
+    assert specs["APP-134_photo_low_contrast_artwork_review.pdf"].expected_status == STATUS_REVIEW
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
     assert specs["APP-030_wine_cask_spirits_pass.pdf"].expected_status == STATUS_PASS
@@ -323,6 +337,8 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "45% A.B.V." in specs["APP-128_dotted_abv_crest_artwork_pass.pdf"].label_lines
     assert "5.5% v/v" in specs["APP-129_vv_textured_artwork_pass.pdf"].label_lines
     assert "A B V 50%" in specs["APP-130_spaced_abv_dark_artwork_pass.pdf"].label_lines
+    assert specs["APP-133_photo_artwork_pass.pdf"].artwork_style == "photo"
+    assert specs["APP-134_photo_low_contrast_artwork_review.pdf"].artwork_style == "photo-low-contrast"
     assert specs["APP-115_sake_wine_class_pass.pdf"].fields["class_type"] == "Sake"
     assert specs["APP-115_sake_wine_class_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-116_vermouth_wine_class_pass.pdf"].fields["class_type"] == "Vermouth"

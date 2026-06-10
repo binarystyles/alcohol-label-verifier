@@ -190,5 +190,7 @@
 | `APP-186_champagne_of_france_origin_pass.pdf` | Pass | Pass | Imported origin stated as a recognized wine class term plus country should pass, matching the existing Wine of France pattern. |
 | `APP-187_mezcal_of_mexico_origin_pass.pdf` | Pass | Pass | Imported origin stated as a recognized distilled-spirits class term plus country should pass. |
 | `APP-188_modified_hard_cider_first_line_pass.pdf` | Pass | Pass | A first-line modified hard-cider statement should satisfy wine product type and class/type checks without requiring the literal word WINE. |
+| `APP-189_barleywine_ale_malt_pass.pdf` | Pass | Pass | Barleywine/Barley Wine is a malt-beverage beer style and should not be treated as wine or an ambiguous product type. |
+| `APP-190_tequila_barrel_aged_beer_pass.pdf` | Pass | Pass | A descriptor-first barrel-aged beer statement should verify as a malt beverage without being misread as distilled spirits because it contains Tequila. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

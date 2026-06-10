@@ -716,6 +716,10 @@ def test_malt_product_type_first_label_line_passes_when_explicit() -> None:
     assert verify_product_type("MALT BEVERAGES", "SPARKLING HARD SELTZER\nHARBOR LIGHT\n5.0% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "FLAVORED HARD SELTZER\nHARBOR LIGHT\n5.0% Alc./Vol.").status == STATUS_PASS
     assert verify_product_type("MALT BEVERAGES", "FLAVORED MALT BEVERAGE\nHARBOR TEA\n5.0% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("MALT BEVERAGES", "BARLEYWINE ALE\nHARBOR LIGHT\n9.5% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("MALT BEVERAGES", "BARLEY WINE\nHARBOR LIGHT\n9.5% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("MALT BEVERAGES", "TEQUILA BARREL AGED BEER\nHARBOR LIGHT\n7% Alc./Vol.").status == STATUS_PASS
+    assert verify_product_type("DISTILLED SPIRITS", "TEQUILA BARREL AGED BEER\nHARBOR LIGHT\n7% Alc./Vol.").status == STATUS_FAIL
     assert (
         verify_product_type("MALT BEVERAGES", "PRODUCT TYPE: SPIKED SELTZER\nHARBOR LIGHT\n5.0% Alc./Vol.").status
         == STATUS_PASS
@@ -743,6 +747,8 @@ def test_class_type_first_label_line_passes_for_clear_class_phrases() -> None:
     assert verify_class_type("Hard Seltzer", "SPARKLING HARD SELTZER\nHARBOR LIGHT\n5% Alc./Vol.").status == STATUS_PASS
     assert verify_class_type("Stout", "IMPERIAL STOUT\nHARBOR LIGHT\n9% Alc./Vol.").status == STATUS_PASS
     assert verify_class_type("Straight Rye Whiskey", "STRAIGHT RYE WHISKEY\nRIVER BEND\n90 Proof").status == STATUS_PASS
+    assert verify_class_type("Barleywine Ale", "BARLEYWINE ALE\nHARBOR LIGHT\n9.5% Alc./Vol.").status == STATUS_PASS
+    assert verify_class_type("Barrel Aged Beer", "TEQUILA BARREL AGED BEER\nHARBOR LIGHT\n7% Alc./Vol.").status == STATUS_PASS
 
 
 def test_conflicting_class_type_statements_need_review() -> None:

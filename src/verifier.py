@@ -688,6 +688,9 @@ def _split_flat_label_line(line: str) -> list[str]:
         if not piece:
             continue
         if re.match(pattern, piece, flags=re.IGNORECASE):
+            if current.strip() and _ends_with_class_type_marker(current):
+                current += " " + piece
+                continue
             if current.strip():
                 lines.append(current.strip())
             current = piece
@@ -696,6 +699,10 @@ def _split_flat_label_line(line: str) -> list[str]:
     if current.strip():
         lines.append(current.strip())
     return lines
+
+
+def _ends_with_class_type_marker(text: str) -> bool:
+    return bool(re.search(r"\bCLASS\s*/?\s*TYPE\s*:?\s*$", text, flags=re.IGNORECASE))
 
 
 def _line_before_non_brand_context(line: str) -> str:

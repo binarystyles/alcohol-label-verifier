@@ -2964,6 +2964,27 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Responsible-party wording may include a modifier such as Bottled exclusively for before the expected entity.",
         ),
+        SampleSpec(
+            filename="APP-152_distilled_spirits_specialty_class_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-152",
+                "formula": "F-15200",
+                "class_type": "Distilled Spirits Specialty",
+            },
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Distilled Spirits Specialty",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Explicit Class/Type values may contain product-type words such as Distilled Spirits Specialty and should still verify.",
+        ),
     ]
 
 

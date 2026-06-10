@@ -593,6 +593,21 @@ def test_class_type_does_not_match_inside_larger_word() -> None:
     assert "not clearly found" in result.reason
 
 
+def test_class_type_keeps_product_type_words_after_explicit_marker() -> None:
+    assert (
+        verify_class_type("Distilled Spirits Specialty", "Class/Type: Distilled Spirits Specialty").status
+        == STATUS_PASS
+    )
+    assert (
+        verify_class_type(
+            "Distilled Spirits Specialty",
+            "OLD TOM GIN Class/Type: Distilled Spirits Specialty 45% Alc./Vol.",
+        ).status
+        == STATUS_PASS
+    )
+    assert verify_class_type("Ale with natural flavors", "Class/Type: Ale with natural flavors").status == STATUS_PASS
+
+
 def test_imported_country_of_origin_passes_when_present() -> None:
     result = verify_country_of_origin("Mexico", True, "CASA VERDE TEQUILA Product of Mexico")
     assert result.status == STATUS_PASS

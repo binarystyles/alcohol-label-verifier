@@ -377,6 +377,32 @@ def test_formula_approval_parser_handles_ocr_values_before_finished_product_labe
     assert fields["alcohol_content"] == "5.5-5.8% ABV"
 
 
+def test_formula_approval_parser_ignores_row_number_after_finished_product_label() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: MB-14000
+    Yield Summary
+    Alcohol Content of Finished Product 3 5.5 5.8 % by Volume
+    Alcohol From Flavors: 0.99 0.99 % by Volume
+    """
+    fields = parse_formula_approval_fields(text, "MB-14000")
+    assert fields["alcohol_content"] == "5.5-5.8% ABV"
+
+
+def test_formula_approval_parser_does_not_include_total_yield_after_final_alcohol() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: F-14100
+    Yield Summary
+    Alcohol Content of Finished Product: 45% ABV
+    Total Yield: 100 Gallons
+    Ingredients List
+    Finished alcohol, botanicals, and water
+    """
+    fields = parse_formula_approval_fields(text, "F-14100")
+    assert fields["alcohol_content"] == "45% ABV"
+
+
 def test_formula_approval_parser_marks_matching_document_without_final_alcohol() -> None:
     text = """
     FORMULAS ONLINE APPROVAL DETERMINATION

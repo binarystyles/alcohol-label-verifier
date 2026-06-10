@@ -38,6 +38,7 @@ class SampleSpec:
     formula_approval_status: str = "Approved"
     formula_approval_identifier_label: str = "TTB Formula ID"
     formula_approval_alcohol_label: str = "Alcohol Content of Finished Product"
+    formula_approval_alcohol_row_number: str = ""
     extra_formula_approvals_before: tuple[dict[str, str | bool], ...] = ()
     expected_status_without_ocr: str | None = None
     instruction_pages_before_supplemental_label: int = 0
@@ -2751,6 +2752,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Non-alcohol flavoring percent-by-volume text alone should not be treated as an ABV mismatch; missing actual ABV requires review.",
         ),
+        SampleSpec(
+            filename="APP-140_formula_row_number_pass.pdf",
+            fields={**malt_fields, "serial_number": "APP-140", "formula": "MB-14000", "alcohol_content": "5.5-5.8% ABV"},
+            label_lines=[
+                "HARBOR LIGHT LAGER",
+                "MALT BEVERAGES",
+                "Class/Type: Flavored Malt Beverage",
+                "5.7% Alc./Vol.",
+                "12 fl oz",
+                "Brewed by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Formula support has an OCR-style row number before the low/high final-alcohol values and should still verify.",
+            formula_approval_alcohol_row_number="3",
+        ),
     ]
 
 
@@ -2805,6 +2822,7 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
             formula_status=spec.formula_approval_status,
             formula_identifier_label=spec.formula_approval_identifier_label,
             formula_alcohol_label=spec.formula_approval_alcohol_label,
+            formula_alcohol_row_number=spec.formula_approval_alcohol_row_number,
         )
     document.set_metadata({"title": spec.filename, "subject": "Synthetic completed TTB application"})
     document.save(output_path, garbage=4, deflate=True)
@@ -2989,10 +3007,15 @@ def _append_formula_approval_page(
     formula_status: str = "Approved",
     formula_identifier_label: str = "TTB Formula ID",
     formula_alcohol_label: str = "Alcohol Content of Finished Product",
+    formula_alcohol_row_number: str = "",
 ) -> None:
     page = document.new_page(width=612, height=792)
     formula_id = formula_id_override or str(fields.get("formula", "") or "")
     low_alcohol, high_alcohol = _low_high_values(fields.get("alcohol_content", ""))
+    if formula_alcohol_row_number:
+        alcohol_line = f"{formula_alcohol_label} {formula_alcohol_row_number} {low_alcohol} {high_alcohol} Unit {formula_unit}"
+    else:
+        alcohol_line = f"{formula_alcohol_label}: Low {low_alcohol} High {high_alcohol} Unit {formula_unit}"
     lines = [
         formula_header,
         "",
@@ -3004,7 +3027,7 @@ def _append_formula_approval_page(
         "",
         "Yield Summary",
         "Total Yield: 100.0 Percentage",
-        f"{formula_alcohol_label}: Low {low_alcohol} High {high_alcohol} Unit {formula_unit}",
+        alcohol_line,
         "",
         "Ingredients List:",
         "Finished alcohol, botanicals, purified water, and approved flavor materials.",

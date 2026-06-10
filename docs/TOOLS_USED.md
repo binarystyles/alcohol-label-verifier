@@ -56,4 +56,4 @@ This project is implemented as a local, deterministic Streamlit application. It 
 | --- | --- |
 | `docs/source/f510031.pdf` | Local copy of the current TTB F 5100.31 template used for deterministic sample generation and form-region mapping. |
 | TTB F 5100.31 instructions | Defines the application fields and Item 9 formula-reference behavior used in `docs/FORM_MAPPING.md`. |
-| TTB formula guidance and example formula pages | Informs local parsing of Formula ID/source documents included inside uploaded application packages, especially `Yield Summary` and `Alcohol Content of Finished Product` rows. |
+| TTB formula guidance and example formula pages | Informs local parsing of Formula ID/source documents included inside uploaded application packages, especially `Yield Summary` and `Alcohol Content of Finished Product` / `Alcohol Content of the Finished Product` rows. |

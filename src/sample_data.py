@@ -2701,6 +2701,23 @@ def sample_specs() -> list[SampleSpec]:
             note="Application has both Domestic and Imported Item 3 checkboxes selected, so source of product is ambiguous even though country evidence is present.",
             source_import_checks=(False, True),
         ),
+        SampleSpec(
+            filename="APP-137_formula_of_the_finished_product_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-137", "formula": "F-13700"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Formula support states final alcohol with the official-style Alcohol Content of the Finished Product wording.",
+            formula_approval_alcohol_label="Alcohol Content of the Finished Product",
+        ),
     ]
 
 

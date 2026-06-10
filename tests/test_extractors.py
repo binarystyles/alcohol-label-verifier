@@ -194,6 +194,20 @@ def test_formula_approval_parser_handles_ttb_distilled_spirits_range() -> None:
     assert fields["alcohol_content"] == "25-30% ABV"
 
 
+def test_formula_approval_parser_handles_of_the_finished_product_wording() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: DS-13700
+    Product Information Class: DISTILLED SPIRITS SPECIALTY
+    Yield Summary
+    Alcohol Content of the Finished Product: Low 45 High 45 Unit % by Volume
+    Ingredients List
+    Finished alcohol, botanicals, and water
+    """
+    fields = parse_formula_approval_fields(text, "DS-13700")
+    assert fields["alcohol_content"] == "45% ABV"
+
+
 def test_formula_approval_parser_handles_ttb_wine_multiline_range() -> None:
     text = """
     Formulas Online Entry
@@ -322,6 +336,20 @@ def test_formula_approval_parser_ignores_generic_alcohol_content_wording() -> No
     Blend and bottle.
     """
     fields = parse_formula_approval_fields(text, "F-8400")
+    assert fields == {"alcohol_content": ""}
+
+
+def test_formula_approval_parser_ignores_overall_alcohol_limit_wording() -> None:
+    text = """
+    Formulas Online Entry
+    TTB Formula ID: MB-13700
+    Limited Ingredient Calculation Worksheet
+    No more than 49% of the overall alcohol content of the finished product
+    may be derived from added flavors and other nonbeverage ingredients containing alcohol.
+    Ingredients List
+    Malt base, coffee flavor, caramel color
+    """
+    fields = parse_formula_approval_fields(text, "MB-13700")
     assert fields == {"alcohol_content": ""}
 
 

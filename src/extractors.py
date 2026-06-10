@@ -78,7 +78,14 @@ SUMMARY_KEYS: dict[str, str] = {
 PHONE_PATTERN = re.compile(r"(?:\+?1[\s.-]?)?(?:\(?\d{3}\)?[\s.-]?)\d{3}[\s.-]?\d{4}")
 EMAIL_PATTERN = re.compile(r"[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}", re.IGNORECASE)
 FORMULA_FINAL_ALCOHOL_PATTERN = re.compile(
-    r"(?:ALCOHOL\s+CONTENT\s+(?:OF\s+)?FINISHED\s+PRODUCT|FINAL\s+ALCOHOL\s+CONTENT|FINISHED\s+ALCOHOL\s+CONTENT|FINISHED\s+PRODUCT\s+(?:ALCOHOL\s+CONTENT|ALC\.?\s*/?\s*VOL\.?|ABV)|FINAL\s+PRODUCT\s+ALCOHOL\s+CONTENT|TARGET\s+ALCOHOL\s+CONTENT)",
+    r"(?:"
+    r"(?<!OVERALL\s)ALCOHOL\s+CONTENT\s+(?:OF\s+(?:THE\s+)?)?FINISHED\s+PRODUCT"
+    r"|FINAL\s+ALCOHOL\s+CONTENT"
+    r"|FINISHED\s+ALCOHOL\s+CONTENT"
+    r"|FINISHED\s+PRODUCT\s+(?:ALCOHOL\s+CONTENT|ALC\.?\s*/?\s*VOL\.?|ABV)"
+    r"|FINAL\s+PRODUCT\s+ALCOHOL\s+CONTENT"
+    r"|TARGET\s+ALCOHOL\s+CONTENT"
+    r")",
     flags=re.IGNORECASE,
 )
 FORMULA_STATUS_PATTERN = re.compile(r"\b(?:APPROVAL\s+)?STATUS\s*[:\-]?\s*(?P<status>.+)$", flags=re.IGNORECASE)

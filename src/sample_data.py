@@ -3303,6 +3303,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Percent Alcohol Vol. wording should normalize as ABV.",
         ),
+        SampleSpec(
+            filename="APP-169_slash_alcohol_volume_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-169", "formula": "F-16900"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alcohol/Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Slash-separated Alcohol/Vol. wording should normalize as ABV.",
+        ),
     ]
 
 

@@ -288,6 +288,7 @@ NUMBER_WORD_PATTERN = (
     r"ZERO|ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|EIGHT|NINE|TEN|ELEVEN|TWELVE|THIRTEEN|FOURTEEN|FIFTEEN|SIXTEEN|"
     r"SEVENTEEN|EIGHTEEN|NINETEEN|TWENTY|THIRTY|FORTY|FOURTY|FIFTY|SIXTY|SEVENTY|EIGHTY|NINETY|HUNDRED|THOUSAND|AND"
 )
+NET_CONTENTS_COUNT_PATTERN = rf"(?:\d{{1,3}}|(?:{NUMBER_WORD_PATTERN})(?:[\s-]+(?:{NUMBER_WORD_PATTERN}))*)"
 NET_CONTENTS_COMPOUND_PATTERN = re.compile(
     r"(?<![A-Z0-9])(?P<pints>\d+(?:\.\d+)?)\s*(?:PT\.?|PINTS?)\s+(?P<ounces>\d+(?:\.\d+)?)\s*(?:F\s*\.?\s*L\.?\s*O\s*\.?\s*Z\.?|FLUID\s+OUNCES?|OZ\.?|OUNCES?)(?=$|[^A-Z0-9])",
     re.IGNORECASE,
@@ -310,23 +311,27 @@ NET_CONTENTS_PATTERN = re.compile(
 )
 NET_CONTENTS_MULTIPACK_PATTERNS = (
     re.compile(
-        rf"(?<![A-Z0-9])(?P<count>\d{{1,3}})\s*(?:X|x|\u00d7)\s*(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN}){NET_CONTENTS_UNIT_BOUNDARY}",
+        rf"(?<![A-Z0-9])(?P<count>{NET_CONTENTS_COUNT_PATTERN})\s*(?:X|x|\u00d7)\s*(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN}){NET_CONTENTS_UNIT_BOUNDARY}",
         re.IGNORECASE,
     ),
     re.compile(
-        rf"(?<![A-Z0-9])(?P<count>\d{{1,3}})\s*(?:-|\u2010|\u2011|\u2012|\u2013|\u2014|\u2015)\s*(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN}){NET_CONTENTS_UNIT_BOUNDARY}",
+        rf"(?<![A-Z0-9])(?P<count>{NET_CONTENTS_COUNT_PATTERN})\s*(?:-|\u2010|\u2011|\u2012|\u2013|\u2014|\u2015)\s*(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN}){NET_CONTENTS_UNIT_BOUNDARY}",
         re.IGNORECASE,
     ),
     re.compile(
-        rf"(?<![A-Z0-9])(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\s*(?:X|x|\u00d7)\s*(?P<count>\d{{1,3}})(?=$|[^A-Z0-9])",
+        rf"(?<![A-Z0-9])(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\s*(?:X|x|\u00d7)\s*(?P<count>{NET_CONTENTS_COUNT_PATTERN})(?=$|[^A-Z0-9])",
         re.IGNORECASE,
     ),
     re.compile(
-        rf"(?<![A-Z0-9])(?P<count>\d{{1,3}})\s*/\s*(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\s+(?:BOTTLES?|CANS?|CONTAINERS?|PACKS?|PK)(?=$|[^A-Z0-9])",
+        rf"(?<![A-Z0-9])(?P<count>{NET_CONTENTS_COUNT_PATTERN})\s*/\s*(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\s+(?:BOTTLES?|CANS?|CONTAINERS?|PACKS?|PK)(?=$|[^A-Z0-9])",
         re.IGNORECASE,
     ),
     re.compile(
-        rf"(?<![A-Z0-9])(?P<count>\d{{1,3}})\s*(?:(?:-|\u2010|\u2011|\u2012|\u2013|\u2014|\u2015)\s*)?(?:BOTTLES?|CANS?|CONTAINERS?|PACK|PACKS|PK)\s+(?:OF\s+)?(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})(?:\s+EACH)?{NET_CONTENTS_UNIT_BOUNDARY}",
+        rf"(?<![A-Z0-9])(?P<count>{NET_CONTENTS_COUNT_PATTERN})\s+(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})\s+(?:BOTTLES?|CANS?|CONTAINERS?|PACKS?|PK)(?=$|[^A-Z0-9])",
+        re.IGNORECASE,
+    ),
+    re.compile(
+        rf"(?<![A-Z0-9])(?P<count>{NET_CONTENTS_COUNT_PATTERN})\s*(?:(?:-|\u2010|\u2011|\u2012|\u2013|\u2014|\u2015)\s*)?(?:BOTTLES?|CANS?|CONTAINERS?|PACK|PACKS|PK)\s+(?:OF\s+)?(?P<num>\d+(?:[.,]\d{{1,3}})?)\s*(?P<unit>{NET_CONTENTS_UNIT_PATTERN})(?:\s+EACH)?{NET_CONTENTS_UNIT_BOUNDARY}",
         re.IGNORECASE,
     ),
 )
@@ -342,7 +347,9 @@ def extract_net_contents_values(text: str | None) -> list[float]:
         for match in pattern.finditer(text):
             if _is_non_net_contents_volume(text, match.start(), match.end()):
                 continue
-            count = float(match.group("count"))
+            count = _parse_net_contents_count(match.group("count"))
+            if count is None:
+                continue
             number = _parse_net_contents_number(match.group("num"))
             milliliters = _net_unit_to_milliliters(number, match.group("unit")) * count
             if 0 < milliliters < 100000:
@@ -415,6 +422,12 @@ def _parse_net_contents_number(value: str) -> float:
             return float(value.replace(",", ""))
         return float(value.replace(",", "."))
     return float(value.replace(",", ""))
+
+
+def _parse_net_contents_count(value: str) -> float | None:
+    if re.fullmatch(r"\d{1,3}", value.strip()):
+        return float(value)
+    return _parse_number_words(value)
 
 
 def _strip_estimated_net_quantity_mark(text: str) -> str:

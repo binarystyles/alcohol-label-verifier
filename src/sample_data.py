@@ -3397,6 +3397,26 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Needs Review",
             note="Application supplies grape varietal and appellation values, but the label is missing Merlot and California, so wine-only fields need review.",
         ),
+        SampleSpec(
+            filename="APP-173_word_count_multipack_net_contents_pass.pdf",
+            fields={
+                **malt_fields,
+                "serial_number": "APP-173",
+                "formula": "MB-17300",
+                "net_contents": "72 fl oz",
+            },
+            label_lines=[
+                "HARBOR LIGHT LAGER",
+                "MALT BEVERAGE",
+                "Class/Type: Flavored Malt Beverage",
+                "5.5% Alc./Vol.",
+                "Net Contents six 12 fl oz cans",
+                "Brewed by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Word-count multipack net-contents wording such as six 12 fl oz cans should normalize to total package volume.",
+        ),
     ]
 
 

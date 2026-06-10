@@ -235,6 +235,7 @@ NET_CONTENTS_PATTERN = re.compile(
 def extract_net_contents_values(text: str | None) -> list[float]:
     if not text:
         return []
+    text = _strip_estimated_net_quantity_mark(text)
     values: list[float] = []
     compound_spans: list[tuple[int, int]] = []
     for match in NET_CONTENTS_COMPOUND_PATTERN.finditer(text):
@@ -296,6 +297,10 @@ def extract_net_contents_values(text: str | None) -> list[float]:
 def normalize_net_contents(text: str | None) -> float | None:
     values = extract_net_contents_values(text)
     return values[0] if values else None
+
+
+def _strip_estimated_net_quantity_mark(text: str) -> str:
+    return re.sub(r"(?<![A-Z0-9])(?:E|\u212E)\s*(?=\d)", " ", text, flags=re.IGNORECASE)
 
 
 def normalize_warning_for_compare(text: str | None) -> str:

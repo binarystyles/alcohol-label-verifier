@@ -83,9 +83,12 @@ FORMULA_FINAL_ALCOHOL_PATTERN = re.compile(
 )
 FORMULA_ID_VALUE_PATTERN = r"[A-Z]{1,8}\s*[-./]?\s*\d[A-Z0-9]*(?:\s*[-./]\s*[A-Z0-9]+)*"
 FORMULA_ID_PATTERNS = (
-    re.compile(rf"(?:TTB\s+)?FORMULA\s+ID\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
+    re.compile(
+        rf"(?:APPROVED\s+)?(?:TTB\s+)?FORMULA\s+ID\s*(?:(?:NO\.?|NUMBER|#)\s*)?[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})",
+        re.IGNORECASE,
+    ),
     re.compile(rf"TTB\s+ID\s*(?:NO\.?|NUMBER)?\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
-    re.compile(rf"FORMULA\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
+    re.compile(rf"(?:APPROVED\s+)?(?:TTB\s+)?FORMULA\s*(?:NO\.?|NUMBER|#)\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
     re.compile(rf"LAB\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
 )
 LOW_LABEL_SHARPNESS_THRESHOLD = 250.0

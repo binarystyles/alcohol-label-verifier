@@ -2082,6 +2082,39 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Responsible-party legal suffix Ltd. in the application matches Limited on the label.",
         ),
+        SampleSpec(
+            filename="APP-105_formula_symbol_label_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-105", "formula": "F-10500"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Formula support identifies the approval as Formula # instead of Formula ID.",
+            formula_approval_identifier_label="Formula #",
+        ),
+        SampleSpec(
+            filename="APP-106_estimated_net_contents_mark_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-106", "formula": "F-10600"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "Net Contents e750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Label prefixes net contents with a compact estimated quantity mark, e750 mL.",
+        ),
     ]
 
 

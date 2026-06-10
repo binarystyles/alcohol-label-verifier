@@ -40,9 +40,12 @@ def test_application_summary_parser_maps_expected_fields() -> None:
 def test_formula_identifier_extraction() -> None:
     assert extract_formula_identifier("F-1001") == "F-1001"
     assert extract_formula_identifier("TTB Formula ID: F-1001") == "F-1001"
+    assert extract_formula_identifier("TTB Formula ID No.: F-1001") == "F-1001"
     assert extract_formula_identifier("TTB Formula ID: F 1001") == "F 1001"
     assert extract_formula_identifier("TTB Formula ID: F/1001") == "F/1001"
     assert extract_formula_identifier("TTB Formula ID: F.1001") == "F.1001"
+    assert extract_formula_identifier("Formula #: F-1001") == "F-1001"
+    assert extract_formula_identifier("Approved Formula #: F-1001") == "F-1001"
     assert extract_formula_identifier("TTB ID Number: DS 3400") == "DS 3400"
 
 
@@ -68,6 +71,20 @@ def test_formula_approval_parser_matches_separator_variants() -> None:
     assert parse_formula_approval_fields(text, "F 1001")["alcohol_content"] == "45% ABV"
     assert parse_formula_approval_fields(text, "F/1001")["alcohol_content"] == "45% ABV"
     assert parse_formula_approval_fields(text, "F.1001")["alcohol_content"] == "45% ABV"
+
+
+def test_formula_approval_parser_matches_formula_symbol_and_id_number_labels() -> None:
+    for label in ("Formula #: F-10500", "Approved Formula #: F-10500", "Formula ID No.: F-10500"):
+        text = f"""
+        FORMULAS ONLINE ENTRY
+        {label}
+        Class/Type: Gin
+        Yield Summary
+        Alcohol Content of Finished Product: Low 45 High 45 Unit % by Volume
+        """
+        fields = parse_formula_approval_fields(text, "F-10500")
+        assert fields["alcohol_content"] == "45% ABV"
+        assert fields["class_type"] == "Gin"
 
 
 def test_formula_approval_parser_uses_finished_product_row_before_ingredient_abv() -> None:

@@ -106,5 +106,7 @@
 | `APP-102_hard_seltzer_malt_pass.pdf` | Pass | Pass | Malt beverage hard seltzer label uses hard-seltzer wording instead of beer-style terms. |
 | `APP-103_hard_seltzer_first_line_pass.pdf` | Pass | Pass | Malt beverage hard seltzer label states product type as the first line before the brand. |
 | `APP-104_bottler_legal_suffix_pass.pdf` | Pass | Pass | Responsible-party legal suffix Ltd. in the application matches Limited on the label. |
+| `APP-105_formula_symbol_label_pass.pdf` | Pass | Pass | Formula support identifies the approval as Formula # instead of Formula ID. |
+| `APP-106_estimated_net_contents_mark_pass.pdf` | Pass | Pass | Label prefixes net contents with a compact estimated quantity mark, e750 mL. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

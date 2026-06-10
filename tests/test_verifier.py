@@ -80,6 +80,11 @@ def test_bottler_producer_accepts_combined_responsible_party_statement() -> None
 def test_bottler_producer_company_abbreviation_passes() -> None:
     assert verify_bottler_producer("Acme Distilling Co.", "Bottled by Acme Distilling Company").status == STATUS_PASS
     assert verify_bottler_producer("Acme Distilling Company", "Bottled by Acme Distilling Co.").status == STATUS_PASS
+    assert verify_bottler_producer("Example Imports LLC", "Imported by Example Imports L.L.C.").status == STATUS_PASS
+    assert verify_bottler_producer("Acme Distilling Inc.", "Bottled by Acme Distilling Incorporated").status == STATUS_PASS
+    assert verify_bottler_producer("North Coast Ltd.", "Produced by North Coast Limited").status == STATUS_PASS
+    assert verify_bottler_producer("Copper Ridge Corp.", "Distilled by Copper Ridge Corporation").status == STATUS_PASS
+    assert verify_bottler_producer("Example Imports LLC", "Imported by Example Imports Limited").status == STATUS_REVIEW
 
 
 def test_bottler_producer_accepts_distilled_by_statement() -> None:

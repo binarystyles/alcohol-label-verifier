@@ -102,3 +102,4 @@ APP-100_expected_proof_range_pass.pdf,APP-100,APP-100,PROOF RANGE BOURBON,DISTIL
 APP-101_repeated_unit_proof_range_pass.pdf,APP-101,APP-101,RANGE HOUSE BOURBON,DISTILLED SPIRITS,Pass,0.95,0.081,All required checks passed with adequate confidence.,,
 APP-102_hard_seltzer_malt_pass.pdf,APP-102,APP-102,HARBOR LIGHT SELTZER,MALT BEVERAGES,Pass,0.95,0.074,All required checks passed with adequate confidence.,,
 APP-103_hard_seltzer_first_line_pass.pdf,APP-103,APP-103,HARBOR LIGHT SELTZER,MALT BEVERAGES,Pass,0.95,0.074,All required checks passed with adequate confidence.,,
+APP-104_bottler_legal_suffix_pass.pdf,APP-104,APP-104,NORTH COAST GIN,DISTILLED SPIRITS,Pass,0.95,0.074,All required checks passed with adequate confidence.,,

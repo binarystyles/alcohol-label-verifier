@@ -37,11 +37,15 @@ def normalize_for_match(value: str | None) -> str:
 
 def normalize_name(value: str | None) -> str:
     value = normalize_text(value)
+    value = re.sub(r"\bL\s*\.?\s*L\s*\.?\s*C\.?\b", " LLC ", value)
     value = value.replace("&", " AND ")
     value = re.sub(r"['`]", "", value)
     value = re.sub(r"[^A-Z0-9]+", " ", value)
     token_aliases = {
         "CO": "COMPANY",
+        "CORP": "CORPORATION",
+        "INC": "INCORPORATED",
+        "LTD": "LIMITED",
         "MT": "MOUNT",
         "ST": "SAINT",
     }
@@ -54,9 +58,14 @@ def fuzzy_score(expected: str | None, actual: str | None) -> float:
     actual_norm = normalize_name(actual)
     if not expected_norm or not actual_norm:
         return 0.0
-    if _contains_token_sequence(expected_norm.split(), actual_norm.split()):
+    expected_tokens = expected_norm.split()
+    actual_tokens = actual_norm.split()
+    if _contains_token_sequence(expected_tokens, actual_tokens):
         return 100.0
-    return float(fuzz.token_set_ratio(expected_norm, actual_norm))
+    score = float(fuzz.token_set_ratio(expected_norm, actual_norm))
+    if _has_conflicting_legal_suffix(expected_tokens, actual_tokens):
+        return min(score, 84.0)
+    return score
 
 
 def ordered_fuzzy_score(expected: str | None, actual: str | None) -> float:
@@ -78,6 +87,15 @@ def _contains_token_sequence(expected_tokens: list[str], actual_tokens: list[str
         return False
     width = len(expected_tokens)
     return any(actual_tokens[index : index + width] == expected_tokens for index in range(len(actual_tokens) - width + 1))
+
+
+LEGAL_SUFFIX_TOKENS = {"COMPANY", "CORPORATION", "INCORPORATED", "LIMITED", "LLC"}
+
+
+def _has_conflicting_legal_suffix(expected_tokens: list[str], actual_tokens: list[str]) -> bool:
+    expected_suffixes = LEGAL_SUFFIX_TOKENS.intersection(expected_tokens)
+    actual_suffixes = LEGAL_SUFFIX_TOKENS.intersection(actual_tokens)
+    return bool(expected_suffixes and actual_suffixes and expected_suffixes.isdisjoint(actual_suffixes))
 
 
 def extract_product_type(text: str | None) -> str:

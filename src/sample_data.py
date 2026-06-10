@@ -2058,6 +2058,30 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Malt beverage hard seltzer label states product type as the first line before the brand.",
         ),
+        SampleSpec(
+            filename="APP-104_bottler_legal_suffix_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-104",
+                "brand_name": "NORTH COAST GIN",
+                "fanciful_name": "",
+                "formula": "F-10400",
+                "class_type": "Gin",
+                "alcohol_content": "45% ABV",
+                "bottler_producer": "North Coast Ltd.",
+            },
+            label_lines=[
+                "NORTH COAST GIN",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by North Coast Limited",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Responsible-party legal suffix Ltd. in the application matches Limited on the label.",
+        ),
     ]
 
 

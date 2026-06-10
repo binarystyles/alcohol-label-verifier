@@ -121,6 +121,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-101_repeated_unit_proof_range_pass.pdf" in specs
     assert "APP-102_hard_seltzer_malt_pass.pdf" in specs
     assert "APP-103_hard_seltzer_first_line_pass.pdf" in specs
+    assert "APP-104_bottler_legal_suffix_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
@@ -248,6 +249,9 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-102_hard_seltzer_malt_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-103_hard_seltzer_first_line_pass.pdf"].label_lines[0] == "HARD SELTZER"
     assert specs["APP-103_hard_seltzer_first_line_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-104_bottler_legal_suffix_pass.pdf"].fields["bottler_producer"] == "North Coast Ltd."
+    assert "Bottled by North Coast Limited" in specs["APP-104_bottler_legal_suffix_pass.pdf"].label_lines
+    assert specs["APP-104_bottler_legal_suffix_pass.pdf"].expected_status == STATUS_PASS
 
 
 def test_sample_generator_uses_real_source_form_when_available(sample_paths: list[Path]) -> None:

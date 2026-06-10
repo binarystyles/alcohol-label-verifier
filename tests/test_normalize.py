@@ -19,6 +19,10 @@ def test_text_normalization_handles_brand_punctuation() -> None:
     assert normalize_name("Stone's   Throw") == "STONES THROW"
     assert normalize_name("Smith & Sons") == "SMITH AND SONS"
     assert normalize_name("Acme Distilling Co.") == "ACME DISTILLING COMPANY"
+    assert normalize_name("Example Imports L.L.C.") == "EXAMPLE IMPORTS LLC"
+    assert normalize_name("Acme Distilling Inc.") == "ACME DISTILLING INCORPORATED"
+    assert normalize_name("Copper Ridge Corp.") == "COPPER RIDGE CORPORATION"
+    assert normalize_name("North Coast Ltd.") == "NORTH COAST LIMITED"
     assert normalize_name("St. George Gin") == "SAINT GEORGE GIN"
     assert normalize_name("Mt. Hood Vodka") == "MOUNT HOOD VODKA"
     assert normalize_name("Caf\u00e9 Azul") == "CAFE AZUL"
@@ -34,6 +38,10 @@ def test_fuzzy_score_does_not_match_inside_larger_words() -> None:
     assert fuzzy_score("Reserve", "Reserved Batch") < 86
     assert fuzzy_score("Reserve", "Reserve Selection") == 100
     assert fuzzy_score("Example Distilling Co.", "Bottled by Example Distilling Company") >= 86
+    assert fuzzy_score("Example Imports LLC", "Imported by Example Imports L.L.C.") >= 86
+    assert fuzzy_score("North Coast Ltd.", "Produced by North Coast Limited") >= 86
+    assert fuzzy_score("Copper Ridge Corp.", "Distilled by Copper Ridge Corporation") >= 86
+    assert fuzzy_score("Example Imports LLC", "Imported by Example Imports Limited") < 86
 
 
 def test_ordered_fuzzy_score_preserves_brand_word_order() -> None:

@@ -105,5 +105,6 @@
 | `APP-101_repeated_unit_proof_range_pass.pdf` | Pass | Pass | Application alcohol-content proof range repeats the proof unit on both sides and still matches the label. |
 | `APP-102_hard_seltzer_malt_pass.pdf` | Pass | Pass | Malt beverage hard seltzer label uses hard-seltzer wording instead of beer-style terms. |
 | `APP-103_hard_seltzer_first_line_pass.pdf` | Pass | Pass | Malt beverage hard seltzer label states product type as the first line before the brand. |
+| `APP-104_bottler_legal_suffix_pass.pdf` | Pass | Pass | Responsible-party legal suffix Ltd. in the application matches Limited on the label. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

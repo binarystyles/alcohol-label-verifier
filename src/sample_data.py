@@ -2833,6 +2833,22 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Malt beverage label states LAGER BEER before the brand; this should be treated as an explicit product-type statement.",
         ),
+        SampleSpec(
+            filename="APP-145_brand_number_symbol_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-145", "brand_name": "OLD TOM NO. 5"},
+            label_lines=[
+                "OLD TOM #5",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Brand number marker in the application uses No. while the label uses #; this should pass as harmless formatting variation.",
+        ),
     ]
 
 

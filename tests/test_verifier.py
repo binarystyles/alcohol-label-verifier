@@ -46,6 +46,11 @@ def test_brand_common_word_abbreviations_pass() -> None:
     assert verify_brand("MT. HOOD VODKA", "MOUNT HOOD VODKA\nDISTILLED SPIRITS").status == STATUS_PASS
 
 
+def test_brand_number_symbol_variations_pass() -> None:
+    assert verify_brand("OLD TOM NO. 5", "OLD TOM #5\nDISTILLED SPIRITS").status == STATUS_PASS
+    assert verify_brand("OLD TOM NUMBER 5", "OLD TOM 5\nDISTILLED SPIRITS").status == STATUS_PASS
+
+
 def test_brand_containing_proof_word_is_not_treated_as_alcohol_statement() -> None:
     result = verify_brand("PROOF RANGE BOURBON", "PROOF RANGE BOURBON\nDISTILLED SPIRITS\n90 Proof")
     assert result.status == STATUS_PASS

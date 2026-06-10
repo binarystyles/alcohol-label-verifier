@@ -39,6 +39,7 @@ def normalize_name(value: str | None) -> str:
     value = normalize_text(value)
     value = re.sub(r"\bL\s*\.?\s*L\s*\.?\s*C\.?\b", " LLC ", value)
     value = value.replace("&", " AND ")
+    value = re.sub(r"\b(?:NO|NUMBER)\s*\.?\s*(?=\d)", " ", value)
     value = re.sub(r"['`]", "", value)
     value = re.sub(r"[^A-Z0-9]+", " ", value)
     token_aliases = {

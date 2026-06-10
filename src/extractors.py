@@ -81,11 +81,12 @@ FORMULA_FINAL_ALCOHOL_PATTERN = re.compile(
     r"(?:ALCOHOL\s+CONTENT\s+OF\s+FINISHED\s+PRODUCT|FINAL\s+ALCOHOL\s+CONTENT|FINISHED\s+ALCOHOL\s+CONTENT|FINISHED\s+PRODUCT\s+ALCOHOL\s+CONTENT|FINAL\s+PRODUCT\s+ALCOHOL\s+CONTENT|TARGET\s+ALCOHOL\s+CONTENT)",
     flags=re.IGNORECASE,
 )
+FORMULA_ID_VALUE_PATTERN = r"[A-Z]{1,8}\s*[-./]?\s*\d[A-Z0-9]*(?:\s*[-./]\s*[A-Z0-9]+)*"
 FORMULA_ID_PATTERNS = (
-    re.compile(r"(?:TTB\s+)?FORMULA\s+ID\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})", re.IGNORECASE),
-    re.compile(r"TTB\s+ID\s*(?:NO\.?|NUMBER)?\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})", re.IGNORECASE),
-    re.compile(r"FORMULA\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})", re.IGNORECASE),
-    re.compile(r"LAB\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>[A-Z0-9][A-Z0-9-]{2,})", re.IGNORECASE),
+    re.compile(rf"(?:TTB\s+)?FORMULA\s+ID\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
+    re.compile(rf"TTB\s+ID\s*(?:NO\.?|NUMBER)?\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
+    re.compile(rf"FORMULA\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
+    re.compile(rf"LAB\s*(?:NO\.?|NUMBER)\s*[:#]?\s*(?P<id>{FORMULA_ID_VALUE_PATTERN})", re.IGNORECASE),
 )
 LOW_LABEL_SHARPNESS_THRESHOLD = 250.0
 
@@ -348,7 +349,7 @@ def extract_formula_identifier(text: str) -> str:
         return labeled_identifier
 
     first_part = re.split(r"[;\n]", text, maxsplit=1)[0]
-    generic_match = re.search(r"\b(?=[A-Z0-9-]*\d)[A-Z]{1,8}-?\d[A-Z0-9-]*\b", first_part, flags=re.IGNORECASE)
+    generic_match = re.search(rf"\b(?P<id>{FORMULA_ID_VALUE_PATTERN})\b", first_part, flags=re.IGNORECASE)
     return generic_match.group(0).strip().upper() if generic_match else ""
 
 

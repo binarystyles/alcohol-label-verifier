@@ -109,6 +109,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-089_distilled_matured_bottled_origin_pass.pdf" in specs
     assert "APP-090_ipa_class_type_malt_pass.pdf" in specs
     assert "APP-091_canned_by_responsible_party_pass.pdf" in specs
+    assert "APP-092_formula_id_separator_variant_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
@@ -201,6 +202,9 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-090_ipa_class_type_malt_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-091_canned_by_responsible_party_pass.pdf"].fields["bottler_producer"] == "Harbor Light Brewing Co."
     assert specs["APP-091_canned_by_responsible_party_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-092_formula_id_separator_variant_pass.pdf"].fields["formula"] == "F 9200"
+    assert specs["APP-092_formula_id_separator_variant_pass.pdf"].formula_approval_id == "F-9200"
+    assert specs["APP-092_formula_id_separator_variant_pass.pdf"].expected_status == STATUS_PASS
 
 
 def test_sample_generator_uses_real_source_form_when_available(sample_paths: list[Path]) -> None:

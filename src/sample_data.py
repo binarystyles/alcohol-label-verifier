@@ -1791,6 +1791,23 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Malt beverage label uses Brewed and canned by as responsible-party wording.",
         ),
+        SampleSpec(
+            filename="APP-092_formula_id_separator_variant_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-092", "formula": "F 9200"},
+            label_lines=[
+                "OLD TOM GIN",
+                "Botanical Reserve",
+                "DISTILLED SPIRITS",
+                "Class/Type: Gin",
+                "45% Alc./Vol.",
+                "750 mL",
+                "Bottled by Example Distilling Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Application Formula ID uses a space while the submitted formula approval uses a hyphenated ID.",
+            formula_approval_id="F-9200",
+        ),
     ]
 
 

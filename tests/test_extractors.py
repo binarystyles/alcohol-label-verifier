@@ -39,6 +39,10 @@ def test_application_summary_parser_maps_expected_fields() -> None:
 def test_formula_identifier_extraction() -> None:
     assert extract_formula_identifier("F-1001") == "F-1001"
     assert extract_formula_identifier("TTB Formula ID: F-1001") == "F-1001"
+    assert extract_formula_identifier("TTB Formula ID: F 1001") == "F 1001"
+    assert extract_formula_identifier("TTB Formula ID: F/1001") == "F/1001"
+    assert extract_formula_identifier("TTB Formula ID: F.1001") == "F.1001"
+    assert extract_formula_identifier("TTB ID Number: DS 3400") == "DS 3400"
 
 
 def test_formula_approval_parser_matches_id_and_final_alcohol_content() -> None:
@@ -51,6 +55,18 @@ def test_formula_approval_parser_matches_id_and_final_alcohol_content() -> None:
     fields = parse_formula_approval_fields(text, "F-1001")
     assert fields["alcohol_content"] == "45% ABV"
     assert fields["class_type"] == "Gin"
+
+
+def test_formula_approval_parser_matches_separator_variants() -> None:
+    text = """
+    FORMULAS ONLINE APPROVAL DETERMINATION
+    TTB Formula ID: F-1001
+    Class/Type: Gin
+    Alcohol Content of Finished Product: Low 45 High 45 Unit % by Volume
+    """
+    assert parse_formula_approval_fields(text, "F 1001")["alcohol_content"] == "45% ABV"
+    assert parse_formula_approval_fields(text, "F/1001")["alcohol_content"] == "45% ABV"
+    assert parse_formula_approval_fields(text, "F.1001")["alcohol_content"] == "45% ABV"
 
 
 def test_formula_approval_parser_uses_finished_product_row_before_ingredient_abv() -> None:

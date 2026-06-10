@@ -93,5 +93,6 @@
 | `APP-089_distilled_matured_bottled_origin_pass.pdf` | Pass | Pass | Imported spirits origin is stated as Distilled, matured and bottled in Scotland for a United Kingdom application country. |
 | `APP-090_ipa_class_type_malt_pass.pdf` | Pass | Pass | Malt beverage product type is inferred from IPA class/type shorthand. |
 | `APP-091_canned_by_responsible_party_pass.pdf` | Pass | Pass | Malt beverage label uses Brewed and canned by as responsible-party wording. |
+| `APP-092_formula_id_separator_variant_pass.pdf` | Pass | Pass | Application Formula ID uses a space while the submitted formula approval uses a hyphenated ID. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

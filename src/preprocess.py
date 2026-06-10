@@ -29,6 +29,23 @@ def prepare_for_ocr(image: Image.Image) -> Image.Image:
     return Image.fromarray(thresholded)
 
 
+def prepare_ocr_variants(image: Image.Image) -> list[tuple[str, Image.Image]]:
+    """Return conservative OCR preprocessing variants for labels with artwork."""
+    gray = image.convert("L")
+    scale = 2 if min(gray.size) < 1000 else 1
+    if scale > 1:
+        gray = gray.resize((gray.width * scale, gray.height * scale), Image.Resampling.LANCZOS)
+    contrast = ImageEnhance.Contrast(gray).enhance(2.0).filter(ImageFilter.SHARPEN)
+    blurred = cv2.GaussianBlur(np.array(contrast), (3, 3), 0)
+    _, otsu = cv2.threshold(blurred, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+    return [
+        ("adaptive", prepare_for_ocr(image)),
+        ("grayscale", gray),
+        ("contrast", contrast),
+        ("otsu", Image.fromarray(otsu)),
+    ]
+
+
 def nonwhite_ratio(image: Image.Image, threshold: int = 245) -> float:
     gray = image.convert("L")
     array = np.array(gray)

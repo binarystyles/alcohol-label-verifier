@@ -112,5 +112,9 @@
 | `APP-108_mixed_case_warning_heading_fail.pdf` | Fail | Fail | Government warning statement is exact, but the heading is mixed case instead of all caps. |
 | `APP-109_wine_descriptor_spirits_class_pass.pdf` | Pass | Pass | Distilled spirits class/type should control when wine appears only as a finish descriptor. |
 | `APP-110_numeric_formula_id_pass.pdf` | Pass | Pass | Item 9 and formula support use a numeric TTB Formula ID instead of a letter-prefixed ID. |
+| `APP-111_busy_artwork_pass.pdf` | Pass | Needs Review | Busy color artwork with decorative shapes should still pass when required text remains readable. |
+| `APP-112_dark_reverse_artwork_pass.pdf` | Pass | Needs Review | Dark color artwork with reversed/light text should pass when OCR can read the label. |
+| `APP-113_colored_warning_panel_pass.pdf` | Pass | Needs Review | Color-artwork wine label keeps the government warning inside a colored panel and should still pass. |
+| `APP-114_busy_low_contrast_artwork_review.pdf` | Needs Review | Needs Review | Busy low-contrast artwork should not be failed as missing fields; it should require review for OCR quality. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

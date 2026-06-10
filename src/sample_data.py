@@ -18,6 +18,7 @@ from src.form_mapping import FORM_REGIONS
 SAMPLE_DIR = Path("samples/applications")
 SOURCE_FORM = Path("docs/source/f510031.pdf")
 SOURCE_LABEL_RECT = (24.6108, 681.248, 589.351, 979.0804)
+FONT_CANDIDATES = ("arial.ttf", "DejaVuSans.ttf")
 
 
 @dataclass(frozen=True)
@@ -38,6 +39,7 @@ class SampleSpec:
     extra_formula_approvals_before: tuple[dict[str, str | bool], ...] = ()
     expected_status_without_ocr: str | None = None
     instruction_pages_before_supplemental_label: int = 0
+    artwork_style: str = "geometric"
 
 
 BASE_FIELDS: dict[str, str | bool] = {
@@ -2179,6 +2181,46 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Item 9 and formula support use a numeric TTB Formula ID instead of a letter-prefixed ID.",
         ),
+        SampleSpec(
+            filename="APP-111_busy_artwork_pass.pdf",
+            fields={**small_batch_fields, "serial_number": "APP-111", "formula": "F-11100"},
+            label_lines=copper_label,
+            expected_status="Pass",
+            expected_status_without_ocr="Needs Review",
+            note="Busy color artwork with decorative shapes should still pass when required text remains readable.",
+            artwork_label=True,
+            artwork_style="busy",
+        ),
+        SampleSpec(
+            filename="APP-112_dark_reverse_artwork_pass.pdf",
+            fields={**bourbon_fields, "serial_number": "APP-112", "formula": "F-11200"},
+            label_lines=bourbon_label,
+            expected_status="Pass",
+            expected_status_without_ocr="Needs Review",
+            note="Dark color artwork with reversed/light text should pass when OCR can read the label.",
+            artwork_label=True,
+            artwork_style="dark",
+        ),
+        SampleSpec(
+            filename="APP-113_colored_warning_panel_pass.pdf",
+            fields={**wine_fields, "serial_number": "APP-113", "formula": "W-11300"},
+            label_lines=wine_label,
+            expected_status="Pass",
+            expected_status_without_ocr="Needs Review",
+            note="Color-artwork wine label keeps the government warning inside a colored panel and should still pass.",
+            artwork_label=True,
+            artwork_style="warning-panel",
+        ),
+        SampleSpec(
+            filename="APP-114_busy_low_contrast_artwork_review.pdf",
+            fields={**small_batch_fields, "serial_number": "APP-114", "formula": "F-11400"},
+            label_lines=copper_label,
+            expected_status="Needs Review",
+            note="Busy low-contrast artwork should not be failed as missing fields; it should require review for OCR quality.",
+            artwork_label=True,
+            raster_label=True,
+            artwork_style="busy-low-contrast",
+        ),
     ]
 
 
@@ -2208,7 +2250,7 @@ def create_sample_pdf(spec: SampleSpec, output_path: Path) -> None:
     if spec.blank_label:
         pass
     elif spec.artwork_label:
-        _draw_artwork_label(page, spec.label_lines, low_quality=spec.raster_label)
+        _draw_artwork_label(page, spec.label_lines, low_quality=spec.raster_label, style=spec.artwork_style)
     elif spec.raster_label:
         _draw_raster_label(page, spec.label_lines)
     else:
@@ -2524,14 +2566,9 @@ def _draw_raster_label(page: fitz.Page, label_lines: list[str]) -> None:
     label_rect = _inner_label_rect(page)
     image = Image.new("RGB", (820, 360), (238, 238, 232))
     draw = ImageDraw.Draw(image)
-    try:
-        title_font = ImageFont.truetype("arial.ttf", 38)
-        body_font = ImageFont.truetype("arial.ttf", 21)
-        warning_font = ImageFont.truetype("arial.ttf", 13)
-    except OSError:
-        title_font = ImageFont.load_default()
-        body_font = ImageFont.load_default()
-        warning_font = ImageFont.load_default()
+    title_font = _load_font(38)
+    body_font = _load_font(21)
+    warning_font = _load_font(13)
 
     draw.rectangle((8, 8, 812, 352), outline=(120, 120, 120), width=2)
     y = 25
@@ -2551,31 +2588,20 @@ def _draw_raster_label(page: fitz.Page, label_lines: list[str]) -> None:
     page.insert_image(label_rect, stream=buffer.getvalue(), keep_proportion=True)
 
 
-def _draw_artwork_label(page: fitz.Page, label_lines: list[str], *, low_quality: bool = False) -> None:
+def _draw_artwork_label(page: fitz.Page, label_lines: list[str], *, low_quality: bool = False, style: str = "geometric") -> None:
     label_rect = _inner_label_rect(page)
     width, height = 2200, 920
     title = label_lines[0] if label_lines else "LABEL"
-    palette = _artwork_palette(title)
+    palette = _artwork_palette(title, style=style)
     image = Image.new("RGB", (width, height), palette["background"])
     draw = ImageDraw.Draw(image)
 
-    try:
-        title_font = ImageFont.truetype("arial.ttf", 96)
-        subtitle_font = ImageFont.truetype("arial.ttf", 54)
-        body_font = ImageFont.truetype("arial.ttf", 44)
-        warning_font = ImageFont.truetype("arial.ttf", 34)
-    except OSError:
-        title_font = ImageFont.load_default()
-        subtitle_font = ImageFont.load_default()
-        body_font = ImageFont.load_default()
-        warning_font = ImageFont.load_default()
+    title_font = _load_font(96)
+    subtitle_font = _load_font(54)
+    body_font = _load_font(44)
+    warning_font = _load_font(34)
 
-    draw.rectangle((18, 18, width - 18, height - 18), outline=palette["border"], width=10)
-    draw.rectangle((18, 18, width - 18, 118), fill=palette["band"])
-    draw.ellipse((-190, 100, 560, 840), fill=palette["accent"])
-    draw.polygon([(width - 640, 120), (width - 18, 18), (width - 18, height - 18), (width - 820, height - 74)], fill=palette["accent2"])
-    draw.rectangle((105, 62, width - 105, 188), fill=palette["panel"], outline=palette["border"], width=4)
-    draw.rectangle((140, 220, width - 140, height - 190), fill=palette["panel"], outline=palette["border"], width=3)
+    _draw_artwork_background(draw, width, height, palette, style)
 
     _draw_centered(draw, title, title_font, width // 2, 78, palette["text"])
     y = 238
@@ -2593,7 +2619,7 @@ def _draw_artwork_label(page: fitz.Page, label_lines: list[str], *, low_quality:
         draw.multiline_text(
             (warning_box[0] + 26, warning_box[1] + 16),
             _wrap(warning, 76),
-            fill=palette["text"],
+            fill=palette.get("warning_text", palette["text"]),
             font=warning_font,
             spacing=6,
         )
@@ -2608,13 +2634,101 @@ def _draw_artwork_label(page: fitz.Page, label_lines: list[str], *, low_quality:
     page.insert_image(label_rect, stream=buffer.getvalue(), keep_proportion=True)
 
 
+def _load_font(size: int) -> ImageFont.ImageFont:
+    for font_name in FONT_CANDIDATES:
+        try:
+            return ImageFont.truetype(font_name, size)
+        except OSError:
+            continue
+    return ImageFont.load_default()
+
+
+def _draw_artwork_background(
+    draw: ImageDraw.ImageDraw,
+    width: int,
+    height: int,
+    palette: dict[str, tuple[int, int, int]],
+    style: str,
+) -> None:
+    draw.rectangle((18, 18, width - 18, height - 18), outline=palette["border"], width=10)
+    draw.rectangle((18, 18, width - 18, 118), fill=palette["band"])
+
+    if style in {"busy", "busy-low-contrast"}:
+        colors = [palette["accent"], palette["accent2"], palette["band"], palette["border"]]
+        for index in range(18):
+            x = 60 + (index * 137) % (width - 160)
+            y = 125 + (index * 83) % (height - 340)
+            radius = 58 + (index % 5) * 24
+            draw.ellipse((x - radius, y - radius, x + radius, y + radius), outline=colors[index % len(colors)], width=10)
+        for index in range(13):
+            y = 155 + index * 48
+            draw.line((95, y, width - 95, y + ((index % 3) - 1) * 46), fill=colors[(index + 1) % len(colors)], width=5)
+        if style == "busy-low-contrast":
+            for index in range(24):
+                x0 = 155 + (index * 89) % (width - 310)
+                y0 = 250 + (index * 53) % (height - 470)
+                draw.rectangle((x0, y0, x0 + 130, y0 + 34), fill=palette["accent2"])
+    else:
+        draw.ellipse((-190, 100, 560, 840), fill=palette["accent"])
+        draw.polygon(
+            [(width - 640, 120), (width - 18, 18), (width - 18, height - 18), (width - 820, height - 74)],
+            fill=palette["accent2"],
+        )
+
+    if style == "dark":
+        draw.rectangle((105, 62, width - 105, 188), fill=palette["panel"], outline=palette["accent"], width=4)
+        draw.rectangle((140, 220, width - 140, height - 190), fill=palette["panel"], outline=palette["accent"], width=3)
+    else:
+        draw.rectangle((105, 62, width - 105, 188), fill=palette["panel"], outline=palette["border"], width=4)
+        draw.rectangle((140, 220, width - 140, height - 190), fill=palette["panel"], outline=palette["border"], width=3)
+
+
 def _draw_centered(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.ImageFont, center_x: int, y: int, fill: tuple[int, int, int]) -> None:
     bbox = draw.textbbox((0, 0), text, font=font)
     x = center_x - (bbox[2] - bbox[0]) // 2
     draw.text((x, y), text, fill=fill, font=font)
 
 
-def _artwork_palette(seed: str) -> dict[str, tuple[int, int, int]]:
+def _artwork_palette(seed: str, *, style: str = "geometric") -> dict[str, tuple[int, int, int]]:
+    if style == "dark":
+        return {
+            "background": (16, 22, 35),
+            "band": (6, 32, 49),
+            "band_text": (255, 255, 255),
+            "panel": (20, 31, 47),
+            "accent": (238, 184, 80),
+            "accent2": (62, 102, 117),
+            "border": (232, 224, 204),
+            "text": (252, 248, 235),
+            "warning_panel": (244, 238, 220),
+            "warning_text": (20, 26, 34),
+        }
+    if style == "warning-panel":
+        return {
+            "background": (236, 242, 248),
+            "band": (18, 78, 122),
+            "band_text": (255, 255, 255),
+            "panel": (252, 252, 248),
+            "accent": (232, 168, 76),
+            "accent2": (112, 174, 170),
+            "border": (28, 57, 88),
+            "text": (18, 32, 44),
+            "warning_panel": (18, 78, 122),
+            "warning_text": (255, 255, 255),
+        }
+    if style == "busy-low-contrast":
+        return {
+            "background": (218, 222, 214),
+            "band": (154, 161, 150),
+            "band_text": (245, 246, 242),
+            "panel": (226, 229, 222),
+            "accent": (202, 209, 198),
+            "accent2": (213, 218, 207),
+            "border": (155, 163, 150),
+            "text": (112, 118, 108),
+            "warning_panel": (225, 228, 221),
+            "warning_text": (112, 118, 108),
+        }
     palettes = [
         {
             "background": (230, 241, 238),

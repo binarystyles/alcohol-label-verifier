@@ -34,10 +34,12 @@ def test_expected_status_set_is_complete() -> None:
 def test_sample_corpus_includes_color_artwork_ocr_cases() -> None:
     specs = sample_specs()
     artwork_specs = [spec for spec in specs if spec.artwork_label]
-    assert len(artwork_specs) >= 10
+    assert len(artwork_specs) >= 19
     assert any(spec.expected_status == STATUS_PASS for spec in artwork_specs)
     assert any(spec.expected_status == STATUS_FAIL for spec in artwork_specs)
     assert any(spec.expected_status == STATUS_REVIEW for spec in artwork_specs)
+    artwork_styles = {spec.artwork_style for spec in artwork_specs}
+    assert {"geometric", "busy", "dark", "warning-panel", "busy-low-contrast"} <= artwork_styles
 
 
 def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
@@ -128,6 +130,10 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-108_mixed_case_warning_heading_fail.pdf" in specs
     assert "APP-109_wine_descriptor_spirits_class_pass.pdf" in specs
     assert "APP-110_numeric_formula_id_pass.pdf" in specs
+    assert "APP-111_busy_artwork_pass.pdf" in specs
+    assert "APP-112_dark_reverse_artwork_pass.pdf" in specs
+    assert "APP-113_colored_warning_panel_pass.pdf" in specs
+    assert "APP-114_busy_low_contrast_artwork_review.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
@@ -270,6 +276,14 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-109_wine_descriptor_spirits_class_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-110_numeric_formula_id_pass.pdf"].fields["formula"] == "123456"
     assert specs["APP-110_numeric_formula_id_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-111_busy_artwork_pass.pdf"].artwork_style == "busy"
+    assert specs["APP-111_busy_artwork_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-112_dark_reverse_artwork_pass.pdf"].artwork_style == "dark"
+    assert specs["APP-112_dark_reverse_artwork_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-113_colored_warning_panel_pass.pdf"].artwork_style == "warning-panel"
+    assert specs["APP-113_colored_warning_panel_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-114_busy_low_contrast_artwork_review.pdf"].artwork_style == "busy-low-contrast"
+    assert specs["APP-114_busy_low_contrast_artwork_review.pdf"].expected_status == STATUS_REVIEW
 
 
 def test_sample_generator_uses_real_source_form_when_available(sample_paths: list[Path]) -> None:

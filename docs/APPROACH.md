@@ -9,7 +9,7 @@ The main modules are:
 - `src/pdf_intake.py`: PDF/image/ZIP expansion, hashing, per-file processing, and cache entry points.
 - `src/extractors.py`: AcroForm extraction, page-one region extraction, application summary parsing, and label-area extraction.
 - `src/form_mapping.py`: normalized prototype coordinates for TTB F 5100.31 page-one fields.
-- `src/ocr.py` and `src/preprocess.py`: PDF crop rendering, image preprocessing, and local Tesseract OCR fallback.
+- `src/ocr.py` and `src/preprocess.py`: PDF crop rendering, multiple local image-preprocessing variants, and local Tesseract OCR fallback.
 - `src/normalize.py`: text, brand, ABV/proof, net contents, product type, and warning normalization.
 - `src/verifier.py`: field checks and overall Pass / Needs Review / Fail aggregation.
 - `src/batch.py`: batch orchestration and CSV-ready dataframes.
@@ -78,6 +78,7 @@ The app avoids full-document OCR unless necessary:
 - Embedded PDF text is used first.
 - AcroForms are checked before region OCR.
 - Only mapped page-one regions and candidate label areas are rendered.
+- Label OCR tries conservative adaptive-threshold, grayscale, contrast, and Otsu-preprocessed variants, then keeps the strongest local Tesseract result. This improves colored artwork, dark/reversed text, and colored warning panels without making network calls.
 - Results are cached by PDF hash during the Streamlit session.
 
 On clean text-layer PDFs and generated samples, processing is typically well under the 5-second target per application. Scanned images, scanned PDFs, and rotated raster labels depend on local Tesseract speed and image quality.

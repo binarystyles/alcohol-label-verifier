@@ -19,14 +19,14 @@ This project is implemented as a local, deterministic Streamlit application. It 
 | PyMuPDF (`pymupdf`, imported as `fitz`) | Opens PDFs, renders page regions, reads text layers, fills/generates sample PDFs, and converts scanned image inputs into in-memory PDF pages. |
 | pypdf | Reads PDF AcroForm field values from completed applications. |
 | Pillow | Image loading, scanned-image conversion, sample label artwork generation, and raster label manipulation. |
-| OpenCV headless | OCR image preprocessing and sharpness scoring for low-quality/rotated label detection. |
+| OpenCV headless | OCR image preprocessing variants, Otsu/adaptive thresholding, and sharpness scoring for low-quality/rotated label detection. |
 | NumPy | Image-array operations for preprocessing, nonwhite-pixel ratio, and sharpness calculations. |
 
 ## OCR And Matching
 
 | Tool | Use |
 | --- | --- |
-| Tesseract OCR (`tesseract-ocr`, `tesseract-ocr-eng`) | Local OCR engine for scanned PDFs, scanned images, and raster label artwork. Installed through `packages.txt` and the Dockerfile. |
+| Tesseract OCR (`tesseract-ocr`, `tesseract-ocr-eng`) | Local OCR engine for scanned PDFs, scanned images, and raster label artwork, including colored and reversed-text label variants. Installed through `packages.txt` and the Dockerfile. |
 | pytesseract | Python wrapper used to call local Tesseract and collect text/confidence data. |
 | RapidFuzz | Fuzzy matching for brand, class/type, bottler/producer, Item 15, and other tolerant text comparisons. |
 

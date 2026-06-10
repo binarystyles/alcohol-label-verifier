@@ -1925,6 +1925,35 @@ def sample_specs() -> list[SampleSpec]:
             note="Imported wine label uses decimal-comma alcohol content wording and still matches expected ABV.",
             include_formula_approval=False,
         ),
+        SampleSpec(
+            filename="APP-099_decimal_comma_abv_range_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-099",
+                "product_type": "WINE",
+                "brand_name": "RANGE ESTATE",
+                "fanciful_name": "",
+                "formula": "NO FORMULA REQUIRED",
+                "class_type": "White Wine",
+                "alcohol_content": "12,5-13,5% ABV",
+                "bottler_producer": "Example Imports LLC",
+                "country_of_origin": "France",
+                "imported": True,
+            },
+            label_lines=[
+                "RANGE ESTATE",
+                "WINE",
+                "Class/Type: White Wine",
+                "13.5% vol",
+                "750 mL",
+                "Wine of France",
+                "Imported by Example Imports LLC",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Application alcohol-content range uses decimal commas and still matches the high-end label ABV.",
+            include_formula_approval=False,
+        ),
     ]
 
 
@@ -2212,7 +2241,7 @@ def _append_supplemental_label_page(document: fitz.Document, label_lines: list[s
 
 
 def _low_high_values(value: str | bool) -> tuple[str, str]:
-    matches = re.findall(r"\d{1,3}(?:\.\d+)?", str(value))
+    matches = [match.replace(",", ".") for match in re.findall(r"\d{1,3}(?:[.,]\d{1,2})?", str(value))]
     if not matches:
         text = str(value)
         return text, text

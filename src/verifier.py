@@ -589,6 +589,17 @@ def _downgrade_low_confidence_expected_result(result: FieldResult, fields: Appli
 
 
 def _expected_abv_bounds(expected: str) -> tuple[float, float] | None:
+    decimal_range_match = re.search(
+        r"(?P<low>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:-|TO|\u2013|\u2014|â€“|â€”)\s*(?P<high>\d{1,3}(?:[.,]\d{1,2})?)\s*(?:%|PERCENT)?\s*(?:ABV|ALC\.?\s*/?\s*VOL\.?|ALCOHOL\s+BY\s+VOLUME)?",
+        expected,
+        flags=re.IGNORECASE,
+    )
+    if decimal_range_match:
+        low = float(decimal_range_match.group("low").replace(",", "."))
+        high = float(decimal_range_match.group("high").replace(",", "."))
+        if 0 < low <= 100 and 0 < high <= 100:
+            return (min(low, high), max(low, high))
+
     range_match = re.search(
         r"(?P<low>\d{1,3}(?:\.\d+)?)\s*(?:-|TO|–|—)\s*(?P<high>\d{1,3}(?:\.\d+)?)\s*(?:%|PERCENT)?\s*(?:ABV|ALC\.?\s*/?\s*VOL\.?|ALCOHOL\s+BY\s+VOLUME)?",
         expected,

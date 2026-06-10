@@ -100,5 +100,6 @@
 | `APP-096_multiple_formula_documents_pass.pdf` | Pass | Pass | Package includes an unrelated approved formula before the matching Formula ID; only the matching formula document is used. |
 | `APP-097_diacritic_brand_pass.pdf` | Pass | Pass | Application brand contains a diacritic that is absent from label text and still matches after normalization. |
 | `APP-098_decimal_comma_abv_pass.pdf` | Pass | Pass | Imported wine label uses decimal-comma alcohol content wording and still matches expected ABV. |
+| `APP-099_decimal_comma_abv_range_pass.pdf` | Pass | Pass | Application alcohol-content range uses decimal commas and still matches the high-end label ABV. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

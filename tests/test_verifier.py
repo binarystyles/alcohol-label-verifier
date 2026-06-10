@@ -201,6 +201,18 @@ def test_formula_alcohol_content_range_matches_label() -> None:
     assert result.status == STATUS_PASS
 
 
+def test_alcohol_content_decimal_comma_range_matches_high_end_label() -> None:
+    result = verify_alcohol_content("12,5-13,5% ABV", "SUNSET HOLLOW 13.5% vol")
+    assert result.status == STATUS_PASS
+    assert result.expected == "12.5-13.5% ABV"
+
+
+def test_formula_alcohol_content_decimal_comma_range_matches_high_end_label() -> None:
+    result = verify_formula_alcohol_content("F-1001", "12,5-13,5% ABV", "formula-approval", "Label says 13.5% vol.")
+    assert result.status == STATUS_PASS
+    assert result.expected.startswith("12.5-13.5% ABV")
+
+
 def test_formula_alcohol_content_range_mismatch_fails() -> None:
     result = verify_formula_alcohol_content("F-1001", "25-30% ABV", "formula-approval", "Label says 35% Alc./Vol.")
     assert result.status == STATUS_FAIL

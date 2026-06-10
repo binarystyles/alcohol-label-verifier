@@ -116,6 +116,7 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-096_multiple_formula_documents_pass.pdf" in specs
     assert "APP-097_diacritic_brand_pass.pdf" in specs
     assert "APP-098_decimal_comma_abv_pass.pdf" in specs
+    assert "APP-099_decimal_comma_abv_range_pass.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-027_product_type_mismatch_fail.pdf"].expected_status == STATUS_FAIL
     assert specs["APP-029_formula_id_prefix_mismatch_review.pdf"].formula_approval_id == "F-29001"
@@ -229,6 +230,9 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-098_decimal_comma_abv_pass.pdf"].fields["alcohol_content"] == "13.5% ABV"
     assert "13,5% vol" in specs["APP-098_decimal_comma_abv_pass.pdf"].label_lines
     assert specs["APP-098_decimal_comma_abv_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-099_decimal_comma_abv_range_pass.pdf"].fields["alcohol_content"] == "12,5-13,5% ABV"
+    assert "13.5% vol" in specs["APP-099_decimal_comma_abv_range_pass.pdf"].label_lines
+    assert specs["APP-099_decimal_comma_abv_range_pass.pdf"].expected_status == STATUS_PASS
 
 
 def test_sample_generator_uses_real_source_form_when_available(sample_paths: list[Path]) -> None:

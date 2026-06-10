@@ -104,5 +104,6 @@
 | `APP-100_expected_proof_range_pass.pdf` | Pass | Pass | Application alcohol-content range is stated in proof and is converted to ABV before label comparison. |
 | `APP-101_repeated_unit_proof_range_pass.pdf` | Pass | Pass | Application alcohol-content proof range repeats the proof unit on both sides and still matches the label. |
 | `APP-102_hard_seltzer_malt_pass.pdf` | Pass | Pass | Malt beverage hard seltzer label uses hard-seltzer wording instead of beer-style terms. |
+| `APP-103_hard_seltzer_first_line_pass.pdf` | Pass | Pass | Malt beverage hard seltzer label states product type as the first line before the brand. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

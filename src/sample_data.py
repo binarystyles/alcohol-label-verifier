@@ -2031,6 +2031,33 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Malt beverage hard seltzer label uses hard-seltzer wording instead of beer-style terms.",
         ),
+        SampleSpec(
+            filename="APP-103_hard_seltzer_first_line_pass.pdf",
+            fields={
+                **BASE_FIELDS,
+                "serial_number": "APP-103",
+                "product_type": "MALT BEVERAGES",
+                "brand_name": "HARBOR LIGHT SELTZER",
+                "fanciful_name": "Lemon Lift",
+                "formula": "F-10300",
+                "class_type": "Hard Seltzer",
+                "alcohol_content": "5% ABV",
+                "net_contents": "12 FL OZ",
+                "bottler_producer": "Harbor Light Brewing Co.",
+            },
+            label_lines=[
+                "HARD SELTZER",
+                "HARBOR LIGHT SELTZER",
+                "Lemon Lift",
+                "Class/Type: Hard Seltzer",
+                "5% Alc./Vol.",
+                "12 FL OZ",
+                "Brewed and canned by Harbor Light Brewing Co.",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Malt beverage hard seltzer label states product type as the first line before the brand.",
+        ),
     ]
 
 

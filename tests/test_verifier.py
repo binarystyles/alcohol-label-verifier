@@ -331,6 +331,19 @@ def test_no_formula_required_passes_formula_check() -> None:
     assert "no formula is required" in result.reason
 
 
+def test_formula_not_required_wording_passes_formula_check() -> None:
+    for formula in ("FORMULA NOT REQUIRED", "Not Required", "Not Applicable - No Formula Required"):
+        result = verify_formula_alcohol_content(formula, "", "", "VALLEY TABLE WINE 13% Alc./Vol.")
+        assert result.status == STATUS_PASS
+        assert "no formula is required" in result.reason
+
+
+def test_ambiguous_formula_na_still_needs_review() -> None:
+    result = verify_formula_alcohol_content("N/A", "", "", "VALLEY TABLE WINE 13% Alc./Vol.")
+    assert result.status == STATUS_REVIEW
+    assert "No matching approved formula document" in result.reason
+
+
 def test_matched_formula_without_final_alcohol_needs_review() -> None:
     result = verify_formula_alcohol_content("F-2800", "", "formula-approval", "OLD TOM GIN 45% Alc./Vol.")
     assert result.status == STATUS_REVIEW

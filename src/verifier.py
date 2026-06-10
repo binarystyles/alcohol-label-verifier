@@ -257,7 +257,7 @@ def verify_alcohol_content(expected: str, label_text: str) -> FieldResult:
 def verify_formula_alcohol_content(formula: str, approved_alcohol_content: str, alcohol_source: str, label_text: str) -> FieldResult:
     if not formula:
         return _result("formula", "", "", "", STATUS_REVIEW, 0.0, "Required Item 9 Formula ID could not be extracted.")
-    if "NO FORMULA REQUIRED" in normalize_text(formula):
+    if _is_no_formula_required_statement(formula):
         return _result("formula", formula, formula, "", STATUS_PASS, 1.0, "Item 9 states that no formula is required.")
     if alcohol_source != "formula-approval":
         return _result(
@@ -324,6 +324,13 @@ def verify_formula_alcohol_content(formula: str, approved_alcohol_content: str, 
         0.95,
         "Approved formula alcohol content materially differs from the label.",
     )
+
+
+def _is_no_formula_required_statement(formula: str) -> bool:
+    normalized = normalize_text(formula)
+    if "NO FORMULA REQUIRED" in normalized or "FORMULA NOT REQUIRED" in normalized:
+        return True
+    return normalized in {"NOT REQUIRED", "NOT APPLICABLE - NO FORMULA REQUIRED"}
 
 
 def verify_net_contents(expected: str, label_text: str) -> FieldResult:

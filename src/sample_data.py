@@ -2352,6 +2352,35 @@ def sample_specs() -> list[SampleSpec]:
             expected_status="Pass",
             note="Port is a dessert wine type under 27 CFR 4.21 and should satisfy wine product-type verification without confusing Porter malt-beverage labels.",
         ),
+        SampleSpec(
+            filename="APP-120_formula_not_required_pass.pdf",
+            fields={
+                **wine_fields,
+                "serial_number": "APP-120",
+                "brand_name": "RIDGE TABLE WINE",
+                "fanciful_name": "",
+                "formula": "FORMULA NOT REQUIRED",
+                "grape_varietals": "Cabernet Sauvignon",
+                "wine_appellation": "California",
+                "class_type": "Red Wine",
+                "alcohol_content": "13.2% ABV",
+                "bottler_producer": "Ridge Table Winery",
+            },
+            label_lines=[
+                "RIDGE TABLE WINE",
+                "WINE",
+                "Class/Type: Red Wine",
+                "Cabernet Sauvignon",
+                "California",
+                "13.2% Alc./Vol.",
+                "750 mL",
+                "Bottled by Ridge Table Winery",
+                GOVERNMENT_WARNING,
+            ],
+            expected_status="Pass",
+            note="Item 9 uses FORMULA NOT REQUIRED wording rather than NO FORMULA REQUIRED; no formula approval page should be required.",
+            include_formula_approval=False,
+        ),
     ]
 
 

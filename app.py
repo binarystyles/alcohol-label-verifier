@@ -162,12 +162,12 @@ def _render_results(results: list, review_files: dict[str, bytes] | None = None)
             original_bytes = review_files.get(result.filename)
             if original_bytes:
                 st.download_button(
-                    "Open original application",
+                    "Download original application",
                     data=original_bytes,
                     file_name=result.filename.replace("/", "_").replace("\\", "_"),
                     mime=_mime_type_for_file(result.filename),
                     key=f"open_original_{result.application_id}_{result.filename}",
-                    help="Open or download the exact uploaded application file for human review.",
+                    help="Download the exact uploaded application file for human review.",
                     width="stretch",
                 )
             st.write(result.short_summary)

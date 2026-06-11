@@ -40,7 +40,7 @@ def test_streamlit_ui_exposes_only_completed_pdf_batch_workflow() -> None:
     assert "dark_mode" not in source
     assert 'key=f"label_ocr_' in source
     assert 'key=f"application_ocr_' in source
-    assert "Open original application" in source
+    assert "Download original application" in source
     assert "pdf" in SUPPORTED_UPLOAD_TYPES
     assert "png" in SUPPORTED_UPLOAD_TYPES
     assert "jpg" in SUPPORTED_UPLOAD_TYPES
@@ -84,7 +84,7 @@ def test_csvs_are_download_outputs_only() -> None:
     assert "Download summary CSV" in source
     assert "Download detailed field-results CSV" in source
     assert "Download extracted application data CSV" in source
-    assert "Open original application" in source
+    assert "Download original application" in source
 
 
 def test_pdf_and_zip_intake_treat_each_pdf_as_own_package(sample_bytes: dict[str, bytes]) -> None:

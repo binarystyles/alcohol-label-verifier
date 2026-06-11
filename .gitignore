@@ -17,6 +17,7 @@ tmp/
 temp/
 uploads/
 samples/applications/*.zip
+samples/sample_batch.zip
 
 docs/source/*
 !docs/source/.gitkeep

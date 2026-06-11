@@ -12,6 +12,7 @@ docs/source/*
 !docs/source/f510031.pdf
 uploads/
 samples/applications/*.zip
+samples/sample_batch.zip
 tmp/
 temp/
 *.log

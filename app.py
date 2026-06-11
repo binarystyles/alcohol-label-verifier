@@ -27,7 +27,7 @@ st.set_page_config(page_title="Alcohol Label Verification", layout="wide")
 
 
 def main() -> None:
-    _render_theme_toggle()
+    _apply_light_theme()
     st.title("Alcohol Label Verification")
     st.write(
         "Select completed TTB application PDFs or scanned application images. Each file is treated "
@@ -40,6 +40,8 @@ def main() -> None:
         st.session_state.results = []
     if "loaded_files" not in st.session_state:
         st.session_state.loaded_files = []
+    if "review_files" not in st.session_state:
+        st.session_state.review_files = {}
 
     uploaded_files = st.file_uploader(
         "Select completed TTB application files",
@@ -59,198 +61,26 @@ def main() -> None:
         if not st.session_state.loaded_files:
             st.warning("Select one or more completed application files.")
         else:
-            st.session_state.results = _run_batch(st.session_state.loaded_files, st.session_state.result_cache)
+            st.session_state.results, st.session_state.review_files = _run_batch(
+                st.session_state.loaded_files, st.session_state.result_cache
+            )
 
     results = st.session_state.results
     if results:
-        _render_results(results)
+        _render_results(results, st.session_state.review_files)
 
 
-def _render_theme_toggle() -> None:
-    top_cols = st.columns([5, 1])
-    dark_mode = top_cols[1].toggle("Dark mode", key="dark_mode")
-    _apply_theme(dark_mode)
-
-
-def _apply_theme(dark_mode: bool) -> None:
-    if dark_mode:
-        st.markdown(
-            """
-            <style>
-            :root { color-scheme: dark; }
-            [data-testid="stAppViewContainer"] { background: #0f172a; color: #e5e7eb; }
-            [data-testid="stSidebar"] { background: #111827; color: #e5e7eb; }
-            [data-testid="stHeader"] { background: rgba(15, 23, 42, 0.92); }
-            [data-testid="stToolbar"] { color: #e5e7eb; }
-            .stApp, .stMarkdown, .stText, label, p, h1, h2, h3, h4, h5, h6 {
-                color: #e5e7eb !important;
-            }
-            small, [data-testid="stMarkdownContainer"] code, [data-testid="stWidgetLabel"] {
-                color: #cbd5e1 !important;
-            }
-
-            [data-testid="stFileUploader"] section,
-            [data-testid="stFileUploader"] [data-testid="stFileUploaderDropzone"],
-            [data-testid="stExpander"] details,
-            [data-testid="stMetric"],
-            textarea, input {
-                background-color: #111827 !important;
-                color: #f8fafc !important;
-                border-color: #334155 !important;
-            }
-            [data-testid="stFileUploader"] * {
-                color: #e5e7eb !important;
-            }
-            [data-testid="stFileUploader"] button,
-            [data-testid="stFileUploader"] button * {
-                background-color: #f8fafc !important;
-                color: #0f172a !important;
-            }
-
-            div[data-testid="stButton"] > button,
-            div[data-testid="stDownloadButton"] > button,
-            [data-testid="baseButton-secondary"],
-            [data-testid="baseButton-minimal"] {
-                background-color: #1e293b !important;
-                color: #f8fafc !important;
-                border: 1px solid #475569 !important;
-            }
-            div[data-testid="stButton"] > button *,
-            div[data-testid="stDownloadButton"] > button *,
-            [data-testid="baseButton-secondary"] *,
-            [data-testid="baseButton-minimal"] * {
-                color: #f8fafc !important;
-            }
-            button[kind="primary"],
-            [data-testid="baseButton-primary"] {
-                background-color: #176b87 !important;
-                color: #ffffff !important;
-                border-color: #38bdf8 !important;
-            }
-            button[kind="primary"] *,
-            [data-testid="baseButton-primary"] * {
-                color: #ffffff !important;
-            }
-            button:disabled,
-            button[disabled],
-            button:disabled *,
-            button[disabled] * {
-                background-color: #1e293b !important;
-                color: #f8fafc !important;
-                opacity: 1 !important;
-            }
-            div[data-testid="stDownloadButton"] button:disabled,
-            div[data-testid="stDownloadButton"] button[disabled],
-            div[data-testid="stDownloadButton"] button:disabled *,
-            div[data-testid="stDownloadButton"] button[disabled] * {
-                background-color: #1e293b !important;
-                color: #f8fafc !important;
-                border-color: #64748b !important;
-                opacity: 1 !important;
-            }
-
-            [data-testid="stSegmentedControl"] label,
-            [data-testid="stSegmentedControl"] label *,
-            [data-testid="stSegmentedControl"] label > div,
-            [data-testid="stSegmentedControl"] button,
-            [data-testid="stSegmentedControl"] button *,
-            [data-testid="stSegmentedControl"] [role="button"],
-            [data-testid="stSegmentedControl"] [role="button"] *,
-            [data-testid="stSegmentedControl"] [role="radio"],
-            [data-testid="stSegmentedControl"] [role="radio"] *,
-            [data-testid="stSegmentedControl"] [data-baseweb="radio"],
-            [data-testid="stSegmentedControl"] [data-baseweb="radio"] * {
-                background-color: #1e293b !important;
-                color: #f8fafc !important;
-                border-color: #475569 !important;
-            }
-            [data-testid="stSegmentedControl"] p,
-            [data-testid="stSegmentedControl"] span {
-                color: #f8fafc !important;
-            }
-            [data-testid="stSegmentedControl"] label:has(input:checked),
-            [data-testid="stSegmentedControl"] label:has(input:checked) *,
-            [data-testid="stSegmentedControl"] [aria-pressed="true"],
-            [data-testid="stSegmentedControl"] [aria-pressed="true"] *,
-            [data-testid="stSegmentedControl"] [aria-checked="true"],
-            [data-testid="stSegmentedControl"] [aria-checked="true"] * {
-                background-color: #083047 !important;
-                color: #ffffff !important;
-                border-color: #38bdf8 !important;
-            }
-            [data-testid="stSelectbox"] *,
-            [data-testid="stSelectbox"] div[data-baseweb="select"] *,
-            div[data-baseweb="popover"] li,
-            div[data-baseweb="popover"] li * {
-                color: #f8fafc !important;
-            }
-            [data-testid="stSelectbox"] div[data-baseweb="select"] > div,
-            div[data-baseweb="popover"] ul,
-            div[data-baseweb="popover"] li {
-                background-color: #1e293b !important;
-                border-color: #475569 !important;
-            }
-
-            [data-testid="stExpander"] details,
-            [data-testid="stExpander"] details *,
-            [data-testid="stExpander"] summary,
-            [data-testid="stExpander"] summary *,
-            [data-testid="stExpander"] summary div,
-            [data-testid="stExpander"] summary p,
-            [data-testid="stExpander"] summary span,
-            [data-testid="stExpander"] [role="button"],
-            [data-testid="stExpander"] [role="button"] * {
-                background-color: #1e293b !important;
-                color: #f8fafc !important;
-            }
-            [data-testid="stExpander"] svg {
-                color: #f8fafc !important;
-                fill: currentColor !important;
-            }
-            [data-testid="stExpander"] details > div {
-                background-color: #0f172a !important;
-                color: #e5e7eb !important;
-                border-color: #334155 !important;
-            }
-
-            [data-testid="stTabs"] button,
-            [data-testid="stTabs"] button * {
-                color: #e5e7eb !important;
-            }
-            [data-testid="stTabs"] [aria-selected="true"],
-            [data-testid="stTabs"] [aria-selected="true"] * {
-                color: #67e8f9 !important;
-            }
-
-            [data-testid="stAlert"],
-            div[data-testid="stNotification"] {
-                background-color: #1f2937 !important;
-                color: #f9fafb !important;
-                border-color: #475569 !important;
-            }
-            [data-testid="stAlert"] * {
-                color: #f9fafb !important;
-            }
-
-            [data-testid="stDataFrame"] {
-                background-color: #f8fafc !important;
-                color: #111827 !important;
-                border-radius: 8px;
-            }
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
-    else:
-        st.markdown(
-            """
-            <style>
-            [data-testid="stAppViewContainer"] { background: #ffffff; color: #111827; }
-            [data-testid="stHeader"] { background: rgba(255, 255, 255, 0.92); }
-            </style>
-            """,
-            unsafe_allow_html=True,
-        )
+def _apply_light_theme() -> None:
+    st.markdown(
+        """
+        <style>
+        :root { color-scheme: light; }
+        [data-testid="stAppViewContainer"] { background: #ffffff; color: #111827; }
+        [data-testid="stHeader"] { background: rgba(255, 255, 255, 0.92); }
+        </style>
+        """,
+        unsafe_allow_html=True,
+    )
 
 
 def _uploaded_to_named_files(uploaded_files, uploaded_zip) -> list[tuple[str, bytes]]:
@@ -262,8 +92,9 @@ def _uploaded_to_named_files(uploaded_files, uploaded_zip) -> list[tuple[str, by
     return named_files
 
 
-def _run_batch(named_files: list[tuple[str, bytes]], cache: dict) -> list:
+def _run_batch(named_files: list[tuple[str, bytes]], cache: dict) -> tuple[list, dict[str, bytes]]:
     pdfs = pdf_intake.expand_named_files(named_files)
+    review_files = {filename: data for filename, data in pdfs}
     processor = getattr(pdf_intake, "process_application_file_cached", pdf_intake.process_pdf_cached)
     progress = st.progress(0)
     status = st.empty()
@@ -274,10 +105,11 @@ def _run_batch(named_files: list[tuple[str, bytes]], cache: dict) -> list:
         results.append(processor(filename, data, cache=cache))
         progress.progress(index / total)
     status.write("Verification complete.")
-    return results
+    return results, review_files
 
 
-def _render_results(results: list) -> None:
+def _render_results(results: list, review_files: dict[str, bytes] | None = None) -> None:
+    review_files = review_files or {}
     metrics = _summary_metrics(results)
     cols = st.columns(6)
     cols[0].metric("Total", metrics["total"])
@@ -327,6 +159,17 @@ def _render_results(results: list) -> None:
         if status_filter != "All" and result.overall_status != status_filter:
             continue
         with st.expander(f"{result.overall_status} - {result.filename}", expanded=result.overall_status != STATUS_PASS):
+            original_bytes = review_files.get(result.filename)
+            if original_bytes:
+                st.download_button(
+                    "Open original application",
+                    data=original_bytes,
+                    file_name=result.filename.replace("/", "_").replace("\\", "_"),
+                    mime=_mime_type_for_file(result.filename),
+                    key=f"open_original_{result.application_id}_{result.filename}",
+                    help="Open or download the exact uploaded application file for human review.",
+                    width="stretch",
+                )
             st.write(result.short_summary)
             if result.warnings:
                 st.warning(" ".join(result.warnings))
@@ -354,6 +197,24 @@ def _render_results(results: list) -> None:
                     height=240,
                     key=f"application_ocr_{result.application_id}_{result.filename}",
                 )
+
+
+def _mime_type_for_file(filename: str) -> str:
+    lower = filename.lower()
+    if lower.endswith(".pdf"):
+        return "application/pdf"
+    if lower.endswith(".png"):
+        return "image/png"
+    if lower.endswith((".jpg", ".jpeg")):
+        return "image/jpeg"
+    if lower.endswith((".tif", ".tiff")):
+        return "image/tiff"
+    if lower.endswith(".bmp"):
+        return "image/bmp"
+    if lower.endswith(".zip"):
+        return "application/zip"
+    return "application/octet-stream"
+
 
 def _summary_metrics(results: list) -> dict[str, int]:
     return batch.summary_metrics(results)

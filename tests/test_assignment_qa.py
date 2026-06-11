@@ -22,7 +22,7 @@ def test_streamlit_ui_exposes_only_completed_pdf_batch_workflow() -> None:
     app.run(timeout=20)
 
     assert app.title[0].value == "Alcohol Label Verification"
-    assert any(toggle.label == "Dark mode" for toggle in app.toggle)
+    assert not any(toggle.label == "Dark mode" for toggle in app.toggle)
     assert [uploader.label for uploader in app.file_uploader] == [
         "Select completed TTB application files",
         "Or select a ZIP containing completed application files",
@@ -37,8 +37,10 @@ def test_streamlit_ui_exposes_only_completed_pdf_batch_workflow() -> None:
     assert "read_csv" not in source
     assert "label image" not in source.lower()
     assert "use_container_width" not in source
+    assert "dark_mode" not in source
     assert 'key=f"label_ocr_' in source
     assert 'key=f"application_ocr_' in source
+    assert "Open original application" in source
     assert "pdf" in SUPPORTED_UPLOAD_TYPES
     assert "png" in SUPPORTED_UPLOAD_TYPES
     assert "jpg" in SUPPORTED_UPLOAD_TYPES
@@ -47,7 +49,6 @@ def test_streamlit_ui_exposes_only_completed_pdf_batch_workflow() -> None:
 def test_streamlit_results_render_multiple_applications_without_duplicate_widget_ids(sample_bytes: dict[str, bytes]) -> None:
     app = AppTest.from_file(str(ROOT / "app.py"))
     app.run(timeout=20)
-    app.toggle[0].set_value(True).run(timeout=20)
     app.file_uploader[0].set_value(
         [
             ("APP-001_old_tom_pass.pdf", sample_bytes["APP-001_old_tom_pass.pdf"], "application/pdf"),
@@ -59,6 +60,11 @@ def test_streamlit_results_render_multiple_applications_without_duplicate_widget
 
     assert len(app.exception) == 0
     assert app.selectbox[0].label == "Status filter"
+    assert sorted(app.session_state["review_files"]) == [
+        "APP-001_old_tom_pass.pdf",
+        "APP-003_wrong_abv.pdf",
+        "APP-006_missing_label_area.pdf",
+    ]
     assert [area.label for area in app.text_area] == [
         "Label OCR text",
         "Application OCR text",
@@ -74,10 +80,11 @@ def test_streamlit_results_render_multiple_applications_without_duplicate_widget
 
 def test_csvs_are_download_outputs_only() -> None:
     source = (ROOT / "app.py").read_text(encoding="utf-8")
-    assert source.count("download_button(") == 3
+    assert source.count("download_button(") == 4
     assert "Download summary CSV" in source
     assert "Download detailed field-results CSV" in source
     assert "Download extracted application data CSV" in source
+    assert "Open original application" in source
 
 
 def test_pdf_and_zip_intake_treat_each_pdf_as_own_package(sample_bytes: dict[str, bytes]) -> None:

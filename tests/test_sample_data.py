@@ -34,7 +34,7 @@ def test_expected_status_set_is_complete() -> None:
 def test_sample_corpus_includes_color_artwork_ocr_cases() -> None:
     specs = sample_specs()
     artwork_specs = [spec for spec in specs if spec.artwork_label]
-    assert len(artwork_specs) >= 24
+    assert len(artwork_specs) >= 30
     assert any(spec.expected_status == STATUS_PASS for spec in artwork_specs)
     assert any(spec.expected_status == STATUS_FAIL for spec in artwork_specs)
     assert any(spec.expected_status == STATUS_REVIEW for spec in artwork_specs)
@@ -51,6 +51,12 @@ def test_sample_corpus_includes_color_artwork_ocr_cases() -> None:
         "photo-low-contrast",
         "ornate",
         "micro-warning",
+        "metallic-foil",
+        "dense-illustration",
+        "stylized",
+        "curved-distorted",
+        "embossed",
+        "glare",
     } <= artwork_styles
 
 
@@ -204,6 +210,12 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert "APP-190_tequila_barrel_aged_beer_pass.pdf" in specs
     assert "APP-191_split_front_back_panels_pass.pdf" in specs
     assert "APP-192_split_panel_conflicting_abv_review.pdf" in specs
+    assert "APP-193_metallic_foil_artwork_pass.pdf" in specs
+    assert "APP-194_dense_illustration_artwork_review.pdf" in specs
+    assert "APP-195_stylized_font_artwork_pass.pdf" in specs
+    assert "APP-196_curved_distorted_text_review.pdf" in specs
+    assert "APP-197_embossed_low_contrast_review.pdf" in specs
+    assert "APP-198_partial_glare_scan_review.pdf" in specs
     assert specs["APP-023_no_formula_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].include_formula_approval is False
     assert specs["APP-120_formula_not_required_pass.pdf"].fields["formula"] == "FORMULA NOT REQUIRED"
@@ -537,6 +549,18 @@ def test_sample_corpus_includes_required_field_and_formula_edge_cases() -> None:
     assert specs["APP-192_split_panel_conflicting_abv_review.pdf"].split_panel_label is True
     assert "Alcohol: 40% by Volume" in specs["APP-192_split_panel_conflicting_abv_review.pdf"].label_lines
     assert specs["APP-192_split_panel_conflicting_abv_review.pdf"].expected_status == STATUS_REVIEW
+    assert specs["APP-193_metallic_foil_artwork_pass.pdf"].artwork_style == "metallic-foil"
+    assert specs["APP-193_metallic_foil_artwork_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-194_dense_illustration_artwork_review.pdf"].artwork_style == "dense-illustration"
+    assert specs["APP-194_dense_illustration_artwork_review.pdf"].expected_status == STATUS_REVIEW
+    assert specs["APP-195_stylized_font_artwork_pass.pdf"].artwork_style == "stylized"
+    assert specs["APP-195_stylized_font_artwork_pass.pdf"].expected_status == STATUS_PASS
+    assert specs["APP-196_curved_distorted_text_review.pdf"].artwork_style == "curved-distorted"
+    assert specs["APP-196_curved_distorted_text_review.pdf"].expected_status == STATUS_REVIEW
+    assert specs["APP-197_embossed_low_contrast_review.pdf"].artwork_style == "embossed"
+    assert specs["APP-197_embossed_low_contrast_review.pdf"].expected_status == STATUS_REVIEW
+    assert specs["APP-198_partial_glare_scan_review.pdf"].artwork_style == "glare"
+    assert specs["APP-198_partial_glare_scan_review.pdf"].expected_status == STATUS_REVIEW
     assert specs["APP-115_sake_wine_class_pass.pdf"].fields["class_type"] == "Sake"
     assert specs["APP-115_sake_wine_class_pass.pdf"].expected_status == STATUS_PASS
     assert specs["APP-116_vermouth_wine_class_pass.pdf"].fields["class_type"] == "Vermouth"

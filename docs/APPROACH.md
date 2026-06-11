@@ -13,7 +13,7 @@ The main modules are:
 - `src/normalize.py`: text, brand, ABV/proof, net contents, product type, and warning normalization.
 - `src/verifier.py`: field checks and overall Pass / Needs Review / Fail aggregation.
 - `src/batch.py`: batch orchestration and CSV-ready dataframes.
-- `src/sample_data.py`: deterministic sample application package generation, including color-artwork labels and split front/back panel fixtures.
+- `src/sample_data.py`: deterministic sample application package generation, including color-artwork labels, split front/back panel fixtures, and harder field-realistic artwork/OCR fixtures.
 
 See `docs/TOOLS_USED.md` for the implementation, OCR, test, and deployment toolchain.
 
@@ -86,7 +86,7 @@ The app avoids full-document OCR unless necessary:
 - Current source-form checkbox widgets and visible checkbox marks are checked before OCR is trusted for checkbox-only values.
 - Only mapped page-one regions and candidate label areas are rendered.
 - Unreadable scanned attachment pages do not downgrade the result when a later supplemental label page is readable.
-- Label OCR tries conservative adaptive-threshold, grayscale, contrast, and Otsu-preprocessed variants, then keeps the strongest local Tesseract result. This improves colored artwork, crest-style/logo-like artwork, ornate overprint-style artwork, textured and photo-like backgrounds, dark/reversed text, and colored warning panels without making network calls. Required elements may be spread across front and back label panels, so readable text from the full affixed label area is treated as one label package. Tiny or low-quality warning text that cannot be read reliably is routed to Needs Review with an OCR-quality reason.
+- Label OCR tries conservative adaptive-threshold, grayscale, contrast, and Otsu-preprocessed variants, then keeps the strongest local Tesseract result. This improves colored artwork, crest-style/logo-like artwork, metallic-foil effects, ornate overprint-style artwork, textured and photo-like backgrounds, dark/reversed text, colored warning panels, and readable stylized fonts without making network calls. Required elements may be spread across front and back label panels, so readable text from the full affixed label area is treated as one label package. Dense illustrations behind required text, curved/distorted text, low-contrast embossed text, partial glare/scanning artifacts, and tiny or low-quality warning text that cannot be read reliably are routed to Needs Review with an OCR-quality reason.
 - Results are cached by intake type plus file hash during the Streamlit session, so identical bytes uploaded as different file types still take the correct PDF/image/ZIP processing path.
 
 On clean text-layer PDFs and generated samples, processing is typically well under the 5-second target per application. Scanned images, scanned PDFs, and rotated raster labels depend on local Tesseract speed and image quality.

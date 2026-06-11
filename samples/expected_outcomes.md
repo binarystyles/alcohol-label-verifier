@@ -194,5 +194,11 @@
 | `APP-190_tequila_barrel_aged_beer_pass.pdf` | Pass | Pass | A descriptor-first barrel-aged beer statement should verify as a malt beverage without being misread as distilled spirits because it contains Tequila. |
 | `APP-191_split_front_back_panels_pass.pdf` | Pass | Pass | Required label elements split across front and back panels should verify as one self-contained label package. |
 | `APP-192_split_panel_conflicting_abv_review.pdf` | Needs Review | Needs Review | Conflicting front/back panel alcohol-content statements should require review instead of passing on the closest matching value. |
+| `APP-193_metallic_foil_artwork_pass.pdf` | Pass | Needs Review | Readable metallic-foil style artwork should still verify when required text has adequate contrast. |
+| `APP-194_dense_illustration_artwork_review.pdf` | Needs Review | Needs Review | Dense illustration behind required text can interfere with OCR and should require review instead of a confident field failure. |
+| `APP-195_stylized_font_artwork_pass.pdf` | Pass | Needs Review | Readable stylized serif label type should still verify when the required text remains clear. |
+| `APP-196_curved_distorted_text_review.pdf` | Needs Review | Needs Review | Curved and distorted required text should require review for OCR/legibility rather than a confident field failure. |
+| `APP-197_embossed_low_contrast_review.pdf` | Needs Review | Needs Review | Low-contrast embossed text should require review for OCR/legibility rather than a confident field failure. |
+| `APP-198_partial_glare_scan_review.pdf` | Needs Review | Needs Review | Partial glare and scan artifacts over required label text should require review for OCR/legibility. |
 
 These PDFs are synthetic completed applications. When `docs/source/f510031.pdf` is available locally, the generator fills the real TTB form template. Otherwise it falls back to a controlled TTB-like one-page layout.

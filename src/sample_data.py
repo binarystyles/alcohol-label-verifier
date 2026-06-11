@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from io import BytesIO
+import math
 from pathlib import Path
 import re
 import zipfile
@@ -19,6 +20,7 @@ SAMPLE_DIR = Path("samples/applications")
 SOURCE_FORM = Path("docs/source/f510031.pdf")
 SOURCE_LABEL_RECT = (24.6108, 681.248, 589.351, 979.0804)
 FONT_CANDIDATES = ("arial.ttf", "DejaVuSans.ttf")
+SERIF_FONT_CANDIDATES = ("Georgia.ttf", "Times New Roman.ttf", "DejaVuSerif-Bold.ttf", "DejaVuSerif.ttf", *FONT_CANDIDATES)
 
 
 @dataclass(frozen=True)
@@ -3779,6 +3781,65 @@ def sample_specs() -> list[SampleSpec]:
             note="Conflicting front/back panel alcohol-content statements should require review instead of passing on the closest matching value.",
             split_panel_label=True,
         ),
+        SampleSpec(
+            filename="APP-193_metallic_foil_artwork_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-193", "formula": "F-19300"},
+            label_lines=good_label,
+            expected_status="Pass",
+            note="Readable metallic-foil style artwork should still verify when required text has adequate contrast.",
+            artwork_label=True,
+            artwork_style="metallic-foil",
+            expected_status_without_ocr="Needs Review",
+        ),
+        SampleSpec(
+            filename="APP-194_dense_illustration_artwork_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-194", "formula": "F-19400"},
+            label_lines=good_label,
+            expected_status="Needs Review",
+            note="Dense illustration behind required text can interfere with OCR and should require review instead of a confident field failure.",
+            artwork_label=True,
+            artwork_style="dense-illustration",
+        ),
+        SampleSpec(
+            filename="APP-195_stylized_font_artwork_pass.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-195", "formula": "F-19500"},
+            label_lines=good_label,
+            expected_status="Pass",
+            note="Readable stylized serif label type should still verify when the required text remains clear.",
+            artwork_label=True,
+            artwork_style="stylized",
+            expected_status_without_ocr="Needs Review",
+        ),
+        SampleSpec(
+            filename="APP-196_curved_distorted_text_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-196", "formula": "F-19600"},
+            label_lines=good_label,
+            expected_status="Needs Review",
+            note="Curved and distorted required text should require review for OCR/legibility rather than a confident field failure.",
+            artwork_label=True,
+            raster_label=True,
+            artwork_style="curved-distorted",
+        ),
+        SampleSpec(
+            filename="APP-197_embossed_low_contrast_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-197", "formula": "F-19700"},
+            label_lines=good_label,
+            expected_status="Needs Review",
+            note="Low-contrast embossed text should require review for OCR/legibility rather than a confident field failure.",
+            artwork_label=True,
+            raster_label=True,
+            artwork_style="embossed",
+        ),
+        SampleSpec(
+            filename="APP-198_partial_glare_scan_review.pdf",
+            fields={**BASE_FIELDS, "serial_number": "APP-198", "formula": "F-19800"},
+            label_lines=good_label,
+            expected_status="Needs Review",
+            note="Partial glare and scan artifacts over required label text should require review for OCR/legibility.",
+            artwork_label=True,
+            raster_label=True,
+            artwork_style="glare",
+        ),
     ]
 
 
@@ -4233,20 +4294,27 @@ def _draw_artwork_label(page: fitz.Page, label_lines: list[str], *, low_quality:
     image = Image.new("RGB", (width, height), palette["background"])
     draw = ImageDraw.Draw(image)
 
-    title_font = _load_font(96)
-    subtitle_font = _load_font(54)
-    body_font = _load_font(44)
-    warning_font = _load_font(18 if style == "micro-warning" else 34)
+    font_candidates = SERIF_FONT_CANDIDATES if style == "stylized" else FONT_CANDIDATES
+    title_font = _load_font(102 if style == "stylized" else 96, font_candidates)
+    subtitle_font = _load_font(58 if style == "stylized" else 54, font_candidates)
+    body_font = _load_font(46 if style == "stylized" else 44, font_candidates)
+    warning_font = _load_font(18 if style == "micro-warning" else 34, FONT_CANDIDATES)
 
     _draw_artwork_background(draw, width, height, palette, style)
 
-    _draw_centered(draw, title, title_font, width // 2, 78, palette["text"])
+    if style == "embossed":
+        _draw_embossed_centered(draw, title, title_font, width // 2, 78, palette["text"])
+    else:
+        _draw_centered(draw, title, title_font, width // 2, 78, palette["text"])
     y = 238
     for index, line in enumerate(label_lines[1:]):
         if _looks_like_warning_line(line):
             continue
         font = subtitle_font if index == 0 else body_font
-        _draw_centered(draw, line, font, width // 2, y, palette["text"])
+        if style == "embossed":
+            _draw_embossed_centered(draw, line, font, width // 2, y, palette["text"])
+        else:
+            _draw_centered(draw, line, font, width // 2, y, palette["text"])
         y += 70 if index == 0 else 56
 
     warning = next((line for line in label_lines if _looks_like_warning_line(line)), "")
@@ -4257,13 +4325,22 @@ def _draw_artwork_label(page: fitz.Page, label_lines: list[str], *, low_quality:
             else (118, height - 282, width - 118, height - 44)
         )
         draw.rectangle(warning_box, fill=palette["warning_panel"])
-        draw.multiline_text(
-            (warning_box[0] + 26, warning_box[1] + 16),
-            _wrap(warning, 118 if style == "micro-warning" else 76),
-            fill=palette.get("warning_text", palette["text"]),
-            font=warning_font,
-            spacing=6,
-        )
+        warning_text = _wrap(warning, 118 if style == "micro-warning" else 76)
+        if style == "embossed":
+            _draw_embossed_multiline(draw, warning_text, (warning_box[0] + 26, warning_box[1] + 16), warning_font, palette["text"])
+        else:
+            draw.multiline_text(
+                (warning_box[0] + 26, warning_box[1] + 16),
+                warning_text,
+                fill=palette.get("warning_text", palette["text"]),
+                font=warning_font,
+                spacing=6,
+            )
+
+    if style == "curved-distorted":
+        image = _apply_curved_distortion(image)
+    elif style == "glare":
+        _apply_glare_artifacts(image)
 
     if low_quality:
         image = image.resize((width // 2, height // 2), Image.Resampling.BILINEAR)
@@ -4275,8 +4352,8 @@ def _draw_artwork_label(page: fitz.Page, label_lines: list[str], *, low_quality:
     page.insert_image(label_rect, stream=buffer.getvalue(), keep_proportion=True)
 
 
-def _load_font(size: int) -> ImageFont.ImageFont:
-    for font_name in FONT_CANDIDATES:
+def _load_font(size: int, candidates: tuple[str, ...] = FONT_CANDIDATES) -> ImageFont.ImageFont:
+    for font_name in candidates:
         try:
             return ImageFont.truetype(font_name, size)
         except OSError:
@@ -4337,6 +4414,38 @@ def _draw_artwork_background(
             draw.line((center_x, 344, center_x, 650), fill=palette["accent3"], width=4)
             draw.ellipse((center_x - 80, 420, center_x - 8, 486), outline=palette["accent"], width=4)
             draw.ellipse((center_x + 8, 482, center_x + 80, 548), outline=palette["accent2"], width=4)
+    elif style == "metallic-foil":
+        for index in range(-240, width, 96):
+            color = palette["accent"] if index % 192 == 0 else palette["accent2"]
+            draw.polygon([(index, 118), (index + 54, 118), (index + 310, height - 18), (index + 236, height - 18)], fill=color)
+        for index in range(24):
+            x = 90 + (index * 191) % (width - 180)
+            y = 160 + (index * 73) % (height - 260)
+            draw.line((x - 28, y, x + 28, y), fill=palette["accent3"], width=4)
+            draw.line((x, y - 28, x, y + 28), fill=palette["accent3"], width=4)
+    elif style == "dense-illustration":
+        colors = [palette["accent"], palette["accent2"], palette["accent3"], palette["border"]]
+        for index in range(34):
+            x = 70 + (index * 157) % (width - 140)
+            y = 145 + (index * 91) % (height - 250)
+            points = [
+                (x, y - 52),
+                (x + 48, y - 12),
+                (x + 30, y + 48),
+                (x - 36, y + 44),
+                (x - 52, y - 20),
+            ]
+            draw.polygon(points, outline=colors[index % len(colors)], fill=colors[(index + 1) % len(colors)])
+        for index in range(22):
+            x0 = 85 + (index * 211) % (width - 250)
+            y0 = 182 + (index * 67) % (height - 340)
+            draw.arc((x0, y0, x0 + 210, y0 + 160), 20, 320, fill=colors[index % len(colors)], width=6)
+    elif style in {"curved-distorted", "embossed", "glare"}:
+        for index in range(0, width, 86):
+            draw.line((index, 122, index + height // 2, height - 18), fill=palette["accent"], width=4)
+        for index in range(12):
+            x0 = 80 + index * 172
+            draw.ellipse((x0, 220, x0 + 112, 332), outline=palette["accent2"], width=6)
     elif style in {"photo", "photo-low-contrast"}:
         sky = palette["accent"]
         ground = palette["accent2"]
@@ -4371,11 +4480,92 @@ def _draw_artwork_background(
         draw.rectangle((105, 62, width - 105, 188), fill=palette["panel"], outline=palette["border"], width=4)
         draw.rectangle((140, 220, width - 140, height - 190), fill=palette["panel"], outline=palette["border"], width=3)
 
+    if style == "metallic-foil":
+        for index in range(14):
+            y = 82 + index * 36
+            draw.line((128, y, width - 128, y + ((index % 3) - 1) * 18), fill=palette["accent3"], width=3)
+    elif style == "dense-illustration":
+        for index in range(20):
+            x0 = 175 + (index * 137) % (width - 350)
+            y0 = 254 + (index * 49) % (height - 500)
+            draw.rectangle((x0, y0, x0 + 112, y0 + 44), outline=palette["accent3"], width=4)
+        for index in range(18):
+            x0 = 210 + (index * 173) % (width - 420)
+            y0 = 302 + (index * 59) % (height - 570)
+            draw.line((x0, y0, x0 + 170, y0 + 56), fill=palette["accent"], width=3)
+
 
 def _draw_centered(draw: ImageDraw.ImageDraw, text: str, font: ImageFont.ImageFont, center_x: int, y: int, fill: tuple[int, int, int]) -> None:
     bbox = draw.textbbox((0, 0), text, font=font)
     x = center_x - (bbox[2] - bbox[0]) // 2
     draw.text((x, y), text, fill=fill, font=font)
+
+
+def _draw_embossed_centered(
+    draw: ImageDraw.ImageDraw,
+    text: str,
+    font: ImageFont.ImageFont,
+    center_x: int,
+    y: int,
+    fill: tuple[int, int, int],
+) -> None:
+    bbox = draw.textbbox((0, 0), text, font=font)
+    x = center_x - (bbox[2] - bbox[0]) // 2
+    _draw_embossed_text(draw, (x, y), text, font, fill)
+
+
+def _draw_embossed_multiline(
+    draw: ImageDraw.ImageDraw,
+    text: str,
+    xy: tuple[int, int],
+    font: ImageFont.ImageFont,
+    fill: tuple[int, int, int],
+) -> None:
+    x, y = xy
+    for line in text.splitlines():
+        _draw_embossed_text(draw, (x, y), line, font, fill)
+        y += int(font.size * 1.35) if hasattr(font, "size") else 22
+
+
+def _draw_embossed_text(
+    draw: ImageDraw.ImageDraw,
+    xy: tuple[int, int],
+    text: str,
+    font: ImageFont.ImageFont,
+    fill: tuple[int, int, int],
+) -> None:
+    x, y = xy
+    draw.text((x - 2, y - 2), text, fill=(244, 244, 236), font=font)
+    draw.text((x + 3, y + 3), text, fill=(118, 118, 110), font=font)
+    draw.text((x, y), text, fill=fill, font=font)
+
+
+def _apply_curved_distortion(image: Image.Image) -> Image.Image:
+    source = image.convert("RGB")
+    output = Image.new("RGB", source.size, (255, 255, 255))
+    width, height = source.size
+    for y in range(height):
+        offset = int(24 * math.sin(y / 34.0) + 10 * math.sin(y / 11.0))
+        row = source.crop((0, y, width, y + 1))
+        output.paste(row, (offset, y))
+        if offset > 0:
+            output.paste(row.crop((0, 0, offset, 1)), (0, y))
+        elif offset < 0:
+            output.paste(row.crop((width + offset, 0, width, 1)), (width + offset, y))
+    return output.rotate(-4, expand=True, fillcolor=(255, 255, 255))
+
+
+def _apply_glare_artifacts(image: Image.Image) -> None:
+    overlay = Image.new("RGBA", image.size, (0, 0, 0, 0))
+    draw = ImageDraw.Draw(overlay)
+    width, height = image.size
+    draw.polygon(
+        [(width * 0.46, 30), (width * 0.73, 30), (width * 0.55, height - 34), (width * 0.28, height - 34)],
+        fill=(255, 255, 255, 172),
+    )
+    draw.rectangle((width * 0.1, height * 0.59, width * 0.9, height * 0.77), fill=(255, 255, 255, 118))
+    draw.line((0, height * 0.42, width, height * 0.48), fill=(255, 255, 255, 160), width=20)
+    image.paste(overlay.convert("RGB"), mask=overlay.split()[3])
 
 
 def _artwork_palette(seed: str, *, style: str = "geometric") -> dict[str, tuple[int, int, int]]:
@@ -4494,6 +4684,81 @@ def _artwork_palette(seed: str, *, style: str = "geometric") -> dict[str, tuple[
             "text": (20, 30, 43),
             "warning_panel": (247, 248, 244),
             "warning_text": (112, 119, 126),
+        }
+    if style == "metallic-foil":
+        return {
+            "background": (232, 226, 214),
+            "band": (45, 50, 58),
+            "band_text": (255, 251, 235),
+            "panel": (255, 252, 242),
+            "accent": (204, 178, 95),
+            "accent2": (239, 220, 146),
+            "accent3": (255, 245, 198),
+            "border": (58, 54, 48),
+            "text": (20, 22, 26),
+            "warning_panel": (255, 252, 242),
+        }
+    if style == "dense-illustration":
+        return {
+            "background": (230, 237, 232),
+            "band": (31, 83, 93),
+            "band_text": (255, 255, 248),
+            "panel": (255, 254, 246),
+            "accent": (205, 127, 76),
+            "accent2": (72, 130, 142),
+            "accent3": (216, 185, 94),
+            "border": (35, 59, 64),
+            "text": (20, 27, 31),
+            "warning_panel": (255, 254, 246),
+        }
+    if style == "stylized":
+        return {
+            "background": (242, 238, 228),
+            "band": (82, 42, 64),
+            "band_text": (255, 252, 246),
+            "panel": (255, 253, 244),
+            "accent": (210, 179, 108),
+            "accent2": (95, 132, 125),
+            "border": (74, 43, 60),
+            "text": (35, 23, 31),
+            "warning_panel": (255, 253, 244),
+        }
+    if style == "curved-distorted":
+        return {
+            "background": (234, 236, 231),
+            "band": (46, 78, 89),
+            "band_text": (255, 255, 248),
+            "panel": (248, 248, 240),
+            "accent": (198, 206, 196),
+            "accent2": (178, 190, 184),
+            "border": (70, 82, 78),
+            "text": (45, 48, 44),
+            "warning_panel": (248, 248, 240),
+        }
+    if style == "embossed":
+        return {
+            "background": (225, 224, 214),
+            "band": (188, 188, 178),
+            "band_text": (236, 236, 228),
+            "panel": (226, 226, 216),
+            "accent": (211, 211, 201),
+            "accent2": (198, 199, 190),
+            "border": (164, 166, 158),
+            "text": (142, 142, 134),
+            "warning_panel": (226, 226, 216),
+            "warning_text": (142, 142, 134),
+        }
+    if style == "glare":
+        return {
+            "background": (232, 238, 243),
+            "band": (42, 70, 105),
+            "band_text": (255, 255, 255),
+            "panel": (250, 250, 246),
+            "accent": (200, 218, 230),
+            "accent2": (180, 195, 208),
+            "border": (55, 68, 82),
+            "text": (24, 31, 39),
+            "warning_panel": (250, 250, 246),
         }
     palettes = [
         {
